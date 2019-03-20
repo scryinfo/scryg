@@ -1,4 +1,4 @@
-module github.com/scryinfo/scryg
+module github.com/scryInfo/scryg
 
 go 1.12
 
