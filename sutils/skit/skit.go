@@ -1,10 +1,12 @@
 package skit
 
 import (
+	"fmt"
 	"reflect"
 )
 
 func IsNil(any interface{}) bool {
+	fmt.Println()
 	re := false
 	if any != nil {
 		v := reflect.ValueOf(any)
@@ -13,6 +15,7 @@ func IsNil(any interface{}) bool {
 			re = v.IsNil()
 			if !re {
 				for {
+					fmt.Println(v.Type())
 					v2 := v.Elem()
 					if v2.Kind() != reflect.Ptr && v2.Kind() != reflect.Interface {
 						break
