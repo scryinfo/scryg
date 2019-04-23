@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 )
-
+//检查interface最终指向的对象是否为空
 func IsNil(any interface{}) bool {
 	fmt.Println()
 	re := false
@@ -15,7 +15,7 @@ func IsNil(any interface{}) bool {
 			re = v.IsNil()
 			if !re {
 				for {
-					fmt.Println(v.Type())
+					//fmt.Println(v.Type())
 					v2 := v.Elem()
 					if v2.Kind() != reflect.Ptr && v2.Kind() != reflect.Interface {
 						break
@@ -33,8 +33,22 @@ func IsNil(any interface{}) bool {
 	return re
 }
 
+
+//返回t最终的类型（非指针，非interface）
+//todo test it
 func RealType(t interface{}) (ty reflect.Type) {
 	ty = nil
-	//tt := reflect.TypeOf(t)
+	v := reflect.ValueOf(t)
+	if !v.IsNil() {
+		if v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface {
+			for {
+				v = v.Elem()
+				if (v.Kind() != reflect.Ptr && v.Kind() != reflect.Interface) || v.IsNil() {
+					break
+				}
+			}
+		}
+	}
+	ty = v.Type()
 	return
 }
