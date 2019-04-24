@@ -55,9 +55,9 @@ func RealType(t interface{}) (ty reflect.Type) {
 	return
 }
 
-//只支持指针与interface类的字段
+//只支持指针与interface类型的字段
 //field 是指针或interface类型
-//newW是对应的类型
+//newValue是对应的类型
 // 代码依赖于 reflect.Value中存放指针的字段名为 “ptr”
 func SetPrivateField(field *reflect.Value, newValue interface{}) error {
 
@@ -71,7 +71,7 @@ func SetPrivateField(field *reflect.Value, newValue interface{}) error {
 		if field.Kind() == reflect.Ptr { //指针
 			fpp := ((**uintptr)(unsafe.Pointer(field.Addr().Pointer()))) //得到字段的地址, 转换为指指针
 			vf2 := reflect.ValueOf(newValue)
-			if vf2.Kind() != reflect.Ptr {
+			if vf2.Kind() != reflect.Ptr || (!vf2.Type().AssignableTo(field.Type())) {
 				err = errors.New("new value is not pointer")
 				break
 			}
