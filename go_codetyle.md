@@ -15,7 +15,7 @@
 11. 如果要使用使用全局变量，给出足够的理由，因为它很难测试
 12. 参考Effective Go中的建议  https://golang.org/doc/effective_go.html
 
-## Name
+## Name 
 
 1. 所有源代码文件名，使用小写，加下划线
 2. 所有目录文件名，使用小写，加下划线
