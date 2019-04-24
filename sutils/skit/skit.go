@@ -70,7 +70,7 @@ func SetPrivateField(field *reflect.Value, newValue interface{}) error {
 
 		if field.Kind() == reflect.Ptr { //指针
 			fpp := ((**uintptr)(unsafe.Pointer(field.Addr().Pointer()))) //得到字段的地址, 转换为指指针
-			vf2 := reflect.ValueOf(newValue).Elem()
+			vf2 := reflect.ValueOf(newValue)
 			if vf2.Kind() != reflect.Ptr {
 				err = errors.New("new value is not pointer")
 				break
@@ -84,14 +84,14 @@ func SetPrivateField(field *reflect.Value, newValue interface{}) error {
 			fpp := ((*interface{})(unsafe.Pointer(field.Addr().Pointer())))
 
 			//{ // 方式一，需要在编译时确定interface的类型
-			//	var t2 Inter2 = &Inter2Imp{F: 20}
+			//	var t2 sampleInterface = &sampleImp{F: 20}
 			//	fp2 := (*interface{})(unsafe.Pointer(&t2))
 			//	*fpp = *fp2
 			//}
 			{ // 方式二，通用使用反射实现
 
 				vf2 := reflect.ValueOf(newValue)
-				if vf2.Kind() != reflect.Interface {
+				if vf2.Elem().Type().AssignableTo(field.Type()) {
 					err = errors.New("new value is not interface")
 					break
 				}
