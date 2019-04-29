@@ -29,7 +29,15 @@
 1. 不要定义interface的指针，它本身就是一个胖指针  
 引用类型一般实现 value method，值类型一般实现pointer method
 
-2. for range 中是复制，所以避免不必要的复制，可以使用索引来遍历
+2. for i, v := range str { // code block } 中v是复制，所以避免不必要的复制，可以只使用i来遍历；值得注意的是，在code block中对i的修改会在下一轮循环前被重置。
+e.g.
+str := "abc.def"
+for i := range str {
+	if str[i] == '.' {
+		i += 2
+	}
+	fmt.Println(i, string(str[i]))
+}
 3. 在循环中，使用匿名函数（也称闭包）时，如果使用到循环变量，一定要注意，循环变量只有一份实例，他会一直接变化。如果需要记录下来当前的值或索引等，请另外定义变量
 4. defer 是在函数退出前运行的
 5. 使用recover来捕获panic时，只能捕获当前 goroutine的panic
@@ -114,6 +122,17 @@ tt4 return : 2
 defer tt5 12
 tt5 return : 13
 ```
+一个没什么用，但是挺有意思的地方：如果defer后面只有一条语句，则其中的变量会立刻被赋值；如果defer后面是一个函数，则其中的变量会在执行时才被赋值。
+e.g.
+func main() {
+	var a int
+	defer fmt.Println("Print a in defer : ", a)
+	defer func() {
+		fmt.Println("Print a in deferf: ", a)
+	}()
+	a++
+	fmt.Println("Print a in main  : ", a)
+}
 14. 无法取map的value的地址，原因是它在变化
 15. go的参数传递，全部分都是值传递（不支持引用传递的，少数语言如C++，C#是支持的）   
     进入函数的参数都是一个副本，对于指针，是使用一副本来存放指针的地址，指针所指向的对象 并没有产生副本，对于引用类型（go中的每一种引用类型，都有各自的实现，引用类型其实是指针），也与指针类似，引用的对象不会产生副本，副本只是这个引用（具体是引用实现的struct的副本，还是只是一个指针的副本或其它，没有研究过）
