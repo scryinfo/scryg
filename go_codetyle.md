@@ -13,7 +13,9 @@
 9. 重要调用都需要写入 info日志
 10. 验证开发中的代码时，使用单元测试；在研究一项目技术实现等使用demo
 11. 如果要使用使用全局变量，给出足够的理由，因为它很难测试
-12. 参考Effective Go中的建议  https://golang.org/doc/effective_go.html
+12. 通用的小功能，经过讨论后写入 scryg 中
+13. 提交代码的要求， 说明 格式化 编译通过，如果提交编译不通过的代码需要有特别的理由
+14. 参考Effective Go中的建议  https://golang.org/doc/effective_go.html
 
 ## Name 
 
@@ -24,6 +26,8 @@
 ## 目录文件
 1. 单元测试与源代码文件放在同一目录下面，如代码文件为 “server.go”，单元测试文件为 “server_test.go”
 2. 所有的demo放入“ 仓库名/demo ” 目录中
+3. 如果是框架或基础库项目，需要“仓库名/sample”
+4. 所有项目使用包管理结构
 
 ## 代码
 1. 不要定义interface的指针，它本身就是一个胖指针  
@@ -184,7 +188,7 @@ func IsNil(any interface{}) bool {
 ```
 
 19. interface为nil与不为nil时的typeof是不相同的
-   typeof(nilInterface) != typeof(notNilInterface)
+      typeof(nilInterface) != typeof(notNilInterface)
 20. slice copy, 如果size太小（不是容量），那么最多只复制size的内容，不会出错
 21. 如果需要slice 的append不改变指针，那么可以可以slice以足够大的容量，让他不重新分配新的slice
 22. 判断两个函数签名相同 ConvertibleTo AssignableTo
@@ -192,7 +196,6 @@ func IsNil(any interface{}) bool {
     
 24. mod管理在依赖第三方包时，要指定依赖的版本，如果直接依赖于master请说明充分的理由
 
-    
 25. interface值内部是（value，type），所以保存了nil值得接口本身并不为nil。
 26. Go语言自增只有：i++，++i或者a=i++编译器报错。
 27. 已经声明的变量v可以出现在”:=”声明中的条件：
