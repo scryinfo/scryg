@@ -26,6 +26,8 @@ func IsNil(any interface{}) bool {
 			}
 
 		}
+	} else {
+		re = true
 	}
 	return re
 }
