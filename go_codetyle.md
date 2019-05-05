@@ -142,6 +142,7 @@ tt5 return : 13
 ```
 一个没什么用，但是挺有意思的地方：如果defer后面只有一条语句，则其中的变量会立刻被赋值；如果defer后面是一个函数，则其中的变量会在执行时才被赋值。
 
+``` go
 func main() {
 	var a int
 	defer fmt.Println("Print a in defer : ", a)
@@ -151,6 +152,9 @@ func main() {
 	a++
 	fmt.Println("Print a in main  : ", a)
 }
+```
+
+
 
 14. 无法取map的value的地址，原因是它在变化
 15. go的参数传递，全部分都是值传递（不支持引用传递的，少数语言如C++，C#是支持的）   
