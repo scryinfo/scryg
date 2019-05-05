@@ -3,7 +3,7 @@
 ## 规则
 
 1. 功能完成，不是在自己电脑上能运行，是要整个项目能正常运行部署
-2. 把问题拿出，不要把它遗忘在开发的过程中，在代码中加入 todo 说明
+2. 把问题拿出，不要把它遗忘在开发的过程中，在代码中加入 todo 说明，添加到github的issues
 3. 先思考后写代码，从命名开始
 4. 处理每一个error，并记录到日志中
 5. 处理所有分支，特别出现的异常分支（如，不应该出现的数据等，写入error日志）
@@ -34,29 +34,41 @@
 引用类型一般实现 value method，值类型一般实现pointer method
 
 2. for i, v := range str { // code block } 中v是复制，所以避免不必要的复制，可以只使用i来遍历；值得注意的是，在code block中对i的修改会在下一轮循环前被重置。
-e.g.
-str := "abc.def"
-for i := range str {
-	if str[i] == '.' {
-		i += 2
-	}
-	fmt.Println(i, string(str[i]))
-}
-3. 在循环中，使用匿名函数（也称闭包）时，如果使用到循环变量，一定要注意，循环变量只有一份实例，他会一直接变化。如果需要记录下来当前的值或索引等，请另外定义变量
+  ```go
+  str := "abc.def"
+  for i := range str {
+  if str[i] == '.' {
+  	i += 2
+  }
+  	fmt.Println(i, string(str[i]))
+  }
+  ```
+
+3. 在循环中，使用匿名函数（也称闭包）时，如果使用到循环变量，一定要注意，循环变量只有一份实例，每一个匿名函中都是“引用”的同一个变量。如果需要记录下来当前的值或索引等，请另外定义变量
+
 4. defer 是在函数退出前运行的
+
 5. recover:
     (1)使用recover来捕获panic时，只能捕获当前 goroutine的panic。
     (2)只有在defer函数的内部，调用recover才有用。
-6. 在使用append向slice增加内容时，如果容量没有超出，返回的地址还有原来的
+    
+6. 在使用append向slice增加内容时，如果容量没有超出容量，返回的地址还有原来的
+
 7. 在使用 "x, err := ..."时，如果与err在同一个｛｝内有同一变量，err不会新定义一个变量
+
 8. channel如果为空，使用它时，不是panic，而是直接卡死
+
 9. 读取已关闭的channel，可以正确读取到channel中的剩余值；如果channel为空，则会读取到该channel类型的空值，且v, ok := <- c中，ok为false
+
 10. 判断一个channel关闭的方法是 _, ok := <-c ，这个方法实际上是一个读取，如果channel中没有数它会wait，如果有数据会把它读取出来。在1.10的版本之前一直没有提供直接判断channel已关闭的方法
+
 11. type T int  与 type T = int是不一样的， 前一个定义一个新的类型，后一个定义int的一个别名
+
 12. 实现接口时，加上如下代码以确保实现接口的所有函数  
-var (
-	_ interfaceName     = (*interfaceImpl)(nil)
-)
+     var (
+     _ interfaceName     = (*interfaceImpl)(nil)
+     )
+
 13. return 和 defer 的执行顺序，see https://github.com/googege/blog/blob/master/go/go/important/README.md
 
 运行到return处，给返回值赋值，运行defer（defer之间是堆栈顺序，后进先出）。注意对返回值是否为同一变量（就是没有产生副本，是同一个），如果是那么在defer中的修改会影响到最后的返回值，下面是两个特殊的例子（更具体的内容参见网页）
@@ -129,7 +141,7 @@ defer tt5 12
 tt5 return : 13
 ```
 一个没什么用，但是挺有意思的地方：如果defer后面只有一条语句，则其中的变量会立刻被赋值；如果defer后面是一个函数，则其中的变量会在执行时才被赋值。
-e.g.
+
 func main() {
 	var a int
 	defer fmt.Println("Print a in defer : ", a)
@@ -139,6 +151,7 @@ func main() {
 	a++
 	fmt.Println("Print a in main  : ", a)
 }
+
 14. 无法取map的value的地址，原因是它在变化
 15. go的参数传递，全部分都是值传递（不支持引用传递的，少数语言如C++，C#是支持的）   
     进入函数的参数都是一个副本，对于指针，是使用一副本来存放指针的地址，指针所指向的对象 并没有产生副本，对于引用类型（go中的每一种引用类型，都有各自的实现，引用类型其实是指针），也与指针类似，引用的对象不会产生副本，副本只是这个引用（具体是引用实现的struct的副本，还是只是一个指针的副本或其它，没有研究过）
@@ -157,7 +170,7 @@ var a2 = make([]int, 0) //a2 是 []int 类型
     func Wrap(err error, message string) error //同时附加堆栈和信息
 
 18. 检查接口最终对象是否为空
-```
+```go
 func IsNil(any interface{}) bool {
 	fmt.Println()
 	re := false
