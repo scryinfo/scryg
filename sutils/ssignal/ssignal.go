@@ -8,6 +8,7 @@ import (
 //返回值表示是否再次等待信号，如果为true表示等待，为false表示不再等待
 type HandleSignal func(s os.Signal) bool
 
+// 如果handle为空或 handle的返回值为false，那么退出等待
 func WaitSignal(handle HandleSignal, sig ...os.Signal) {
 	c := make(chan os.Signal)
 	signal.Notify(c, sig...)
