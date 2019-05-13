@@ -59,7 +59,7 @@ for i := range str {
     (1)使用recover来捕获panic时，只能捕获当前 goroutine的panic。
     (2)只有在defer函数的内部，调用recover才有用。
 
-7. 在使用 "x, err := ..."时，如果与err在同一个｛｝内有同一变量，err不会新定义一个变量
+7. 在使用 "x, err := ..."时，如果与err在同一个｛｝内有同一变量（包括给出变量名的error类型返回值），err不会新定义一个变量
 
 8. channel如果为空，使用它时，不是panic，而是直接卡死
 
