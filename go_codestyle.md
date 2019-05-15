@@ -1,4 +1,4 @@
-# Code Style
+# Code Style -- go
 
 ## 规则
 

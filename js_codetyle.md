@@ -1,4 +1,4 @@
-# Code Style
+# Code Style -- js
 
 ## 规则
 
