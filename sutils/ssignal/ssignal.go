@@ -1,3 +1,6 @@
+// Scry Info.  All rights reserved.
+// license that can be found in the license.txt file.
+
 package ssignal
 
 import (
@@ -26,6 +29,7 @@ func WaitSignal(handle HandleSignal, sig ...os.Signal) {
 	}
 }
 
+// 等待程序终止信息 ctrl + c
 func WatiCtrlC(handle HandleSignal) {
 	WaitSignal(handle, os.Interrupt, os.Kill)
 }

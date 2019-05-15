@@ -28,7 +28,7 @@ func (c *sampleImp) Get() int {
 
 func TestSetPrivateField(t *testing.T) {
 
-	{//指针
+	{ //指针
 		st := &sampleT{fPtr: nil, fInterface: nil}
 		field := reflect.ValueOf(st).Elem().FieldByName("fPtr")
 
@@ -37,7 +37,7 @@ func TestSetPrivateField(t *testing.T) {
 			t.Error("pointer fail")
 		}
 	}
-	{//interface
+	{ //interface
 		st := &sampleT{fPtr: nil, fInterface: nil}
 		field := reflect.ValueOf(st).Elem().FieldByName("fInterface")
 		err := SetPrivateField(&field, &sampleImp{F: 15})

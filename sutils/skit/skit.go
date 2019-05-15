@@ -1,3 +1,6 @@
+// Scry Info.  All rights reserved.
+// license that can be found in the license.txt file.
+
 package skit
 
 import (
@@ -6,6 +9,7 @@ import (
 	"reflect"
 	"unsafe"
 )
+
 //检查interface最终指向的对象是否为空
 func IsNil(any interface{}) bool {
 	fmt.Println()
@@ -36,7 +40,6 @@ func IsNil(any interface{}) bool {
 	}
 	return re
 }
-
 
 //返回t最终的类型（非指针，非interface）
 //todo test it
@@ -98,7 +101,7 @@ func SetPrivateField(field *reflect.Value, newValue interface{}) error {
 					break
 				}
 
-				vf2 = vf2.Convert(field.Type()) //一定使用Convert 转换为字段的类型， 因为t2的中的类型 为interface{},  不是 Inter2类型
+				vf2 = vf2.Convert(field.Type())                //一定使用Convert 转换为字段的类型， 因为t2的中的类型 为interface{},  不是 Inter2类型
 				ptr := reflect.ValueOf(vf2).FieldByName("ptr") //通过反射取到 ptr的值， 这里不能使用Pointer，会panic，因为 t2不是指针类型
 				fp2 := (*interface{})(unsafe.Pointer(ptr.Pointer()))
 				*fpp = *fp2
