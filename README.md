@@ -1,7 +1,7 @@
 # scry base lib for golang
 
 ## scipher
-信封加密，使用RSS 与 AES
+信封加密，使用RSA 与 AES
 ## sfile
 判断文件是否存在
 ## skit
