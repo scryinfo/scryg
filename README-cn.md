@@ -1,6 +1,5 @@
-#README
-* [中文](./README-cn.md)
-* [EN](./README.md)
+[中文](./README-cn.md)  
+[EN](./README.md)  
 # scry base lib for golang
 
 ## scipher
