@@ -1,4 +1,8 @@
+
+[中文](./codestyle_go.md)  
+[한국어](./codestyle_go-ko.md)  
 # Code Style -- go
+
 SCRYINFO
 
 ## 规则
