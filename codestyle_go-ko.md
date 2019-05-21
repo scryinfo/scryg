@@ -6,7 +6,7 @@ SCRYINFO
 
 ## 규칙
 
-1. 소프트웨어 설계의 7가지 원칙을 준수
+1. 소프트웨어 설계의 6가지 원칙을 준수
 	1. 오픈-클로즈 원칙(Open-Closed Principle, OCP)
 	2. 리스코프 치환 원칙(Liskov Substitution Principle, 약자. LSP)
 	3. 의존성 뒤집기 원칙(Dependence Inversion Principle)
