@@ -181,33 +181,39 @@ func IsNil(any interface{}) bool {
 }
 ```
 
-19. interface为nil与不为nil时的typeof是不相同的
-      typeof(nilInterface) != typeof(notNilInterface)
-    
+19. interface与nil
+interface为nill时它的类型与指向的对象都为nil
+
+```go
+var inter1 interface{} = nil  // == nil
+var inter2 interface{} = (*int)(nil) // != nil 因为类型值不为nil
+fmt.Println(inter1 == nil)
+fmt.Println(inter2 == nil)
+//输出的结果为：
+true
+false
+```
+interface为nil与不为nil时的typeof是不相同的
+```go
+typeof(nilInterface) != typeof(notNilInterface)
+```
+
 20. slice copy, 如果size太小（不是容量），那么最多只复制size的内容，且不会出错
-
 21. 在使用append向slice增加内容时，如果size没有超出容量，不会重新分配sclice，也就是说原slice的地址不变
-
 22. slice中的两个冒号：对于v :=data\[ a : b : c\],a,b分别为上下界，c为容量  
-	产生slice副本的正确方法是： c := v\[:0:0\]
-
+    产生slice副本的正确方法是： c := v\[:0:0\]
 23. 判断两个函数签名相同 ConvertibleTo AssignableTo
-
 24. mod管理依赖包时，要指定依赖的版本，如果直接依赖于master请说明充分的理由
-
-27. 已经声明的变量v可以出现在”:=”声明中的条件：
+25. 已经声明的变量v可以出现在”:=”声明中的条件：
     (1)本次声明的v与已经声明的v处于同一个作用域中（如果v已经在外层作用域中声明过，则此次声明会创建一个新的变量）。
     (2)	初始化中与v的值的类型相同的值才能赋予v。
     (3)此次声明中至少有一个变量时新声明得。
-
-29. iota枚举器：
+26. iota枚举器：
     (1)iota常量自动生成器，每隔一行，自动累加1。
     (2)iota遇到const，重置为0。
     (3)可以只写一个iota，常量声明省略值时，默认和之前一个字面得值相同。
     (4)如果在同一行，值都一样。
     (5)iota被中断之后必须显式恢复。
-
-33. 常量表达式：除了移位运算符之外，如果二元运算符是不同类型的无类型常量，结果类型是靠后的一个。比如一个无类型的整数常量除以一个无类型的复数常量，结果是一个无类型的复数常量。
-
-34. fallthrough：强制执行switch匹配之后的case，但是它不会判断下一条case的表达式的结果是true或者false。并且fallthrough不能再type switch中使用。
+27. 常量表达式：除了移位运算符之外，如果二元运算符是不同类型的无类型常量，结果类型是靠后的一个。比如一个无类型的整数常量除以一个无类型的复数常量，结果是一个无类型的复数常量。
+28. fallthrough：强制执行switch匹配之后的case，但是它不会判断下一条case的表达式的结果是true或者false。并且fallthrough不能再type switch中使用。
 
