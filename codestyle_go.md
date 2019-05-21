@@ -60,7 +60,7 @@ for i := range str {
 
 9. 读取已关闭的channel，可以正确读取到channel中的剩余值；如果channel为空，则会读取到该channel类型的空值，且v, ok := <- c中，ok为false
 
-10. 判断一个channel关闭的方法是 _, ok := <-c ，注释它还读取了数据，如果channel中没有数它会wait。在1.10的版本之前一直没有提供直接判断channel已关闭的方法
+10. 判断一个channel关闭的方法是 _, ok := <-c ，注释它还读取了数据，如果channel中没有数它会wait（当然close的除外）。在1.10的版本之前一直没有提供直接判断channel已关闭的方法
 
 10. select：如果没有可运行的case语句，且没有default语句，select将阻塞，直到某个case通信可以运行
 
@@ -195,25 +195,71 @@ false
 ```
 interface为nil与不为nil时的typeof是不相同的
 ```go
-typeof(nilInterface) != typeof(notNilInterface)
+var err error = nil
+var err2 error = errors.New("")
+fmt.Println("err : ", reflect.TypeOf(err))
+fmt.Println("err2: ", reflect.TypeOf(err2))
+fmt.Println(reflect.TypeOf(err) == reflect.TypeOf(err2))
+//输出结果为：
+err :  <nil>
+err2:  *errors.errorString
+false
+
+//err 与 err2的类型都为 error类型，一个为nil值一个不为空， 这时他们的类型是不相同的
 ```
 
 20. slice copy, 如果size太小（不是容量），那么最多只复制size的内容，且不会出错
+
 21. 在使用append向slice增加内容时，如果size没有超出容量，不会重新分配sclice，也就是说原slice的地址不变
+
 22. slice中的两个冒号：对于v :=data\[ a : b : c\],a,b分别为上下界，c为容量  
     产生slice副本的正确方法是： c := v\[:0:0\]
+    
 23. 判断两个函数签名相同 ConvertibleTo AssignableTo
+
 24. mod管理依赖包时，要指定依赖的版本，如果直接依赖于master请说明充分的理由
+
 25. 已经声明的变量v可以出现在”:=”声明中的条件：
     (1)本次声明的v与已经声明的v处于同一个作用域中（如果v已经在外层作用域中声明过，则此次声明会创建一个新的变量）。
     (2)	初始化中与v的值的类型相同的值才能赋予v。
     (3)此次声明中至少有一个变量时新声明得。
+    
 26. iota枚举器：
     (1)iota常量自动生成器，每隔一行，自动累加1。
     (2)iota遇到const，重置为0。
     (3)可以只写一个iota，常量声明省略值时，默认和之前一个字面得值相同。
     (4)如果在同一行，值都一样。
     (5)iota被中断之后必须显式恢复。
+    
 27. 常量表达式：除了移位运算符之外，如果二元运算符是不同类型的无类型常量，结果类型是靠后的一个。比如一个无类型的整数常量除以一个无类型的复数常量，结果是一个无类型的复数常量。
+
 28. fallthrough：强制执行switch匹配之后的case，但是它不会判断下一条case的表达式的结果是true或者false。并且fallthrough不能再type switch中使用。
+
+29. 不要在struct中定义没有名字的接口(embedding interface)
+```go
+package main
+
+func main() {
+	Call()
+}
+
+type Hi interface {
+	HiName() string
+}
+type Hello struct {
+	Hi
+}
+
+func Call() {
+	hello := &Hello{}
+	hello.HiName()
+}
+```
+这段代码是可以编译通过的， 运行时panic。为什么没有实现接口 Hi 就编译通过了，因为嵌入struct中的Hi只是一个字段而已，且是没有名字的，完整调用这样的： hello.Hi.HiName()，hello.Hi的值为nil，所以运行时panic
+
+* 增加出错的机会，编译通过而运行出错
+* 如果Hello真的实现了接口Hi，那么 hello.HiName调用的是自己的方法，而不是 hello.Hi.HiName，容易让人误解
+* struct中嵌入的struct与inerface都是一个字段， 而interface中嵌入的interface，是要求实现对应方法的
+
+30. 其它
 
