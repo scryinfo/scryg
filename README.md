@@ -10,3 +10,5 @@ Check if the object in the interface is empty, and modify the private fields of 
 generate uuid string by github.com/google/uuid
 ## ssignal
 wait the signal ctrl + c
+
+# [Code Style ---- Go](./codestyle_go.md)
