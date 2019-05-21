@@ -1,12 +1,12 @@
 # scry base lib for golang
 
 ## scipher
-信封加密，使用RSA 与 AES
+envelope encryption by RSA  and AES
 ## sfile
-判断文件是否存在
+Check if the file exists
 ## skit
-检查interface中的对象是否为空，及修改struct的私有字段
+Check if the object in the interface is empty, and modify the private fields of the struct
 ## uuid
-使用 github.com/google/uuid 生成 uuid string
+generate uuid string by github.com/google/uuid
 ## ssignal
-等待程序终止信息 ctrl + c
+wait the signal ctrl + c
