@@ -11,4 +11,4 @@ generate uuid string by github.com/google/uuid
 ## ssignal
 wait the signal ctrl + c
 
-# [Code Style ---- Go](./codestyle_go.md)
+# [Code Style -- Go](./codestyle_go.md)
