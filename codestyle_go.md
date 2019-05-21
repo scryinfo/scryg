@@ -1,89 +1,91 @@
-
-[中文](./codestyle_go.md)  
+[中文](./codestyle_go-cn.md)  
+[EN](./codestyle_go.md)  
 [한국어](./codestyle_go-ko.md)  
 # Code Style -- go
-
 SCRYINFO
 
-## 规则
+## Rule 
 
-1. 遵守软件设计七大原则
-	1. 开-闭原则(Open-Closed Principle, OCP)
-	2. 里氏代换原则(Liskov Substitution Principle,常缩写为.LSP)
-	3. 依赖倒置原则(Dependence Inversion Principle)
-	4. 口隔离原则(Interface Segregation Principle, ISP)
-	6. 迪米特法则(Law of Demeter LoD)又叫做最少知识原则(Least Knowledge Principle,LKP)
-	7. 单一职责原则(Simple responsibility pinciple SRP)
-2. 功能完成，不是在自己电脑上能运行，是要整个项目能正常运行部署
-3. 把问题拿出，不要把它遗忘在开发的过程中，在代码中加入 todo 说明，添加到github的issues
-4. 先思考后写代码，从命名开始
-5. 处理每一个error，并记录到日志中
-6. 处理所有分支，特别出现的异常情况的分支（如，不应该出现的数据等，写入error日志）
-7. 重要调用都需要写入 info日志
-8. 直接对外提供服务接口，必须稳定，不能因为一个错误就让整个服务停止工作
-9. 对外提供的接口，统一错误编号及错误信息
-10. 定义函数时要考虑两个方面，一实现函数代码是否合理，二使用是否方便，是否容易出错
-11. 验证开发中的代码，使用单元测试；研究一项目技术实现等使用demo
-12. 如果要使用使用全局变量，给出足够的理由
-13. 通用的小功能，经过讨论后写入 scryg 中
-14. 提交代码的要求， 说明 格式化 编译通过，如果提交编译不通过的代码需要有特别的理由
-15. 参考Effective Go中的建议  https://golang.org/doc/effective_go.html
+1. Follow the six principles of software design 
 
-## Name 
+	1. Open-Closed Principle (OCP) 
+	2. Liskov Substitution Principle (LSP) 
+	3. Dependence Inversion Principle 
+	4. Interface Segregation Principle (ISP)
+	5. Law of Demeter LoD is also known as the Least Knowledge Principle (LKP). 
+	6. Simple responsibility pinciple SRP
 
-1. 所有源代码文件名，使用小写，加下划线
-2. 所有目录文件名，使用小写，加下划线
-3. 命名使用有明确函义的英文单词
+2. Complete the function which is necessary to run the entire project rather than your own computer. 
+3. Take the problem out and don't forget it in the development process; add the todo description in the code, add issues in github
+4. Think firstly and then write the code starting with naming 
+5 Handle each error and log it to the log 
+6. Handle all branches, especially the branch in the abnormal situation (for example, data that should not appear and write it to the error log) 
+7. Write the important call in the info log
+8. Directly provide the service interface and it must be stable; the whole service process should not shut down for one error
+9. Unify error number and error information for the external provided interface.
+10. While defining the function, there are two aspects to consider: 1. whether the function code is reasonable for achieving the function code; 2. whether it is convenient for utilization or it is easy to make mistakes.
+11. Verify the code in development process, use the unit testing, research the demo for the project technology implementation, etc
+12. Give the sufficient reason if you want to use global variables 
+13. Write the general small function in scryg after discussion
+14. Requirements for code submit: Format compile passed. There should be a special reason to submit the code that fails to compile
+15. Reference the recommendations in Effective Go https://golang.org/doc/effective_go.html
 
-## 目录文件
-1. 单元测试与源代码文件放在同一目录下面，如代码文件为 “server.go”，单元测试文件为 “server_test.go”
-2. 所有的demo放入“ 仓库名/demo ” 目录中
-3. 如果是框架或基础库，需要“仓库名/sample”
-4. 所有项目使用包管理(go mod)
+## Name
 
-## 代码
-1. 不要定义interface的指针，它本身就是一个胖指针 
+1. Use the lowercase and underline in all source code file
+2. Use the lowercase and underline in all directory file names, 
+3. Use the clear meaning English words while naming
 
-2. for i, v := range str { // code block } 中v是复制，所以避免不必要的复制，可以只使用i来遍历；值得注意的是，在code block中对i的修改会在下一轮循环前被重置。
-  ```go
-str := "abc.def"
-for i := range str {
-	if str[i] == '.' {
-    	i += 2
-	}
-	fmt.Println(i, string(str[i]))
+## Catalog file
+1. The unit test is placed in the same directory as the source code file. For example, the code file is “server.go” and the unit test file is “server_test.go”.
+2. Place all demos in the "warehouse name /demo" directory
+3. If it is a framework or base library, there is the "warehouse name / sample" to be required
+4. All projects use package management (go mod)
+
+## code 
+
+1. Do not define the pointer to the interface, itself is the fat pointer
+
+2. for i, v := range str { // code block } v is a copy; in order to avoid unnecessary copying, you can use only i to traverse; it is worth noting that the modification of i in the code block would be reset before the next round of cycling.
+  ```go
+Str := "abc.def"
+For i := range str {
+If str[i] == '.' {
+    i += 2
 }
-  ```
+fmt.Println(i, string(str[i]))
+}
+```
+3. If the anonymous function (also called the closure) has a loop variable, there are two ways to solve it.
 
-3. 如果匿名函数（也称闭包）有使用到循环变量时，有两种方式解决  
+	One way is to deliver parameters; do not use loop variables
+	Other way is to define the new variable
 
-	一通过传参数的方式，不使用循环变量
-	二定义一个新的变量
+4. If the channel is empty, it will directly stuck while using it rather than panic
 
-8. channel如果为空，使用它时，不是panic，而是直接卡死
+5. Read the closed channel which can correctly read the remaining value in the channel; if the channel is empty, it would read the null value of the channel type, and v, ok := <- c, ok is False 
 
-9. 读取已关闭的channel，可以正确读取到channel中的剩余值；如果channel为空，则会读取到该channel类型的空值，且v, ok := <- c中，ok为false
+6. The way to determine whether the channel shutdown is _, ok := <-c , and it also reads the data. If there is no number in the channel, it will wait. There is no way to directly determine that the channel is closed before the 1.10 version. 
 
-10. 判断一个channel关闭的方法是 _, ok := <-c ，注释它还读取了数据，如果channel中没有数它会wait（当然close的除外）。在1.10的版本之前一直没有提供直接判断channel已关闭的方法
+7. select: If there is no case statement that can be run and no default statement, select would be blocked until the certain case communication can be run 
 
-10. select：如果没有可运行的case语句，且没有default语句，select将阻塞，直到某个case通信可以运行
+8. type T int is not the same as type T = int, the previous one defines the new type, the latter one defines the alias of int 
 
-8. type T int  与 type T = int是不一样的， 前一个定义一个新的类型，后一个定义int的一个别名
+9. When implementing the interface, add the following code to ensure that all functions of the interface are implemented       
+```go
+ var(     
+   _ interfaceName = (*interfaceImpl)(nil)
+   ) 
+```
+10. recover:   
+  (1) When using recover to capture panic, only current goroutine panic can be captured
+ (2) Calling recover is useful only inside the defer function. 
 
-9. 实现接口时，加上如下代码以确保实现接口的所有函数  
-       var (
-       _ interfaceName     = (*interfaceImpl)(nil)
-       )
 
-10. recover:
-    (1)使用recover来捕获panic时，只能捕获当前 goroutine的panic。
-    (2)只有在defer函数的内部，调用recover才有用。
-
-11. return 和 defer 的执行顺序，see https://github.com/googege/blog/blob/master/go/go/important/README.md
-
-运行到return处，给返回值赋值，运行defer（defer之间是堆栈顺序，后进先出）。注意对返回值是否为同一变量（没有产生副本，是同一个），如果是那么在defer中的修改会影响到最后的返回值，下面是两个特殊的例子（更具体的内容参见网页）
+11. The order of execution of return and defer, see https://github.com/googege/blog/blob/master/go/go/important/README.md
+while running to the return, it would assign the value to the return value and run defer (the stack order is between defers, last in, first out). There should be notifying that if the return value is the same variable (no copy, the same one), if so the modification in the defer would affect the final return value, here are two special examples (see the webpage for more details) 
 ``` go
-//返回值为 1，不是2
+ / / return value is 1 rather than 2
 func tt3() int {
 	var i = 0
 	defer func() {
@@ -92,7 +94,7 @@ func tt3() int {
 	i++
 	return i
 }
-//返回的函数运行结果为 2， 不是1
+// the operation of the return function is 2 rather than 1
 func tt4() func() int {
 	var i = 0
 	defer func() {
@@ -100,24 +102,25 @@ func tt4() func() int {
 	}()
 	i++
 	return func() int {
-		return i // 引用变量/同一变量
+		return i // reference variable / the same variable
 	}
 }
-//返回值为 13，不是12
+//return value is 13 rather than 12
 func tt5() (num int) {
 	defer func() {
 		num++
 	}()
-	return 12 // 给返回值 num 赋值为12
+	return 12 // Assign the return value num to 12
 }
-//返回值为 1
+
+// the return value is 1 
 func tt6() (num int) {
 	defer func() {
 		num++
 	}()
 	return
 }
-//返回值指向 1
+// the return value points to 1
 func tt7() (*int) {
     num := 0
 	defer func() {
@@ -126,7 +129,9 @@ func tt7() (*int) {
 	return &num
 }
 ```
-注意：如果defer后面只有一条语句，则其中的变量会立刻被赋值；如果defer后面是一个函数，则其中的变量会在执行时才被赋值。
+
+Note: If there is only one statement after defer, then the variable will be assigned immediately; if defer is followed by the function, the variable will be assigned at execution time.
+
 
 ``` go
 func main() {
@@ -140,21 +145,21 @@ func main() {
 }
 ```
 
-14. go的参数传递，全部是值传递（不支持引用传递，少数语言如C++，C#支持）进入函数的参数都是副本
-16. new 出来是指针类型，所以不能使用new来初始引用类型，一般不使用new，而使用“ &TypeName{...}”，如下  
+14. pass the Go parameter, all of which are value passing (does not support reference passing, a few languages ​​such as C++, C# support). The parameters entering the function are all copies.
+16. the coming out of new is the pointer type, so you can't use new to initialize the type. Generally, you don't use new, but use "&TypeName{...}" as follows.
 ``` go
-var a = new([]int) //a 是 *[]int 类型
-var a2 = make([]int, 0) //a2 是 []int 类型
+Var a = new([]int) //a yes *[]int type
+Var a2 = make([]int, 0) //a2 is a []int type
 ```
-17. error的建议处理方式
-    see github.com/pkg/errors
-    
-    func New(message string) error //如果有一个现成的error，这时候有三个函数可以选择。
-    func WithMessage(err error, message string) error //只附加新的信息
-    func WithStack(err error) error //只附加调用堆栈信息
-    func Wrap(err error, message string) error //同时附加堆栈和信息
+17. The suggestion way to handle error
+    See github.com/pkg/errors
 
-18. 检查接口最终对象是否为空
+    Func New(message string) error //If there is a ready-made error, there are three functions to choose.
+    Func WithMessage(err error, message string) error //only add the new information
+    Func WithStack(err error) error //only add the call stack information
+    Func Wrap(err error, message string) error //Add stack and information at the same time
+
+18. Check if the final object of the interface is empty
 ```go
 func IsNil(any interface{}) bool {
 	fmt.Println()
@@ -178,68 +183,60 @@ func IsNil(any interface{}) bool {
 					v = v2
 				}
 			}
-
+	
 		}
 	}
 	return re
 }
 ```
-
-19. interface与nil
-interface为nill时它的类型与指向的对象都为nil
-
+19.When interface and nil interface is nil，the type and pointed object is nil
 ```go
-var inter1 interface{} = nil  // == nil
+      Typeof(nilInterface) != tyvar inter1 interface{} = nil  // == nil
 var inter2 interface{} = (*int)(nil) // != nil 因为类型值不为nil
 fmt.Println(inter1 == nil)
 fmt.Println(inter2 == nil)
-//输出的结果为：
+//Output result is：
 true
 false
 ```
-interface为nil与不为nil时的typeof是不相同的
+When interface is nil, typeof is different with when it is not nil
 ```go
-var err error = nil
-var err2 error = errors.New("")
+var err error = nilvar err2 error = errors.New("")
 fmt.Println("err : ", reflect.TypeOf(err))
 fmt.Println("err2: ", reflect.TypeOf(err2))
-fmt.Println(reflect.TypeOf(err) == reflect.TypeOf(err2))
-//输出结果为：
+fmt.Println(reflect.TypeOf(err) == reflect.TypeOf(err2))//result is：
 err :  <nil>
-err2:  *errors.errorString
-false
+err2:  *errors.errorStringfalse
 
-//err 与 err2的类型都为 error类型，一个为nil值一个不为空， 这时他们的类型是不相同的
+//err and err2 type are error type， one is nil value and one is not empty. The type is different
 ```
+20. slice copy, if the size is too small (not capacity), then only copy the content of the size and will not go wrong
 
-20. slice copy, 如果size太小（不是容量），那么最多只复制size的内容，且不会出错
+21. When using append to add content to the slice, if the size does not exceed the capacity, the sclice will not be reassigned that means the address of the original slice will not change.
 
-21. 在使用append向slice增加内容时，如果size没有超出容量，不会重新分配sclice，也就是说原slice的地址不变
+22. Two colons in the slice: for v :=data\[ a : b : c\], a, b are the upper and lower bounds respectively, and c is the capacity
+The correct way to generate the copy of the slice is: c := v\[:0:0\]
 
-22. slice中的两个冒号：对于v :=data\[ a : b : c\],a,b分别为上下界，c为容量  
-    产生slice副本的正确方法是： c := v\[:0:0\]
-    
-23. 判断两个函数签名相同 ConvertibleTo AssignableTo
+23. Determine that the two function signatures are the same. ConvertibleTo AssignableTo
 
-24. mod管理依赖包时，要指定依赖的版本，如果直接依赖于master请说明充分的理由
+24. When mod manages the library, you must specify the version of the dependency. If you rely directly on the master, please explain the reason.
 
-25. 已经声明的变量v可以出现在”:=”声明中的条件：
-    (1)本次声明的v与已经声明的v处于同一个作用域中（如果v已经在外层作用域中声明过，则此次声明会创建一个新的变量）。
-    (2)	初始化中与v的值的类型相同的值才能赋予v。
-    (3)此次声明中至少有一个变量时新声明得。
-    
-26. iota枚举器：
-    (1)iota常量自动生成器，每隔一行，自动累加1。
-    (2)iota遇到const，重置为0。
-    (3)可以只写一个iota，常量声明省略值时，默认和之前一个字面得值相同。
-    (4)如果在同一行，值都一样。
-    (5)iota被中断之后必须显式恢复。
-    
-27. 常量表达式：除了移位运算符之外，如果二元运算符是不同类型的无类型常量，结果类型是靠后的一个。比如一个无类型的整数常量除以一个无类型的复数常量，结果是一个无类型的复数常量。
+25. The declared variable v can appear in the condition of the ":=" statement:
+    (1) The v of this declaration is in the same scope as the already declared v (if v has already been declared in the outer scope, this declaration will create a new variable).
+    (2) The same value as the value of v in initialization can be assigned to v.
+    (3) There is at least one variable in this statement when it is newly declared.
 
-28. fallthrough：强制执行switch匹配之后的case，但是它不会判断下一条case的表达式的结果是true或者false。并且fallthrough不能再type switch中使用。
+26. iota enumerator:
+    (1) The iota constant auto generator automatically increments 1 every other line.
+    (2) iota encounters meets const and resets to 0.
+    (3) You can write only one iota. When the constant declaration omits the value, the default value is the same as the previous one.
+    (4) If they are in the same line, the values are the same.
+    (5) The iota must be explicitly restored after being interrupted.
 
-29. 不要在struct中定义没有名字的接口(embedding interface)
+27. Constant expression: In addition to the shift operator, if the binary operator is a different type of untyped constant, the result type is the latter one. For example, an untyped integer constant divided by an untyped complex constant results in an untyped complex constant.
+
+28. fallthrough: Force run switch paired case,but it does not judge whether the result of the next case expression is true or false. Fallthrough can no longer be used in type switch.
+29. Don’t define noname API in struct(embedding interface)
 ```go
 package main
 
@@ -259,11 +256,10 @@ func Call() {
 	hello.HiName()
 }
 ```
-这段代码是可以编译通过的， 运行时panic。为什么没有实现接口 Hi 就编译通过了，因为嵌入struct中的Hi只是一个字段而已，且是没有名字的，完整调用这样的： hello.Hi.HiName()，hello.Hi的值为nil，所以运行时panic
+The code above can be compiled, The reason why compile passed without realizing API hi while running panic is that the Hi in the struct is only one field and don’t have name, the full call is like:
+hello.Hi.HiName()，hello.Hi value is nil，so while running panic
 
-* 增加出错的机会，编译通过而运行出错
-* 如果Hello真的实现了接口Hi，那么 hello.HiName调用的是自己的方法，而不是 hello.Hi.HiName，容易让人误解
-* struct中嵌入的struct与inerface都是一个字段， 而interface中嵌入的interface，是要求实现对应方法的
-
-30. 其它
-
+* Add possibilities for error, compile passed but running error
+* If Hello realize API Hi，then hello.HiName call is its own method rather than hello.Hi.HiName，easy to be misunderstanding.
+* Struct embedded struct and inerface is one field, but interface embedded in interface should be required for realization methods 
+30.Others
