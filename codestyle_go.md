@@ -193,16 +193,16 @@ err2:  *errors.errorStringfalse
 The correct way to generate the copy of the slice is: c := v\[:0:0\]
 23. Determine that the two function signatures are the same. ConvertibleTo AssignableTo
 24. When mod manages the library, you must specify the version of the dependency. If you rely directly on the master, please explain the reason.
-25. The declared variable v can appear in the condition of the ":=" statement:
-    * The v of this declaration is in the same scope as the already declared v (if v has already been declared in the outer scope, this declaration will create a new variable).
-    * The same value as the value of v in initialization can be assigned to v.
-    * There is at least one variable in this statement when it is newly declared.
-26. iota enumerator:
-    * The iota constant auto generator automatically increments 1 every other line.
-    * iota encounters meets const and resets to 0.
-    * You can write only one iota. When the constant declaration omits the value, the default value is the same as the previous one.
-    * If they are in the same line, the values are the same.
-    * The iota must be explicitly restored after being interrupted.
+25. The declared variable v can appear in the condition of the ":=" statement:  
+* The v of this declaration is in the same scope as the already declared v (if v has already been declared in the outer scope, this declaration will create a new variable).
+* The same value as the value of v in initialization can be assigned to v.
+* There is at least one variable in this statement when it is newly declared.
+26. iota enumerator:  
+* The iota constant auto generator automatically increments 1 every other line.
+* iota encounters meets const and resets to 0.
+* You can write only one iota. When the constant declaration omits the value, the default value is the same as the previous one.
+* If they are in the same line, the values are the same.
+* The iota must be explicitly restored after being interrupted.
 27. Constant expression: In addition to the shift operator, if the binary operator is a different type of untyped constant, the result type is the latter one. For example, an untyped integer constant divided by an untyped complex constant results in an untyped complex constant.
 28. fallthrough: Force run switch paired case,but it does not judge whether the result of the next case expression is true or false. Fallthrough can no longer be used in type switch.
 29. Don’t define noname API in struct(embedding interface)
