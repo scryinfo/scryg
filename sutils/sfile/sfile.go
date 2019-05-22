@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-// 判断文件或文件夹是否存在， true为存在
+// judge if the file or folder exsits, true means existence
 func ExitFile(file string) bool {
 	_, err := os.Stat(file)
 	return (err == nil || os.IsExist(err))

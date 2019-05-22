@@ -109,7 +109,7 @@ func decodeRsaPrivate(endata []byte, priKey *rsa.PrivateKey, headLen int) (data 
 	return
 }
 
-// 通过Rss的Private key 加密数据
+// encrypt data with Rsa'Private key
 func EncodeRsaPrivate(data []byte, priKey *rsa.PrivateKey) (endata []byte, headLen int, err error) {
 	endata = nil
 	err = nil
@@ -167,7 +167,7 @@ func EncodeRsaPrivate(data []byte, priKey *rsa.PrivateKey) (endata []byte, headL
 	return
 }
 
-// 通过Rsa的公钥解密数据
+// decrypt data with the public key of Rsa
 func DecodeRsaPublic(endata []byte, pubKey *rsa.PublicKey, headLen int) (data []byte, err error) {
 
 	err = nil

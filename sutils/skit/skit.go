@@ -10,7 +10,7 @@ import (
 	"unsafe"
 )
 
-//检查interface最终指向的对象是否为空
+//check if the final object pointed by interface is empty
 func IsNil(any interface{}) bool {
 	fmt.Println()
 	re := false
@@ -41,7 +41,7 @@ func IsNil(any interface{}) bool {
 	return re
 }
 
-//返回t最终的类型（非指针，非interface）
+//return the final type of t (non-pointer, non-interface)
 //todo test it
 func RealType(t interface{}) (ty reflect.Type) {
 	ty = nil
@@ -60,10 +60,10 @@ func RealType(t interface{}) (ty reflect.Type) {
 	return
 }
 
-//只支持指针与interface类型的字段
-//field 是指针或interface类型
-//newValue是对应的类型
-// 代码依赖于 reflect.Value中存放指针的字段名为 “ptr”
+// only support the field type of the pointer and interface
+// field is the type of the pointer and interface
+//newValue is the corresponding type
+// the code depends on reflect.Value which contains the field name 'ptr'of pointer
 func SetPrivateField(field *reflect.Value, newValue interface{}) error {
 
 	var err error = nil
@@ -73,8 +73,8 @@ func SetPrivateField(field *reflect.Value, newValue interface{}) error {
 			break
 		}
 
-		if field.Kind() == reflect.Ptr { //指针
-			fpp := ((**uintptr)(unsafe.Pointer(field.Addr().Pointer()))) //得到字段的地址, 转换为指指针
+		if field.Kind() == reflect.Ptr { //Pointer
+			fpp := ((**uintptr)(unsafe.Pointer(field.Addr().Pointer()))) //get the address of the field and transfer to the Pointer
 			vf2 := reflect.ValueOf(newValue)
 			if vf2.Kind() != reflect.Ptr || (!vf2.Type().AssignableTo(field.Type())) {
 				err = errors.New("new value is not pointer")
@@ -88,12 +88,12 @@ func SetPrivateField(field *reflect.Value, newValue interface{}) error {
 		if field.Kind() == reflect.Interface { //interface
 			fpp := ((*interface{})(unsafe.Pointer(field.Addr().Pointer())))
 
-			//{ // 方式一，需要在编译时确定interface的类型
+			//{ // method one， require to decide the type of interface at complile time
 			//	var t2 sampleInterface = &sampleImp{F: 20}
 			//	fp2 := (*interface{})(unsafe.Pointer(&t2))
 			//	*fpp = *fp2
 			//}
-			{ // 方式二，通用使用反射实现
+			{ // method two，generally use the reflection implementation
 
 				vf2 := reflect.ValueOf(newValue)
 				if vf2.Elem().Type().AssignableTo(field.Type()) {
@@ -101,8 +101,8 @@ func SetPrivateField(field *reflect.Value, newValue interface{}) error {
 					break
 				}
 
-				vf2 = vf2.Convert(field.Type())                //一定使用Convert 转换为字段的类型， 因为t2的中的类型 为interface{},  不是 Inter2类型
-				ptr := reflect.ValueOf(vf2).FieldByName("ptr") //通过反射取到 ptr的值， 这里不能使用Pointer，会panic，因为 t2不是指针类型
+				vf2 = vf2.Convert(field.Type())                //must use convert the field type, because the type of t2 is Interface {},rather than Inter2类型
+				ptr := reflect.ValueOf(vf2).FieldByName("ptr") //get ptr value by the reflection,pointer cannot be used and it would cause to panic because the t2 is the pointer type
 				fp2 := (*interface{})(unsafe.Pointer(ptr.Pointer()))
 				*fpp = *fp2
 			}
