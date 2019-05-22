@@ -165,8 +165,30 @@ func IsNil(any interface{}) bool {
 	return re
 }
 ```
-19. Interface가 nil거나 nil아닐 경우 typeof는 동일하지 않다
-      typeof(nilInterface) != typeof(notNilInterface)
+19. Interface와 nil  
+	interface가 nill일 경우 그에 해당된 타입 및 객체는 nil이 된다.
+```go
+var inter1 interface{} = nil  // == nil
+var inter2 interface{} = (*int)(nil) // != nil 타입 값이 nil이 아니기 때문이다
+fmt.Println(inter1 == nil)
+fmt.Println(inter2 == nil)
+//아웃풋 결과는：
+true
+false
+```
+Interface가 nil거나 nil아닐 경우 typeof는 동일하지 않다.  
+```go
+var err error = nil
+var err2 error = errors.New("")
+fmt.Println("err : ", reflect.TypeOf(err))
+fmt.Println("err2: ", reflect.TypeOf(err2))
+fmt.Println(reflect.TypeOf(err) == reflect.TypeOf(err2))
+//아웃풋 결과는：
+err :  <nil>
+err2:  *errors.errorString
+false
+// err와 err2의 타입이 모두 다 error타입이며 하나는 nil의 값이고 다른 하나는 비여 있지 않을 경우 그에 대한 타입은 동일하지 않다.
+```
 20. slice copy, size가 너무 작(용량은 아님)을 경우 많아서 size의 내용만 복사되고 오류는 발생되지 않는다
 21. Append로 slice에 내용을 추가할 경우 마침 size가 최고 용량을 초과하지 않는다면 sclice는 다시 배정되지 않을 것이다. 즉 말 그대로 slice의 주소가 변하지 않는다
 22. Slice에서의 두 콜론: v :=data\[ a : b : c\],a,b에 대해 a와b는 각각 상한과 하한이고 c는 용량이다
@@ -185,3 +207,28 @@ func IsNil(any interface{}) bool {
 * Iota가 인터럽트 된 후 반드시 복구해야 한다
 27. 상수 표현식: 시프트 연산자 외에 이항 연산이 다른 타입의 상수일 경우 결과는 후자이다. 예를 들어, 타입리스의 정수 상수를 타입리스의 복합 상수로 나눈다면 결과는 하나의 타입리스의 복합 상수가 된다
 28. Fallthrough: switch 매칭한 case를 강제로 실행했지만 다음 case의 표현식 결과가 true 혹은 false라는 것에 대해 판단하지 않는다. 또한 fallthrough는 더 이상 type switch에서 사용할 수 없다
+29. struct에 이름 없는 인터페이스(embedding interface)를 정의하지 말아야 한다.
+```go
+package main
+
+ func main() {
+	Call()
+}
+
+type Hi interface {
+	HiName() string
+}
+type Hello struct {
+	Hi
+}
+
+func Call() {
+	hello := &Hello{}
+	hello.HiName()
+}
+```
+이 코드는 컴파일로 통과할 수 있다. Panic을 실행할 시 현실적인 인터페이스 Hi가 없이 컴파일 가능한 이유는 struct에 내장된 Hi는 단 하나의 필드일 뿐이고 게다가 이름도 없기 때문이다. 완전한 호출이 라면: hello.Hi.HiName()，hello.Hi의 값이 nil이므로 실행할 시 panic로 된다.  
+* 오류의 가능성이 높아지면 따라서 컴파일 실행에도 오류가 많이 발생된다.
+* Hello가 인터페이스 Hi를 실현할 경우 hello.HiName 호출은 hello.Hi.HiName가 아닌 자체의 메서드로 호출한다. 두 이름은 쉽게 오해할 가능성이 많다.
+* Struct에 내장된 struct와 inerface는 모두 다 하나의 필드이고 interface에 내장된 interface는 해당 메서드를 실현해야 한다.
+30. 기타
