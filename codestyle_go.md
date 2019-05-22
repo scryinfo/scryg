@@ -45,32 +45,24 @@ SCRYINFO
 ## code 
 
 1. Do not define the pointer to the interface, itself is the fat pointer
-
 2. for i, v := range str { // code block } v is a copy; in order to avoid unnecessary copying, you can use only i to traverse; it is worth noting that the modification of i in the code block would be reset before the next round of cycling.
-  ```go
-Str := "abc.def"
-For i := range str {
-If str[i] == '.' {
-    i += 2
-}
-fmt.Println(i, string(str[i]))
+```go
+str := "abc.def"
+for i := range str {
+    If str[i] == '.' {
+        i += 2
+    }
+    fmt.Println(i, string(str[i]))
 }
 ```
 3. If the anonymous function (also called the closure) has a loop variable, there are two ways to solve it.
-
 	One way is to deliver parameters; do not use loop variables
 	Other way is to define the new variable
-
 4. If the channel is empty, it will directly stuck while using it rather than panic
-
 5. Read the closed channel which can correctly read the remaining value in the channel; if the channel is empty, it would read the null value of the channel type, and v, ok := <- c, ok is False 
-
 6. The way to determine whether the channel shutdown is _, ok := <-c , and it also reads the data. If there is no number in the channel, it will wait. There is no way to directly determine that the channel is closed before the 1.10 version. 
-
 7. select: If there is no case statement that can be run and no default statement, select would be blocked until the certain case communication can be run 
-
 8. type T int is not the same as type T = int, the previous one defines the new type, the latter one defines the alias of int 
-
 9. When implementing the interface, add the following code to ensure that all functions of the interface are implemented       
 ```go
  var(     
@@ -78,9 +70,8 @@ fmt.Println(i, string(str[i]))
    ) 
 ```
 10. recover:   
-  (1) When using recover to capture panic, only current goroutine panic can be captured
- (2) Calling recover is useful only inside the defer function. 
-
+  * When using recover to capture panic, only current goroutine panic can be captured
+  * Calling recover is useful only inside the defer function. 
 
 11. The order of execution of return and defer, see https://github.com/googege/blog/blob/master/go/go/important/README.md
 while running to the return, it would assign the value to the return value and run defer (the stack order is between defers, last in, first out). There should be notifying that if the return value is the same variable (no copy, the same one), if so the modification in the defer would affect the final return value, here are two special examples (see the webpage for more details) 
@@ -262,4 +253,5 @@ hello.Hi.HiName()，hello.Hi value is nil，so while running panic
 * Add possibilities for error, compile passed but running error
 * If Hello realize API Hi，then hello.HiName call is its own method rather than hello.Hi.HiName，easy to be misunderstanding.
 * Struct embedded struct and inerface is one field, but interface embedded in interface should be required for realization methods 
-30.Others
+
+30. Others
