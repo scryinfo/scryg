@@ -1,3 +1,5 @@
+[中文](./codestyle_js-cn.md)  
+[EN](./codestyle_js.md)  
 # Code Style -- js
 
 ## 规则
