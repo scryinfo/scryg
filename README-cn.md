@@ -12,5 +12,4 @@
 使用 github.com/google/uuid 生成 uuid string
 ## ssignal
 等待程序终止信息 ctrl + c
-
-[Code Style -- Go](./codestyle_go.md)
+# [Code Style -- Go](./codestyle_go-cn.md)
