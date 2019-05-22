@@ -63,8 +63,8 @@ for i := range str {
    ) 
 ```
 10. recover:   
-  * When using recover to capture panic, only current goroutine panic can be captured
-  * Calling recover is useful only inside the defer function. 
+* When using recover to capture panic, only current goroutine panic can be captured
+* Calling recover is useful only inside the defer function. 
 11. The order of execution of return and defer, see https://github.com/googege/blog/blob/master/go/go/important/README.md
 while running to the return, it would assign the value to the return value and run defer (the stack order is between defers, last in, first out). There should be notifying that if the return value is the same variable (no copy, the same one), if so the modification in the defer would affect the final return value, here are two special examples (see the webpage for more details)
 ``` go
