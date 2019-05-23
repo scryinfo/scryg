@@ -168,7 +168,7 @@ func IsNil(any interface{}) bool {
 When interface and nil interface is nil，the type and pointed object is nil
 ```go
 Typeof(nilInterface) != tyvar inter1 interface{} = nil  // == nil
-var inter2 interface{} = (*int)(nil) // != nil 因为类型值不为nil
+var inter2 interface{} = (*int)(nil) // != nil,because the type is not nil 
 fmt.Println(inter1 == nil)
 fmt.Println(inter2 == nil)
 //Output result is：
