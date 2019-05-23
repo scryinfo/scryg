@@ -1,6 +1,7 @@
 [中文](./codestyle_go-cn.md)  
 [EN](./codestyle_go.md)  
 [한국어](./codestyle_go-ko.md)  
+[日本語](./codestyle_go-ja.md)  
 # Code Style -- go
 SCRYINFO
 ## 규칙
@@ -129,12 +130,10 @@ var a2 = make([]int, 0) //a2 是 []int 타입
 ```
 17. error에 대한 처리 방법
     see github.com/pkg/errors
-    
     func New(message string) error //하나의 error가 발생할 경우 3개의 함수를 선택할 수 있다
     func WithMessage(err error, message string) error //새로운 정보만 첨부한다
     func WithStack(err error) error //호출할 스택 정보만 첨부된다
     func Wrap(err error, message string) error //스택 및 정보를 동시에 첨부한다
-
 18. 인터페이스의 최종 객체가 비여 있는지 확인해야 한다
 ```go
 func IsNil(any interface{}) bool {
@@ -187,6 +186,7 @@ fmt.Println(reflect.TypeOf(err) == reflect.TypeOf(err2))
 err :  <nil>
 err2:  *errors.errorString
 false
+
 // err와 err2의 타입이 모두 다 error타입이며 하나는 nil의 값이고 다른 하나는 비여 있지 않을 경우 그에 대한 타입은 동일하지 않다.
 ```
 20. slice copy, size가 너무 작(용량은 아님)을 경우 많아서 size의 내용만 복사되고 오류는 발생되지 않는다

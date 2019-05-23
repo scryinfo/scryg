@@ -1,7 +1,7 @@
-
 [中文](./codestyle_go-cn.md)  
 [EN](./codestyle_go.md)  
 [한국어](./codestyle_go-ko.md)  
+[日本語](./codestyle_go-ja.md)  
 # Code Style -- go
 SCRYINFO
 ## 规则
@@ -111,7 +111,6 @@ func tt7() (*int) {
 }
 ```
 注意：如果defer后面只有一条语句，则其中的变量会立刻被赋值；如果defer后面是一个函数，则其中的变量会在执行时才被赋值。
-
 ``` go
 func main() {
 	var a int
@@ -233,4 +232,3 @@ func Call() {
 * 如果Hello真的实现了接口Hi，那么 hello.HiName调用的是自己的方法，而不是 hello.Hi.HiName，容易让人误解
 * struct中嵌入的struct与inerface都是一个字段， 而interface中嵌入的interface，是要求实现对应方法的
 30. 其它
-

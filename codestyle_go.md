@@ -1,11 +1,10 @@
 [中文](./codestyle_go-cn.md)  
 [EN](./codestyle_go.md)  
 [한국어](./codestyle_go-ko.md)  
+[日本語](./codestyle_go-ja.md)  
 # Code Style -- go
 SCRYINFO
-
 ## Rule 
-
 1. Follow the six principles of software design 
 	1. Open-Closed Principle (OCP) 
 	2. Liskov Substitution Principle (LSP) 
@@ -58,9 +57,9 @@ for i := range str {
 8. type T int is not the same as type T = int, the previous one defines the new type, the latter one defines the alias of int 
 9. When implementing the interface, add the following code to ensure that all functions of the interface are implemented    
 ```go
- var(     
-   _ interfaceName = (*interfaceImpl)(nil)
-   ) 
+var (  
+    _ interfaceName = (*interfaceImpl)(nil)
+) 
 ```
 10. recover:   
 * When using recover to capture panic, only current goroutine panic can be captured
@@ -95,7 +94,6 @@ func tt5() (num int) {
 	}()
 	return 12 // Assign the return value num to 12
 }
-
 // the return value is 1 
 func tt6() (num int) {
 	defer func() {
@@ -166,7 +164,8 @@ func IsNil(any interface{}) bool {
 	return re
 }
 ```
-19.When interface and nil interface is nil，the type and pointed object is nil
+19. Interface and nil
+When interface and nil interface is nil，the type and pointed object is nil
 ```go
 Typeof(nilInterface) != tyvar inter1 interface{} = nil  // == nil
 var inter2 interface{} = (*int)(nil) // != nil 因为类型值不为nil
@@ -178,12 +177,15 @@ false
 ```
 When interface is nil, typeof is different with when it is not nil
 ```go
-var err error = nilvar err2 error = errors.New("")
+var err error = nilvar 
+var err2 error = errors.New("")
 fmt.Println("err : ", reflect.TypeOf(err))
 fmt.Println("err2: ", reflect.TypeOf(err2))
-fmt.Println(reflect.TypeOf(err) == reflect.TypeOf(err2))//result is：
+fmt.Println(reflect.TypeOf(err) == reflect.TypeOf(err2))
+//result is：
 err :  <nil>
-err2:  *errors.errorStringfalse
+err2:  *errors.errorString
+false
 
 //err and err2 type are error type， one is nil value and one is not empty. The type is different
 ```
@@ -225,8 +227,7 @@ func Call() {
 	hello.HiName()
 }
 ```
-The code above can be compiled, The reason why compile passed without realizing API hi while running panic is that the Hi in the struct is only one field and don’t have name, the full call is like:
-hello.Hi.HiName()，hello.Hi value is nil，so while running panic
+The code above can be compiled, The reason why compile passed without realizing API hi while running panic is that the Hi in the struct is only one field and don’t have name, the full call is like:hello.Hi.HiName()，hello.Hi value is nil，so while running panic
 * Add possibilities for error, compile passed but running error
 * If Hello realize API Hi，then hello.HiName call is its own method rather than hello.Hi.HiName，easy to be misunderstanding.
 * Struct embedded struct and inerface is one field, but interface embedded in interface should be required for realization methods 
