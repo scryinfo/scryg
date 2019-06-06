@@ -192,7 +192,47 @@ false
 20. slice copy, 如果size太小（不是容量），那么最多只复制size的内容，且不会出错
 21. 在使用append向slice增加内容时，如果size没有超出容量，不会重新分配sclice，也就是说原slice的地址不变
 22. slice中的两个冒号：对于v :=data\[ a : b : c\],a,b分别为上下界，c为容量  
-    产生slice副本的正确方法是： c := v\[:0:0\]
+```go
+//clone 一个slice的最高效方法
+clone := append(data[:0:0], data...)
+//不要使用下面的方法
+clone2 := append(data[:0:len(data)], data...)// 没有clone
+//先 make后再 copy， 也慢，且语句很多
+
+//合并两slice的最高效方法
+
+//合并clone的建议方法（可以依据len 与 cap的不同值进行clone，如果有特别的性能要求才需要这么处理） , see the scryg/sutils/skit/MergeClone
+clone := make([]type,0, len(a) + len(b))
+clone = append(clone, a...)
+clone = append(clone, b...)
+
+//最高效的合并clone
+alen, blen := len(a), len(b)
+switch alen + blen {
+case blen :
+    clone = append(b[:0:0], b...)
+case alen:
+    clone = append(a[:0:0], a...)
+default:
+    clone = append(a[:0:alen], a...)//不会产生clone
+    clone = append(clone, b...)//一定产生clone,因为 alen 与 blen 都不为零
+}
+```
+特别注意：  
+* 如果没有超出容量append不会新分配内存，slice常因为这个而出错
+* slice的第三个参数不能超过 cap的值， 不然运行时panic  (slice bounds out of range)
+下面是错误的示例  
+```go
+a := make([]int,0,4)
+b := a[:0:cap(a)]  //运行正确
+b2:= a[:0:10] //运行 panic
+
+data := []int{1}
+errClone := append(data[:0:len(data)], data...)
+errClone[0] = 6
+// data[0] == errClone[0] 这时值相等，因为并没有clone， data与errClone指向同一内存
+
+```
 23. 判断两个函数签名相同 ConvertibleTo AssignableTo
 24. mod管理依赖包时，要指定依赖的版本，如果直接依赖于master请说明充分的理由
 25. 已经声明的变量v可以出现在”:=”声明中的条件：

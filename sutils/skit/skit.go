@@ -115,3 +115,19 @@ func SetPrivateField(field *reflect.Value, newValue interface{}) error {
 	}
 	return err
 }
+
+//MergeClone marge and clone
+func MergeClone(a []byte, b []byte) []byte {
+	var clone []byte
+	alen, blen := len(a), len(b)
+	switch alen + blen {
+	case blen:
+		clone = append(b[:0:0], b...)
+	case alen:
+		clone = append(a[:0:0], a...)
+	default:
+		clone = append(a[:0:alen], a...) //do not clone
+		clone = append(clone, b...)      //clone certainly,because alen and blen  are both not zero,   only alloc memory once
+	}
+	return clone
+}

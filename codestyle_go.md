@@ -192,7 +192,48 @@ false
 20. slice copy, if the size is too small (not capacity), then only copy the content of the size and will not go wrong
 21. When using append to add content to the slice, if the size does not exceed the capacity, the sclice will not be reassigned that means the address of the original slice will not change.
 22. Two colons in the slice: for v :=data\[ a : b : c\], a, b are the upper and lower bounds respectively, and c is the capacity
-The correct way to generate the copy of the slice is: c := v\[:0:0\]
+```go
+//efficiently clone a slice
+clone := append(data[:0:0], data...)
+//do not use the methods as follows
+//one
+clone2 := append(data[:0:len(data)], data...)// no clone
+//two
+//call copy function after make a new slice, it is slowly and many statements
+
+
+//the normal way that merge and clone
+clone := make([]type,0, len(a) + len(b))
+clone = append(clone, a...)
+clone = append(clone, b...)
+
+//efficiently clone and merge two slices, see the scryg/sutils/skit/MergeClone
+alen, blen := len(a), len(b)
+switch alen + blen {
+case blen :
+    clone = append(b[:0:0], b...)
+case alen:
+    clone = append(a[:0:0], a...)
+default:
+    clone = append(a[:0:alen], a...)//no clone
+    clone = append(clone, b...)//clone certainly, because the alen and blen are both not zero, so len of clone < cap of clone
+}
+```
+Notice:  
+* If it's less than the capacity, the append will not alloc new memory. slice often make mistakes because of this
+* the third parameter of slice is less than capacity， otherwise it panic  (slice bounds out of range)
+the error sample as follow  
+```go
+a := make([]int,0,4)
+b := a[:0:cap(a)]  //work
+b2:= a[:0:10] //panic,  greater than capacity
+
+data := []int{1}
+errClone := append(data[:0:len(data)], data...)
+errClone[0] = 6
+// data[0] == errClone[0] is true，as no clone， data and errClone point the same memory
+
+```
 23. Determine that the two function signatures are the same. ConvertibleTo AssignableTo
 24. When mod manages the library, you must specify the version of the dependency. If you rely directly on the master, please explain the reason.
 25. The declared variable v can appear in the condition of the ":=" statement:  
