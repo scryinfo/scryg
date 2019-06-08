@@ -30,6 +30,6 @@ func WaitSignal(handle HandleSignal, sig ...os.Signal) {
 }
 
 // waiting for the program termination information ctrl + c
-func WatiCtrlC(handle HandleSignal) {
+func WaitCtrlC(handle HandleSignal) {
 	WaitSignal(handle, os.Interrupt, os.Kill)
 }
