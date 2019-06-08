@@ -8,7 +8,7 @@ import (
 )
 
 // judge if the file or folder exsits, true means existence
-func ExitFile(file string) bool {
+func ExistFile(file string) bool {
 	_, err := os.Stat(file)
 	return (err == nil || os.IsExist(err))
 }
