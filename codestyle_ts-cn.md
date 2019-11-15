@@ -30,5 +30,11 @@ SCRYINFO
 2. 所有的demo放入“ 仓库名/demo ” 目录中
 3. 如果是框架或基础库，需要“仓库名/sample”
 ## 代码
-1. 
-2. 其它
+1. 定义一个数组，进行push操作之前，一定要有值或者初始化。  
+2. 会变化的值最好不要直接当做，for循环的判断条件，因为for循环有可能改变它。  
+3. 通过控制光标，可让移动端软键盘收回。
+4. 一个域对应一组localStorage cookie。
+5. document.referrer 只会是进入这个页面的url。
+6. removeEventListener的时候永远不需写 passive 和 once。
+7. 数字减一后再取模可以保持数据模运算后的顺序性。
+8. 其他
