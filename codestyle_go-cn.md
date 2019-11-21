@@ -164,8 +164,8 @@ func IsNil(any interface{}) bool {
 	return re
 }
 ```
-19. interface与nil
-interface为nill时它的类型与指向的对象都为nil
+19. interface{}与nil
+interface{}为nill时它的类型与指向的对象都为nil
 ```go
 var inter1 interface{} = nil  // == nil
 var inter2 interface{} = (*int)(nil) // != nil 因为类型值不为nil
@@ -175,7 +175,7 @@ fmt.Println(inter2 == nil)
 true
 false
 ```
-interface为nil与不为nil时的typeof是不相同的
+interface{}为nil与不为nil时的typeof是不相同的
 ```go
 var err error = nil
 var err2 error = errors.New("")
@@ -188,6 +188,12 @@ err2:  *errors.errorString
 false
 
 //err 与 err2的类型都为 error类型，一个为nil值一个不为空， 这时他们的类型是不相同的
+```
+怎么取一个interface的Type
+```go
+type TypeInterface interface{}
+t := reflect.TypeOf((*TypeInterface)(nil)).Elem()
+//注：因为interface不能实例化，所以只有先拿到它的指针类型
 ```
 20. slice copy, 如果size太小（不是容量），那么最多只复制size的内容，且不会出错
 21. 在使用append向slice增加内容时，如果size没有超出容量，不会重新分配sclice，也就是说原slice的地址不变
