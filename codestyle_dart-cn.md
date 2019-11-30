@@ -30,5 +30,74 @@ SCRYINFO
 2. 所有的demo放入“ 仓库名/demo ” 目录中
 3. 如果是框架或基础库，需要“仓库名/sample”
 ## 代码
-1. 
-2. 其它
+1.数组 可以看成列表一样。
+var list=[] 和 List list = List();
+2.函数 
+dart中，所有类型都是对象，函数的对象类型是：Function。  可作为参数传递。
+3.方法和变量
+dart中并没有public、protected、private等关键字，声明变量与方法时，前面加上 "_" 即可作为private方法使用。不加，默认为public。 
+注意： "_" 的限制范围并不是类级别，而是库访问级别
+4.mixin混入
+一般是 单继承、多实现，混入是多继承。
+通过混入，一个类可以以非继承的方式，使用其他类中的变量和方法。
+ps：mixin 在flutter源码中使用较多。
+5.基本操作符
+    除法与整除
+        /       除号
+        ~/      除号，但返回值是整数
+    相等
+        操作符是 ==            // 其中两个对象代表 同样内容 的时候返回true。
+        如果要判两对象是否为 同一个对象，用identical（）方法。
+    类型判定
+        is     是指定类型，true
+        is!    不是指定类型，true
+    类型转换
+        as     类型转换     eg：num x=666; x as int;
+    赋值操作符
+        ??= 
+        a??=value, 如果a为null，则赋值value给a;如果不为null，则a不变 
+    条件表达式
+        常见表达式 term ? expr1 : expr2 
+        另一种     expr1 ?? expr2     (如果expr1是non-null，返回其值；否则执行expr2并返回其接口)。
+6.对象级联操作符
+   ..  一个对象上，多次调用该对象的多个方法或成员。
+    new Person()
+        ..name = "not6"
+        ..age = "110"
+        ..saySomething();
+7.条件成员访问操作符  
+    区分操作符  ?. 和操作符 . 之间的区别
+    ?.  和常规的成员访问操作符 . 相似， 但左边对象不能为null。
+     如果左边操作对象为null，则返回 null，否则，返回右边的成员。
+8.流程控制
+    assert断言      ，只会在debug模式下生效。
+    assert(x < 10);
+    不符合条件，会抛出一个异常AssertionError。 程序中断
+9.异常
+    Exception和Error两个类型。    
+    写法差异：
+    try { 
+        //...
+    } on Exception catch (e) {    // catch 捕获所有异常
+        print('Unknown exception: $e');
+    }
+    try { 
+        //...
+    } catch (e,s) {               // catch 可以带有一个或两个参数，第二个为堆栈信息
+        print('Unknown exception: $e');
+    }
+10.异步dart-future和Microtask执行顺序
+    Dart 中事件的执行顺序：Main > MicroTask > EventQueue
+    示例代码：
+    void testSX(){
+      new Future(() => print('s_1'));
+      scheduleMicrotask(() => print('s_2'));
+      print('s_3');
+    }
+    结果：
+    I/flutter (32415): s_3
+    I/flutter (32415): s_2
+    I/flutter (32415): s_1
+    
+        
+10. 其它
