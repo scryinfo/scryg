@@ -98,6 +98,95 @@ ps：mixin 在flutter源码中使用较多。
     I/flutter (32415): s_3
     I/flutter (32415): s_2
     I/flutter (32415): s_1
-    
-        
+11.future  最主要的功能就是提供了链式调用
+    多个future的执行顺序
+        规则一：Future 的执行顺序为Future的在 EventQueue 的排列顺序。类似于 JAVA 中的队列，先来先执行。
+        规则二：当任务需要延迟执行时，可以使用 new Future.delay() 来将任务延迟执行。
+        规则三： Future 如果执行完才添加 than ，该任务会被放入 microTask，当前 Future 执行完会执行 microTask，microTask 为空后才会执行下一个Future。
+        规则四：Future 是链式调用，意味着Future 的 then 未执行完，下一个then 不会执行。
+
+    多组类型，代码示例：
+    void testFuture() {
+      Future f1 = new Future(() => print('f1'));
+      Future f2 = new Future(() =>  null);
+      Future f3 = new Future.delayed(Duration(seconds: 1) ,() => print('f2'));
+      Future f4 = new Future(() => null);
+      Future f5 = new Future(() => null);
+
+      f5.then((_) => print('f3'));
+      f4.then((_) {
+        print('f4');
+        new Future(() => print('f5'));
+        f2.then((_) {
+          print('f6');
+        });
+      });
+      f2.then((m) {
+        print('f7');
+      });
+      print('f8');
+    }
+    输出结果：
+       com.example.flutter_dart_app I/flutter: f8
+       com.example.flutter_dart_app I/flutter: f1
+       com.example.flutter_dart_app I/flutter: f7
+       com.example.flutter_dart_app I/flutter: f4
+       com.example.flutter_dart_app I/flutter: f6
+       com.example.flutter_dart_app I/flutter: f3
+       com.example.flutter_dart_app I/flutter: f5
+       com.example.flutter_dart_app I/flutter: f2
+    说明：
+      首先执行Main 的代码，所以首先输出: 8;
+      然后参考上面的规则1，Future 1 到 5 是按初始化顺序放入 EventQueue中，所以依次执行Future 1到5 ， 所以输出结果：8，1，7。
+      参考规则2，f3 延时执行，一定是在最后一个：8，1，7，…，2。
+      在 f4 中，首先输出 f4 ：8，1，7，4，…，2。
+      在 f4 的 then 的方法块中，新建了Future, 所以新建的 Future 将在 EventQueue尾部，最后被执行：8，1，7，4，…，5，2。
+      在 f4 的 then 的方法块中，给 f2 添加了 then ,但此时 f2 已经执行完了，参考规则三，所以 then 中的代码会被放到 microTask 中，在当前 Future 执行完后执行。 因为此时Future f4已经执行完了，所以会处理microTask（microTask优先级高）。结果：8，1，7，4，6，..，5，2。
+      此时我们的 EventQueue 中还有 f5，和在 f4 中添加的新的Future。 所以我们的最终结果就是：8，1，7，4，6，3，5，2。
+
+12.多future和多micTask的执行顺序
+      代码示例：
+      void testScheduleMicrotatsk() {
+        scheduleMicrotask(() => print('Mission_1'));
+      //注释1
+        new Future.delayed(new Duration(seconds: 1), () => print('Mission_2'));
+      //注释2
+        new Future(() => print('Mission_3')).then((_) {
+          print('Mission_4');
+          scheduleMicrotask(() => print('Mission_5'));
+        }).then((_) => print('Mission_6'));
+      //注释3
+        new Future(() => print('Mission_7'))
+            .then((_) => new Future(() => print('Mission_8')))
+            .then((_) => print('Mission_9'));
+      //注释4
+        new Future(() => print('Mission_10'));
+        scheduleMicrotask(() => print('Mission_11'));
+        print('Mission_12');
+      }
+
+     输出结果：
+     I/flutter (19025): Mission_12
+     I/flutter (19025): Mission_1
+     I/flutter (19025): Mission_11
+     I/flutter (19025): Mission_3
+     I/flutter (19025): Mission_4
+     I/flutter (19025): Mission_6
+     I/flutter (19025): Mission_5
+     I/flutter (19025): Mission_7
+     I/flutter (19025): Mission_10
+     I/flutter (19025): Mission_8
+     I/flutter (19025): Mission_9
+     Syncing files to device MIX 3...
+     I/flutter (19025): Mission_2
+
+     结果分析：
+     根据 Main > MicroTask > EventQueue。我们首先会得到输出结果：12，1，11。
+     注释1 的 Future 是延时执行，所以：12，1，11，…，2。
+     注释2 中创建了 Microtask，Microtask会在该Future执行完后执行，所以：12，1，11，4，6，5，…，2。
+     重点来了: 我们在注释3 的Future 的 then 中新建了Future(输出Mission_8),新建的 Future 将被加到 EventQueue尾部，并且，注释3的Future后续的then将不再执行，因为这个链被阻塞了！
+     注意对比上一题中的 f4, 上一题中的 f4 是一个 than 方法包裹了代码块。
+     此时的结果：12，1，11，4，6，5，7，…，2。
+     执行完注释4 的 Future，然后会执行我们在注释3 Future 新加入的 Future，之后注释3 的Future不再阻塞，会继续执行，结果： 12，1，11，4，6，5，7，10，8，9，2。
+
 10. 其它
