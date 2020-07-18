@@ -277,113 +277,112 @@ func Call() {
     * 增加出错的机会，编译通过而运行出错
     * 如果Hello真的实现了接口Hi，那么 hello.HiName调用的是自己的方法，而不是 hello.Hi.HiName，容易让人误解
     * struct中嵌入的struct与inerface都是一个字段， 而interface中嵌入的interface，是要求实现对应方法的
-
-31. 多线程（goroutines）
-    1. 退出/取消设计  
-        * 如果线程会长时间运行，必须有退出/取消
-        * 长时间运行的代码中，必须有退出/取消检查
-        * 在任何形式的wait中加入退出/取消机制（参数定时任务实现）
-        ```go
-       //一般的限出/取消
-       	cancel := make(chan struct{})//使用channel 实现
-       	go func() {
-       		for {
-       			//do something
-       			select {
-       			case <-cancel:
-       				//清理
-       				return
-       			// 其它的case
-       
-       			}
-       
-       		}
-       	}()
-       
-       	ctx := context.Background()//使用 context 实现
-       	go func() {
-       		for {
-       			select {
-       			case <-ctx.Done():
-       				//清理
-       				return
-       			//其它case
-       			}
-       		}
-       	}()
-       //长时间运行，比如在一个for循环中，每10次检查一次是否需要退出（做到1秒内检查一次）
-       go func() {//方式一使用channel
-       		const maxCheck = 10
-       		for count := 0; true; count++ {
-       			if count > maxCheck {
-       				count = 0
-       				select {
-       				case <-cancel:
-       					//清理
-       					return
-       				default:
-       					//do nothing
-       				}
-       			}
-       			//do something
-       		}
-       	}()
-       
-       cancelValue := int32(0)//方式二 使用变量
-       	go func() {
-       		const maxCheck = 10
-       		for count := 0; true; count++ {
-       			if count > maxCheck {       
-       				if 1 == atomic.LoadInt32(&cancelValue) {
-       					//清理
-       					return
-       				}
-       			}
-       			//do something
-       		}
-       	}()
-       ```
-    2. 数据安全的条件
-        * 有多线程
-        * 在运行过程中数据会有变化  
-        注： 只有一个线程写，多个线程读，也有多线程数据安全问题
-    3. write copy，在函数中都使用临时变量，反写回去时，必须整体替换
-    4. 尽量不使用time.Sleep函数，因为在sleep的过程中，不能正常退出
-    5. 最多等待运行10秒  
-    带context的实现
-    ```go
-    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+### 多线程（goroutines）
+1. 退出/取消设计  
+    * 如果线程会长时间运行，必须有退出/取消
+    * 长时间运行的代码中，必须有退出/取消检查
+    * 在任何形式的wait中加入退出/取消机制（参数定时任务实现）
+```go
+   //一般的限出/取消
+    cancel := make(chan struct{})//使用channel 实现
     go func() {
-        _, err := bind.WaitMined(ctx, client, ts)
-        if err != nil {
-            log.Println(err)
+        for {
+            //do something
+            select {
+            case <-cancel:
+                //清理
+                return
+            // 其它的case
+   
+            }
+   
         }
-        cancel() //没有到时间就运行完成，主动调用   //确认cancel可以被多次调用
     }()
-    select {
-    case <-ctx.Done():
-    //增加退出线程处理
-    }
-    ```
-    6. 定时任务实现  
-    注： 特别注意任务本身运行的时间，下面是不计算任务本身运行时间的样例
-    ```go
-	//不计算定时任务本身运行时间
-	timer := time.NewTimer(time.Second * 10)
-	for {
-
-		select {
-		case <-cancel:
-			//退出清理
-			timer.Stop() //尽快清理timer
-			return
-		case <-timer.C:
-			//do something
-		}
-		timer.Reset(time.Second * 10)
-	}
-	```
+   
+    ctx := context.Background()//使用 context 实现
+    go func() {
+        for {
+            select {
+            case <-ctx.Done():
+                //清理
+                return
+            //其它case
+            }
+        }
+    }()
+   //长时间运行，比如在一个for循环中，每10次检查一次是否需要退出（做到1秒内检查一次）
+   go func() {//方式一使用channel
+        const maxCheck = 10
+        for count := 0; true; count++ {
+            if count > maxCheck {
+                count = 0
+                select {
+                case <-cancel:
+                    //清理
+                    return
+                default:
+                    //do nothing
+                }
+            }
+            //do something
+        }
+    }()
+   
+   cancelValue := int32(0)//方式二 使用变量
+    go func() {
+        const maxCheck = 10
+        for count := 0; true; count++ {
+            if count > maxCheck {       
+                if 1 == atomic.LoadInt32(&cancelValue) {
+                    //清理
+                    return
+                }
+            }
+            //do something
+        }
+    }()
 ```
+2. 数据安全的条件
+    * 有多线程
+    * 在运行过程中数据会有变化  
+    注： 只有一个线程写，多个线程读，也有多线程数据安全问题
+3. write copy，在函数中都使用临时变量，反写回去时，必须整体替换
+4. 尽量不使用time.Sleep函数，因为在sleep的过程中，不能正常退出
+5. 最多等待运行10秒  
+带context的实现
+```go
+ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+go func() {
+    _, err := bind.WaitMined(ctx, client, ts)
+    if err != nil {
+        log.Println(err)
+    }
+    cancel() //没有到时间就运行完成，主动调用   //确认cancel可以被多次调用
+}()
+select {
+case <-ctx.Done():
+//增加退出线程处理
+}
+```
+6. 定时任务实现  
+注： 特别注意任务本身运行的时间，下面是不计算任务本身运行时间的样例
+```go
+//不计算定时任务本身运行时间
+timer := time.NewTimer(time.Second * 10)
+for {
+
+    select {
+    case <-cancel:
+        //退出清理
+        timer.Stop() //尽快清理timer
+        return
+    case <-timer.C:
+        //do something
+    }
+    timer.Reset(time.Second * 10)
+}
+```
+
 31. 其它
 
 ```
