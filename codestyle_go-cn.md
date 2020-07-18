@@ -48,8 +48,8 @@ for i := range str {
 }
 ```
 3. 如果匿名函数（也称闭包）有使用到循环变量时，有两种方式解决  
-	一通过传参数的方式，不使用循环变量
-	二定义一个新的变量
+	一通过传参数的方式，不使用循环变量  
+	二定义一个新的变量  
 4. channel如果为空，使用它时，不是panic，而是直接卡死
 5. 读取已关闭的channel，可以正确读取到channel中的剩余值；如果channel为空，则会读取到该channel类型的空值，且v, ok := <- c中，ok为false
 6. 判断一个channel关闭的方法是 _, ok := <-c ，注释它还读取了数据，如果channel中没有数它会wait（当然close的除外）。在1.10的版本之前一直没有提供直接判断channel已关闭的方法
@@ -62,8 +62,8 @@ var (
 )
 ```
 10. recover:   
-* 使用recover来捕获panic时，只能捕获当前 goroutine的panic。
-* 只有在defer函数的内部，调用recover才有用。
+    * 使用recover来捕获panic时，只能捕获当前 goroutine的panic。
+    * 只有在defer函数的内部，调用recover才有用。
 11. return 和 defer 的执行顺序，see https://github.com/googege/blog/blob/master/go/go/important/README.md
 运行到return处，给返回值赋值，运行defer（defer之间是堆栈顺序，后进先出）。注意对返回值是否为同一变量（没有产生副本，是同一个），如果是那么在defer中的修改会影响到最后的返回值，下面是两个特殊的例子（更具体的内容参见网页）
 ``` go
@@ -225,8 +225,8 @@ default:
 }
 ```
 特别注意：  
-* 如果没有超出容量append不会新分配内存，slice常因为这个而出错
-* slice的第三个参数不能超过 cap的值， 不然运行时panic  (slice bounds out of range)
+    *. 如果没有超出容量append不会新分配内存，slice常因为这个而出错  
+    *. slice的第三个参数不能超过 cap的值， 不然运行时panic  (slice bounds out of range)
 下面是错误的示例  
 ```go
 a := make([]int,0,4)
@@ -242,15 +242,15 @@ errClone[0] = 6
 23. 判断两个函数签名相同 ConvertibleTo AssignableTo
 24. mod管理依赖包时，要指定依赖的版本，如果直接依赖于master请说明充分的理由
 25. 已经声明的变量v可以出现在”:=”声明中的条件：
-* 本次声明的v与已经声明的v处于同一个作用域中（如果v已经在外层作用域中声明过，则此次声明会创建一个新的变量）。
-* 初始化中与v的值的类型相同的值才能赋予v。
-* 此次声明中至少有一个变量时新声明得。
+    * 本次声明的v与已经声明的v处于同一个作用域中（如果v已经在外层作用域中声明过，则此次声明会创建一个新的变量）。
+    * 初始化中与v的值的类型相同的值才能赋予v。
+    * 此次声明中至少有一个变量时新声明得。
 26. iota枚举器：
-* iota常量自动生成器，每隔一行，自动累加1。
-* iota遇到const，重置为0。
-* 可以只写一个iota，常量声明省略值时，默认和之前一个字面得值相同。
-* 如果在同一行，值都一样。
-* iota被中断之后必须显式恢复。
+    * iota常量自动生成器，每隔一行，自动累加1。
+    * iota遇到const，重置为0。
+    * 可以只写一个iota，常量声明省略值时，默认和之前一个字面得值相同。
+    * 如果在同一行，值都一样。
+    * iota被中断之后必须显式恢复。
 27. 常量表达式：除了移位运算符之外，如果二元运算符是不同类型的无类型常量，结果类型是靠后的一个。比如一个无类型的整数常量除以一个无类型的复数常量，结果是一个无类型的复数常量。
 28. fallthrough：强制执行switch匹配之后的case，但是它不会判断下一条case的表达式的结果是true或者false。并且fallthrough不能再type switch中使用。
 29. 不要在struct中定义没有名字的接口(embedding interface)
@@ -274,7 +274,116 @@ func Call() {
 }
 ```
 这段代码是可以编译通过的， 运行时panic。为什么没有实现接口 Hi 就编译通过了，因为嵌入struct中的Hi只是一个字段而已，且是没有名字的，完整调用这样的： hello.Hi.HiName()，hello.Hi的值为nil，所以运行时panic
-* 增加出错的机会，编译通过而运行出错
-* 如果Hello真的实现了接口Hi，那么 hello.HiName调用的是自己的方法，而不是 hello.Hi.HiName，容易让人误解
-* struct中嵌入的struct与inerface都是一个字段， 而interface中嵌入的interface，是要求实现对应方法的
-30. 其它
+    * 增加出错的机会，编译通过而运行出错
+    * 如果Hello真的实现了接口Hi，那么 hello.HiName调用的是自己的方法，而不是 hello.Hi.HiName，容易让人误解
+    * struct中嵌入的struct与inerface都是一个字段， 而interface中嵌入的interface，是要求实现对应方法的
+
+31. 多线程（goroutines）
+    1. 退出/取消设计  
+        * 如果线程会长时间运行，必须有退出/取消
+        * 长时间运行的代码中，必须有退出/取消检查
+        * 在任何形式的wait中加入退出/取消机制（参数定时任务实现）
+        ```go
+       //一般的限出/取消
+       	cancel := make(chan struct{})//使用channel 实现
+       	go func() {
+       		for {
+       			//do something
+       			select {
+       			case <-cancel:
+       				//清理
+       				return
+       			// 其它的case
+       
+       			}
+       
+       		}
+       	}()
+       
+       	ctx := context.Background()//使用 context 实现
+       	go func() {
+       		for {
+       			select {
+       			case <-ctx.Done():
+       				//清理
+       				return
+       			//其它case
+       			}
+       		}
+       	}()
+       //长时间运行，比如在一个for循环中，每10次检查一次是否需要退出（做到1秒内检查一次）
+       go func() {//方式一使用channel
+       		const maxCheck = 10
+       		for count := 0; true; count++ {
+       			if count > maxCheck {
+       				count = 0
+       				select {
+       				case <-cancel:
+       					//清理
+       					return
+       				default:
+       					//do nothing
+       				}
+       			}
+       			//do something
+       		}
+       	}()
+       
+       cancelValue := int32(0)//方式二 使用变量
+       	go func() {
+       		const maxCheck = 10
+       		for count := 0; true; count++ {
+       			if count > maxCheck {       
+       				if 1 == atomic.LoadInt32(&cancelValue) {
+       					//清理
+       					return
+       				}
+       			}
+       			//do something
+       		}
+       	}()
+       ```
+    2. 数据安全的条件
+        * 有多线程
+        * 在运行过程中数据会有变化  
+        注： 只有一个线程写，多个线程读，也有多线程数据安全问题
+    3. write copy，在函数中都使用临时变量，反写回去时，必须整体替换
+    4. 尽量不使用time.Sleep函数，因为在sleep的过程中，不能正常退出
+    5. 最多等待运行10秒  
+    带context的实现
+    ```go
+    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+    go func() {
+        _, err := bind.WaitMined(ctx, client, ts)
+        if err != nil {
+            log.Println(err)
+        }
+        cancel() //没有到时间就运行完成，主动调用   //确认cancel可以被多次调用
+    }()
+    select {
+    case <-ctx.Done():
+    //增加退出线程处理
+    }
+    ```
+    6. 定时任务实现  
+    注： 特别注意任务本身运行的时间，下面是不计算任务本身运行时间的样例
+    ```go
+	//不计算定时任务本身运行时间
+	timer := time.NewTimer(time.Second * 10)
+	for {
+
+		select {
+		case <-cancel:
+			//退出清理
+			timer.Stop() //尽快清理timer
+			return
+		case <-timer.C:
+			//do something
+		}
+		timer.Reset(time.Second * 10)
+	}
+	```
+```
+31. 其它
+
+```
