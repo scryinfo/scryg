@@ -31,51 +31,66 @@ SCRYINFO
 3. 如果是框架或基础库，需要“仓库名/sample”
 ## 代码
 1.数组 可以看成列表一样。
+```
 var list=[] 和 List list = List();
+```
 2.函数 
+```
 dart中，所有类型都是对象，函数的对象类型是：Function。  可作为参数传递。
+```
 3.方法和变量
-dart中并没有public、protected、private等关键字，声明变量与方法时，前面加上 "_" 即可作为private方法使用。不加，默认为public。 
-注意： "_" 的限制范围并不是类级别，而是库访问级别
+-   dart中并没有public、protected、private等关键字，声明变量与方法时，前面加上 "_" 即可作为private方法使用。
+-   不加，默认为public。 
+
+****注意： "_" 的限制范围并不是类级别，而是库访问级别****
+
 4.mixin混入
-一般是 单继承、多实现，混入是多继承。
-通过混入，一个类可以以非继承的方式，使用其他类中的变量和方法。
-ps：mixin 在flutter源码中使用较多。
+-   一般是 单继承、多实现，混入是多继承。
+-   通过混入，一个类可以以非继承的方式，使用其他类中的变量和方法。
+
+****ps：mixin 在flutter源码中使用较多。****
+
 5.基本操作符
-    除法与整除
-        /       除号
-        ~/      除号，但返回值是整数
-    相等
-        操作符是 ==            // 其中两个对象代表 同样内容 的时候返回true。
-        如果要判两对象是否为 同一个对象，用identical（）方法。
-    类型判定
-        is     是指定类型，true
-        is!    不是指定类型，true
-    类型转换
-        as     类型转换     eg：num x=666; x as int;
-    赋值操作符
-        ??= 
-        a??=value, 如果a为null，则赋值value给a;如果不为null，则a不变 
-    条件表达式
-        常见表达式 term ? expr1 : expr2 
-        另一种     expr1 ?? expr2     (如果expr1是non-null，返回其值；否则执行expr2并返回其接口)。
+-    除法与整除
+    /       除号
+    ~/      除号，但返回值是整数
+-    相等
+     操作符是 ==            // 其中两个对象代表 同样内容 的时候返回true。
+     如果要判两对象是否为 同一个对象，用identical（）方法。
+-    类型判定
+    is     是指定类型，true
+    is!    不是指定类型，true
+-    类型转换
+    as     类型转换     eg：num x=666; x as int;
+-    赋值操作符
+    ??= 
+    a??=value, 如果a为null，则赋值value给a;如果不为null，则a不变 
+-    条件表达式
+    常见表达式 term ? expr1 : expr2 
+    另一种     expr1 ?? expr2     (如果expr1是non-null，返回其值；否则执行expr2并返回其接口)。
+    
 6.对象级联操作符
-   ..  一个对象上，多次调用该对象的多个方法或成员。
-    new Person()
+*   ..  一个对象上，多次调用该对象的多个方法或成员。
+``` 
+   new Person()
         ..name = "not6"
         ..age = "110"
         ..saySomething();
+```
+
 7.条件成员访问操作符  
-    区分操作符  ?. 和操作符 . 之间的区别
+-    区分操作符  ?. 和操作符 . 之间的区别
     ?.  和常规的成员访问操作符 . 相似， 但左边对象不能为null。
-     如果左边操作对象为null，则返回 null，否则，返回右边的成员。
+    如果左边操作对象为null，则返回 null，否则，返回右边的成员。
+    
 8.流程控制
-    assert断言      ，只会在debug模式下生效。
+-    assert断言      ，只会在debug模式下生效。
     assert(x < 10);
     不符合条件，会抛出一个异常AssertionError。 程序中断
+    
 9.异常
-    Exception和Error两个类型。    
-    写法差异：
+-    Exception和Error两个类型。    
+```    写法差异：
     try { 
         //...
     } on Exception catch (e) {    // catch 捕获所有异常
@@ -86,9 +101,10 @@ ps：mixin 在flutter源码中使用较多。
     } catch (e,s) {               // catch 可以带有一个或两个参数，第二个为堆栈信息
         print('Unknown exception: $e');
     }
+```    
 10.异步dart-future和Microtask执行顺序
-    Dart 中事件的执行顺序：Main > MicroTask > EventQueue
-    示例代码：
+-    Dart 中事件的执行顺序：Main > MicroTask > EventQueue
+```    示例代码：
     void testSX(){
       new Future(() => print('s_1'));
       scheduleMicrotask(() => print('s_2'));
@@ -98,13 +114,14 @@ ps：mixin 在flutter源码中使用较多。
     I/flutter (32415): s_3
     I/flutter (32415): s_2
     I/flutter (32415): s_1
+```    
 11.future  最主要的功能就是提供了链式调用
     多个future的执行顺序
-        规则一：Future 的执行顺序为Future的在 EventQueue 的排列顺序。类似于 JAVA 中的队列，先来先执行。
-        规则二：当任务需要延迟执行时，可以使用 new Future.delay() 来将任务延迟执行。
-        规则三： Future 如果执行完才添加 than ，该任务会被放入 microTask，当前 Future 执行完会执行 microTask，microTask 为空后才会执行下一个Future。
-        规则四：Future 是链式调用，意味着Future 的 then 未执行完，下一个then 不会执行。
-
+-        规则一：Future 的执行顺序为Future的在 EventQueue 的排列顺序。类似于 JAVA 中的队列，先来先执行。
+-        规则二：当任务需要延迟执行时，可以使用 new Future.delay() 来将任务延迟执行。
+-        规则三： Future 如果执行完才添加 than ，该任务会被放入 microTask，当前 Future 执行完会执行 microTask，microTask 为空后才会执行下一个Future。
+-        规则四：Future 是链式调用，意味着Future 的 then 未执行完，下一个then 不会执行。
+```
     多组类型，代码示例：
     void testFuture() {
       Future f1 = new Future(() => print('f1'));
@@ -143,8 +160,10 @@ ps：mixin 在flutter源码中使用较多。
       在 f4 的 then 的方法块中，新建了Future, 所以新建的 Future 将在 EventQueue尾部，最后被执行：8，1，7，4，…，5，2。
       在 f4 的 then 的方法块中，给 f2 添加了 then ,但此时 f2 已经执行完了，参考规则三，所以 then 中的代码会被放到 microTask 中，在当前 Future 执行完后执行。 因为此时Future f4已经执行完了，所以会处理microTask（microTask优先级高）。结果：8，1，7，4，6，..，5，2。
       此时我们的 EventQueue 中还有 f5，和在 f4 中添加的新的Future。 所以我们的最终结果就是：8，1，7，4，6，3，5，2。
-
+```
 12.多future和多micTask的执行顺序
+ -  与nodejs中的机制非常类似
+```
       代码示例：
       void testScheduleMicrotatsk() {
         scheduleMicrotask(() => print('Mission_1'));
@@ -188,5 +207,5 @@ ps：mixin 在flutter源码中使用较多。
      注意对比上一题中的 f4, 上一题中的 f4 是一个 than 方法包裹了代码块。
      此时的结果：12，1，11，4，6，5，7，…，2。
      执行完注释4 的 Future，然后会执行我们在注释3 Future 新加入的 Future，之后注释3 的Future不再阻塞，会继续执行，结果： 12，1，11，4，6，5，7，10，8，9，2。
-
+```
 10. 其它
