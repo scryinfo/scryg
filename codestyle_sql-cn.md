@@ -10,7 +10,8 @@ SCRYINFO
 ## Name 
 1. 命名，使用小写，加下划线
 2. 命名使用有明确函义的英文单词
+3. 不使用数据库的关键字或保留字命名，如不能使用from命名列名等
 ## 代码
 1. 使用like查寻时，分二类处理
    1. 直接查询
-   2. 编码like的关键字
+   2. 编码like的关键字(pg:  https://www.postgresql.org/docs/12/functions-matching.html)
