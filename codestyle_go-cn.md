@@ -3,6 +3,9 @@
 [한국어](./codestyle_go-ko.md)  
 [日本語](./codestyle_go-ja.md)  
 # Code Style -- go
+[Uber Go Style](https://github.com/uber-go/guide)
+[Effective Go](https://golang.org/doc/effective_go.html)
+[Go Code Review Comments](https://github.com/golang/go/wiki/CodeReviewComments)
 SCRYINFO
 ## 规则
 1. 遵守软件设计六大原则
