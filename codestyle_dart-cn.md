@@ -21,6 +21,19 @@ SCRYINFO
 11. 验证开发中的代码，使用单元测试；研究一项目技术实现等使用demo
 12. 如果要使用使用全局变量，给出足够的理由
 13. 提交代码的要求， 说明 格式化 编译通过，如果提交编译不通过的代码需要有特别的理由
+14. 代码原则：   
+    *. 函数内部结构使用数据为主线，分为三大块：定义数据，生成数据，使用数据 
+例子： 
+```Dart
+List<int> funName(){
+    //定义数据
+    var data = <int>[];
+    //生成数据
+    {}
+    //使用数据
+    return data;
+}
+```
 ## Name 
 1. 所有源代码文件名、包名，使用小写，加下划线
 2. 所有目录文件名，使用小写，加下划线
@@ -212,10 +225,46 @@ dart中，所有类型都是对象，函数的对象类型是：Function。  可
      此时的结果：12，1，11，4，6，5，7，…，2。
      执行完注释4 的 Future，然后会执行我们在注释3 Future 新加入的 Future，之后注释3 的Future不再阻塞，会继续执行，结果： 12，1，11，4，6，5，7，10，8，9，2。
 ```
-10. 定义变量时，类型是确定的就给出具体的类型
+13. 定义变量时，类型是确定的就给出具体的类型
 ```Dart
 var mx = {};//不要这样定义map
 var m = <String,String>{};//使用这种方式
 Map<String,String> m = {};//这种方式也可以，上面的方式少写map字符，Dart官方推荐使用，这里都可以使用
+
+var a = <String>[];
+List<String> a = [];
 ```
-11. 其它
+14. 小心使用?, 避免非空时的异常
+在不确定对象是否为空时可以使用?简化代码，但不要误以为?一定不会抛出异常
+```Dart
+var a = <String>[];
+//.....
+var first = a?.first;
+//1,如果a为null，那么first为null
+//2,如果a不为空存，那么调用first函数。特别注意如果a数组的长度为零时，它会抛出异常
+```
+## 库
+### source_gen
+1. 做单元测试时增加 reader参数，不然导入库全为dynamic类型
+```Dart
+testBuilder(
+//...
+reader: await PackageAssetReader.currentIsolate(), //如果不加这个参数导入库全为dynamic类型
+//...
+```
+### ffi
+1. ffi.allocate函数分配内存，没有把内存清零 
+注：window debug下发现的结构，没有验证release或其它系统下面也有这个问题
+下面是清零的代码
+```dart
+Pointer<T> allocateZero<T extends NativeType>({int count = 1}) {
+  final int totalSize = count * sizeOf<T>();
+  var ptr = ffi.allocate<T>();
+  var temp = ptr.cast<Uint8>();
+  for (var i = 0; i < totalSize; i++) {
+    temp.elementAt(i).value = 0;
+  }
+  return ptr;
+}
+```
+

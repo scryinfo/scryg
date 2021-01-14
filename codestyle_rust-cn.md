@@ -21,6 +21,19 @@ SCRYINFO
 11. 验证开发中的代码，使用单元测试；研究技术实现等使用demo；给库提供例子使用sample或文档
 12. 如果要使用使用全局变量，给出足够的理由
 13. 提交代码的要求， 说明 格式化 编译通过，如果提交编译不通过的代码需要有特别的理由
+14. 代码规则    
+    *. 函数内部结构使用数据主线，分为三大块：定义数据，生成数据，使用数据 
+       例子： 
+   ```rust
+   fn fun_name() -> Vec<i32>{
+       //定义数据
+       let mut data = Vec::new();
+       //生成数据
+       {}
+       //使用数据
+       return data
+   }
+   ```
 ## Name 
 [遵守Rust的命名](https://rust-lang.github.io/api-guidelines/naming.html)
 1. 所有源代码文件名，使用小写，加下划线
@@ -32,6 +45,10 @@ SCRYINFO
 2. 所有的demo放入“ 仓库名/demo ” 目录中
 3. 如果是框架或基础库，需要“仓库名/sample”
 ## 代码
+1. 使用确定大小的类型，如i32而不使用int类型
+2. 函数入参优先使用&str代替String, 使用&[T]代替Vec
+3. 尽量不使用panic!，如果需要使用，给出详细说明
+4. 尽量不使用unswap 与 expect，正常情况下let与match，？ 就能很好的解决
 ### 代码提交前准备
 1. fmt --> clippy --> cargo test --no-run。这三样通过后，才提交代码
 2. 清除编译警告
@@ -48,12 +65,7 @@ SCRYINFO
     //let data = Result ....
     assert_eq!(true,v.is_err(),"{:?}", v)
     ```
-### 其它
-1. 使用确定大小的类型，如i32而不使用int类型
-2. 函数入参优先使用&str代替String, 使用&[T]代替Vec
-3. 尽量不使用panic!，如果需要使用，给出详细说明
-4. 尽量不使用unswap 与 expect，正常情况下let与match，？ 就能很好的解决
-5. 
+
 ## 库使用说明
 ### Rbatis
 1.  [rbatis::tx::TxGuard] 是异步事务，如果需要不同连接之间数据的及时通知，请使用如下方式
