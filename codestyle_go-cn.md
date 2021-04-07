@@ -294,6 +294,26 @@ func Call() {
     * 增加出错的机会，编译通过而运行出错
     * 如果Hello真的实现了接口Hi，那么 hello.HiName调用的是自己的方法，而不是 hello.Hi.HiName，容易让人误解
     * struct中嵌入的struct与inerface都是一个字段， 而interface中嵌入的interface，是要求实现对应方法的
+30. 编译约束（go build constraint / tag）：一行以```// +build```开头的注释，后面需要跟一个空行；可能出现在任何类型的文件中，
+    但需要放在文件的开头，上面只能有空行和其他注释（具体到.go文件，则表示该部分代码需要位于“包声明（即package行）”之前）
+    
+    规则：  
+    1. 符号—— ","：and； " "：or； "!"：not。  
+       举例来说：```// +build linux,386 darwin,!cgo```表示```(linux AND 386) OR (darwin AND (NOT cgo))```
+    1. 如果约束分为多行，则每行之间是“and”关系：  
+       ```go
+       // +build windows
+       // +build cgo
+       //     ↓
+       // +build windows,cgo
+       ```
+    1. 如果文件名符合以下特殊匹配规则，视为该文件具有对应的隐式约束：
+        1. *_GOOS
+        1. *_GOARCH
+        1. *_GOOS_GOARCH  
+        
+        举例来说：source_windows_amd64.go，在编译时，会应用隐式约束：GOOS=windows, GOARCH=amd64
+    1. 可以通过```// +build ignore```忽略该文件的build约束
 ### 多线程（goroutines）
 1. 退出/取消设计  
     * 如果线程会长时间运行，必须有退出/取消
