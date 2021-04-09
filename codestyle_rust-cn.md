@@ -49,6 +49,16 @@ SCRYINFO
 2. 函数入参优先使用&str代替String, 使用&[T]代替Vec
 3. 尽量不使用panic!，如果需要使用，给出详细说明
 4. 尽量不使用unswap 与 expect，正常情况下let与match，？ 就能很好的解决
+6. print!或println!每次调用时会锁定stdout，如果连续使用且有性能要求时，可以手动锁定，也可以增加buffer，下面是手动锁的例子
+```rust
+use std::io::Write;
+let mut stdout = std::io::stdout();
+let mut lock = stdout.lock();
+for line in lines {
+    writeln!(lock, "{}", line)?;
+}
+```
+[see](https://poly000.github.io/perf-book-zh/io_zh.html)
 ### 代码提交前准备
 1. fmt --> clippy --> cargo test --no-run。这三样通过后，才提交代码
 2. 清除编译警告
