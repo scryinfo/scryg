@@ -49,9 +49,9 @@
 	增加一个div1，把需要的内容放在里面，且设置float，这样增加的div1的高度为零就不会占用布局的位置，让增加的div1与div2靠在一起，内容部分使用position: relative。这样就可以实现比较完美的对齐
 5. !important 语法 可以覆盖 element.style, 以及 JS 中控制的样式。
 6. z-index 会影响触发事件的元素，并不会影响事件机制本身
-7. bootstrap navbar里面的下拉菜单 safari 点击空白 不会回收。
-8. safari 中 元素是默认不可点击的。
-9. 其他
+7. z-index表示在层叠上下文中的显示顺序，不能超过层叠上下文
+8. bootstrap navbar里面的下拉菜单 safari 点击空白 不会回收。
+9. safari 中 元素是默认不可点击的。
 
 ### ts/js
 1. 定义一个数组，进行push操作之前，一定要有值或者初始化。
