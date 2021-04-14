@@ -55,13 +55,53 @@
 
 ### ts/js
 1. 定义一个数组，进行push操作之前，一定要有值或者初始化。
-2. 会变化的值最好不要直接当做，for循环的判断条件，因为for循环有可能改变它。
 3. 通过控制光标，可让移动端软键盘收回。
 4. 一个域对应一组localStorage cookie。
 5. document.referrer 只会是进入这个页面的url。
 6. removeEventListener的时候永远不需写 passive 和 once。
 7. 数字减一后再取模可以保持数据模运算后的顺序性。
+8. 不使用null返回值
+   * null是一种程序异常，不是返回值  
+   * 字符串时，如果没有值返回“”零长度字符  
+   * Object时可以提供一个全局的空对象
+   * 如果有特殊情况，需要特别处理null的，给出足够的理由
+9. 取数组的一部分时，slice更快
+```ts
+let a = [0,1,2,3,4,5];
+a.length = 2;//第一种
+//或者
+a = a.slice(0,2);//第二种更快
+```
+10. 循环	 
+* 不要循环中改变判断条件，如果业务实现需要更改，请给出足够的理由
+* 在使用for循环时，不要在第二个参数上调用函数，因为每一次循环都会运行对应的函数，浪费cpu。如果判断条件在变化，需要运行函数时，请给出足够的理由。  
+如下是错误做法：
+```ts
+//let array = [];
+//for(let i = 0; i < array.length; i++){}
+```
+正确的做法是：
+```ts
+let array = [];
+for(let i = 0, len = array.length; i < len; i++){}
+```
+* for ... in 与 for ... of的区别
+```ts
+let a = ["one","two"];
+for(let it in a){
+    console.log(it); //,"0,1"
+}
+//for ... in
+//输出属性，当为数组时，输出数组的下标
+//类型为string
 
+for(let it of a){
+    console.log(it); //"one, two"
+}
+//for ... of
+//输出集合的元素
+//类型为集合元素的类型
+```
 ### vue
 1. 在v-for中为item添加key
    当列表有变化时，方便Vue精准找到该条列表数据，进行新旧状态对比，更新变化。

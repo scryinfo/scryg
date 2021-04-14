@@ -8,7 +8,7 @@ SCRYINFO
 	3. 依赖倒置原则(Dependence Inversion Principle)
 	4. 口隔离原则(Interface Segregation Principle, ISP)
 	5. 迪米特法则(Law of Demeter LoD)又叫做最少知识原则(Least Knowledge Principle,LKP)
-	6. 单一职责原则(Simple responsibility pinciple SRP)
+	6. 单一职责原则(Simple responsibility principle SRP)
 2. 功能完成，不是在自己电脑上能运行，是要整个项目能正常运行部署
 3. 把问题拿出，不要把它遗忘在开发的过程中，在代码中加入 todo 说明，添加到github的issues
 4. 先思考后写代码，从命名开始
@@ -47,27 +47,29 @@ List<int> funName(){
 2. 所有的demo放入“ 仓库名/demo ” 目录中
 3. 如果是框架或基础库，需要“仓库名/sample”
 ## 代码
-1.数组 可以看成列表一样。
+1. 数组 可以看成列表一样。
 ```
-var list=[] 和 List list = List();
+var list=<T>[] 和 List<T> list = List();
 ```
-2.函数 
+2. 尽量使用明确的数据类型，能不用dynamic就不使用它。
+3. 在使用var定义变量时，赋值的右边一定要是确定类型的。使用var定义变量时，必须有明确类型的赋值
+2. 函数 
 ```
 dart中，所有类型都是对象，函数的对象类型是：Function。  可作为参数传递。
 ```
-3.方法和变量
+3. 方法和变量
 -   dart中并没有public、protected、private等关键字，声明变量与方法时，前面加上 "_" 即可作为private方法使用。
 -   不加，默认为public。 
 
 ****注意： "_" 的限制范围并不是类级别，而是库访问级别****
 
-4.mixin混入
+4. mixin混入
 -   一般是 单继承、多实现，混入是多继承。
 -   通过混入，一个类可以以非继承的方式，使用其他类中的变量和方法。
 
 ****ps：mixin 在flutter源码中使用较多。****
 
-5.基本操作符
+5. 基本操作符
 -    除法与整除
     /       除号
     ~/      除号，但返回值是整数
@@ -86,7 +88,7 @@ dart中，所有类型都是对象，函数的对象类型是：Function。  可
     常见表达式 term ? expr1 : expr2 
     另一种     expr1 ?? expr2     (如果expr1是non-null，返回其值；否则执行expr2并返回其接口)。
     
-6.对象级联操作符
+6. 对象级联操作符
 *   ..  一个对象上，多次调用该对象的多个方法或成员。
 ``` 
    new Person()
@@ -95,17 +97,17 @@ dart中，所有类型都是对象，函数的对象类型是：Function。  可
         ..saySomething();
 ```
 
-7.条件成员访问操作符  
+7. 条件成员访问操作符  
 -    区分操作符  ?. 和操作符 . 之间的区别
     ?.  和常规的成员访问操作符 . 相似， 但左边对象不能为null。
     如果左边操作对象为null，则返回 null，否则，返回右边的成员。
     
-8.流程控制
+8. 流程控制
 -    assert断言      ，只会在debug模式下生效。
     assert(x < 10);
     不符合条件，会抛出一个异常AssertionError。 程序中断
     
-9.异常
+9. 异常
 -    Exception和Error两个类型。    
 ```    写法差异：
     try { 
@@ -119,7 +121,7 @@ dart中，所有类型都是对象，函数的对象类型是：Function。  可
         print('Unknown exception: $e');
     }
 ```    
-10.异步dart-future和Microtask执行顺序
+10. 异步dart-future和Microtask执行顺序
 -    Dart 中事件的执行顺序：Main > MicroTask > EventQueue
 ```    示例代码：
     void testSX(){
@@ -132,7 +134,7 @@ dart中，所有类型都是对象，函数的对象类型是：Function。  可
     I/flutter (32415): s_2
     I/flutter (32415): s_1
 ```    
-11.future  最主要的功能就是提供了链式调用
+11. future  最主要的功能就是提供了链式调用
     多个future的执行顺序
 -        规则一：Future 的执行顺序为Future的在 EventQueue 的排列顺序。类似于 JAVA 中的队列，先来先执行。
 -        规则二：当任务需要延迟执行时，可以使用 new Future.delay() 来将任务延迟执行。
@@ -178,7 +180,7 @@ dart中，所有类型都是对象，函数的对象类型是：Function。  可
       在 f4 的 then 的方法块中，给 f2 添加了 then ,但此时 f2 已经执行完了，参考规则三，所以 then 中的代码会被放到 microTask 中，在当前 Future 执行完后执行。 因为此时Future f4已经执行完了，所以会处理microTask（microTask优先级高）。结果：8，1，7，4，6，..，5，2。
       此时我们的 EventQueue 中还有 f5，和在 f4 中添加的新的Future。 所以我们的最终结果就是：8，1，7，4，6，3，5，2。
 ```
-12.多future和多micTask的执行顺序
+12. 多future和多micTask的执行顺序
  -  与nodejs中的机制非常类似
 ```
       代码示例：
