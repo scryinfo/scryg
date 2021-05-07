@@ -1,6 +1,10 @@
 [中文](./codestyle_rust-cn.md)  
 # Code Style -- rust
 SCRYINFO
+## 说明
+函数(function)：由fn定义的函数
+方法(method)：是一种特殊的函数，第一个参数含self（与一个struct或trait关联的）
+关联函数(Associated functions)：Associated functions are functions associated with a type
 ## 规则
 1. 遵守软件设计六大原则
 	1. 开-闭原则(Open-Closed Principle, OCP)
@@ -50,6 +54,16 @@ SCRYINFO
 2. 函数入参优先使用&str代替String, 使用&[T]代替Vec
 3. 尽量不使用panic!，如果需要使用，给出详细说明
 4. 尽量不使用unswap 与 expect，正常情况下let与match
+5. 个别字符看起是一个char，可能它是两个char。在使用时，容易产生混淆的字符，加上注释以示区别
+```rust
+let chars = "é".chars().collect::<Vec<_>>();
+// U+00e9: 'latin small letter e with acute'
+assert_eq!(vec!['\u{00e9}'], chars);
+let chars2 = "é".chars().collect::<Vec<_>>();
+// U+0065: 'latin small letter e',U+0301: 'combining acute accent'
+assert_eq!(vec!['\u{0065}','\u{0301}'], chars2);
+```
+[see](https://doc.rust-lang.org/stable/std/primitive.char.html)
 6. print!或println!每次调用时会锁定stdout，如果连续使用且有性能要求时，可以手动锁定，也可以增加buffer，下面是手动锁的例子
 ```rust
 use std::io::Write;
@@ -70,7 +84,7 @@ for line in lines {
      java go dart rust等都不支持C++的引用，而这些语言中的所谓“引用”，只是类似指针
      rust函数参数不支持C++的引用传参，因为rust在传参时使用的是指针，存放指针值的对象产生了副本
      java go dart rust等语言也不支持引用传参，都是传值
-     ？不确定&self/&mut self是否也产生副本
+     ？不确定&self/&mut self是否也产生传数时的副本，从调用工具上看没有产生。
 ```rust
 
 ```
@@ -110,16 +124,16 @@ let mut d = unsafe {
 println!("{}", d.name);
 ```
     
-9. 如果使用Pin<T>，给出足够的原因。Pin的作用是阻止使用可修改指针（&mut T）.也就是对象不可以被移动，在std中使用在在future的pull方法，解决自己引的问题。
-10. trait Drop是一个trait，在对象的lifetime结束时（释放内存之前），会自动调用它的drop方法，这是编译器完成的。  
-    * 对于drop来说它并不释放内存，它只是在释放内存前调用的一个方法。
-    * 在drop方法实现中一般会释放内存或关闭文件等清理工作，但不要弄混了，drop只是一个方法，怎么实现都是可以的。
-    * drop方法一般是自动调用的，也可以手动调用，也可以阻止自动调用
+9. 如果使用Pin<T>，给出足够的原因。Pin的作用是阻止使用可修改指针（&mut T）.也就是对象不可以被移动，在std中使用在在future的pull函数，解决自己引的问题。
+10. trait Drop是一个trait，在对象的lifetime结束时（释放内存之前），会自动调用它的drop函数，这是编译器完成的。  
+    * 对于drop来说它并不释放内存，它只是在释放内存前调用的一个函数。
+    * 在drop函数实现中一般会释放内存或关闭文件等清理工作，但不要弄混了，drop只是一个函数，怎么实现都是可以的。
+    * drop函数一般是自动调用的，也可以手动调用，也可以阻止自动调用
 ```rust
 
 ```
 11. std::Vec实现说明  
-    * set_len是不安全方法，要小心使用
+    * set_len是不安全函数，要小心使用
     * 
 ```rust
 
@@ -130,7 +144,7 @@ println!("{}", d.name);
 2. 清除编译警告
 
 ### 单元测试
-1. 在assert语句中如果使用了对象的字段或方法，建议打印整个对象。    
+1. 在assert语句中如果使用了对象的字段或函数，建议打印整个对象。    
     * 检测Option为None    
     ```rust
     //let data = Option ....

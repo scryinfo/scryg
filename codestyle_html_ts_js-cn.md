@@ -22,10 +22,10 @@
 11. 如果要使用使用全局变量，给出足够的理由，因为它很难测试
 12. 通用的小功能，经过讨论后写入 scryjs 中
 13. 提交代码的要求， 说明 格式化 编译通过，如果提交编译不通过的代码需要有特别的理由
-14. 使用css不使用style
+14. 使用css不使用style，如果要使用style给出理由
 15. 在布局时能不使用具体的数字就不使用
 16. 使用flex进行布局
-17. 单位使用rem
+17. 单位使用rem或em或vh/vw
 
 ## Name 
 1. 所有源代码文件名，使用小写，加下划线
@@ -52,7 +52,25 @@
 7. z-index表示在层叠上下文中的显示顺序，不能超过层叠上下文
 8. bootstrap navbar里面的下拉菜单 safari 点击空白 不会回收。
 9. safari 中 元素是默认不可点击的。
-
+10. metia中的max-width与min-width中的值都不包含“=”
+11. 图片在适应不同屏幕宽度时，可以使用metia来设置不同的图片
+```html
+<picture>
+    <source srcset="/media/cc0-images/surfer-240-200.jpg"
+            media="(min-width: 800px)">
+    <img src="/media/cc0-images/painted-hand-298-332.jpg" alt="" />
+</picture>
+<img
+	srcset="example-320w.jpg 320w,example-480w.jpg 480w,example-800w.jpg 800w"
+	sizes="(max-width: 320px) 280px,(max-width: 480px) 440px,800px"
+	src="example-800w.jpg" alt="An example image">
+```
+12. 单位  
+	width:10% 相对于元素的10%  
+	width:10vw 相对于viewport宽度的10%  
+	width:10em 相对于元素的font-size的，如果没有设置会继承元素的  
+	width:10rem 相对于html的font-size的，如果没有设置为16px  
+	
 ### ts/js
 1. 定义一个数组，进行push操作之前，一定要有值或者初始化。
 3. 通过控制光标，可让移动端软键盘收回。
