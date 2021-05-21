@@ -4,14 +4,10 @@
 package skit
 
 import (
+	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
 )
-
-type sampleT struct {
-	fPtr       *sampleT2
-	fInterface sampleInterface
-}
 
 type sampleT2 struct {
 	f2 int
@@ -21,6 +17,11 @@ type sampleInterface interface {
 	Get() int
 }
 
+type sampleT struct {
+	fPtr       *sampleT2
+	fInterface sampleInterface
+}
+
 type sampleImp struct {
 	F int
 }
@@ -28,7 +29,6 @@ type sampleImp struct {
 func (c *sampleImp) Get() int {
 	return c.F
 }
-
 func TestSetPrivateField(t *testing.T) {
 
 	{ //pointer
@@ -60,5 +60,38 @@ func TestSetPrivateField(t *testing.T) {
 			t.Error("interface fail")
 		}
 	}
-
 }
+
+func TestIsNil(t *testing.T) {
+	var d *int = nil
+	var d2 interface{} = d
+	var d3 interface{} = &d2
+	var d4 interface{} = &d3
+
+	r := IsNil(1)
+	assert.Equal(t, false, r)
+
+	r = IsNil(nil)
+	assert.Equal(t, true, r)
+	r = IsNil(d)
+	assert.Equal(t, true, r)
+	r = IsNil(d2)
+	assert.Equal(t, true, r)
+	r = IsNil(d3)
+	assert.Equal(t, true, r)
+	r = IsNil(d4)
+	assert.Equal(t, true, r)
+
+	var dd = 1
+	d = &dd
+	r = IsNil(d)
+	assert.Equal(t, false, r)
+	r = IsNil(d2)
+	assert.Equal(t, true, r)
+	r = IsNil(d3)
+	assert.Equal(t, true, r)
+	r = IsNil(d4)
+	assert.Equal(t, true, r)
+}
+
+

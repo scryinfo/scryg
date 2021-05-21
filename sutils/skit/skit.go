@@ -5,38 +5,37 @@ package skit
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 	"unsafe"
 )
 
 //check if the final object pointed by interface is empty
 func IsNil(any interface{}) bool {
-	fmt.Println()
-	re := false
+	re := true
 	if any != nil {
 		v := reflect.ValueOf(any)
-
-		if v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface {
+		switch v.Kind() {
+		case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.UnsafePointer, reflect.Interface, reflect.Slice:
 			re = v.IsNil()
-			if !re {
-				for {
-					//fmt.Println(v.Type())
-					v2 := v.Elem()
-					if v2.Kind() != reflect.Ptr && v2.Kind() != reflect.Interface {
-						break
-					}
-					re = v2.IsNil()
-					if re {
-						break
-					}
-					v = v2
+		default:
+			re = false
+			return re
+		}
+		if !re {
+			for v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface { //如果为指针或interface类型，要检查指向的值
+				v = v.Elem() //Ptr或Interface时，返回内部的值
+				switch v.Kind() {
+				case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.UnsafePointer, reflect.Interface, reflect.Slice:
+					re = v.IsNil()
+				default:
+					re = false
+					return re
+				}
+				if re {
+					break
 				}
 			}
-
 		}
-	} else {
-		re = true
 	}
 	return re
 }
