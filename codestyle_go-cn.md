@@ -5,9 +5,6 @@
 
 # Code Style -- go
 
-[Uber Go Style](https://github.com/uber-go/guide)
-[Effective Go](https://golang.org/doc/effective_go.html)
-[Go Code Review Comments](https://github.com/golang/go/wiki/CodeReviewComments)
 SCRYINFO
 
 ## 规则
@@ -32,23 +29,25 @@ SCRYINFO
 12. 如果要使用使用全局变量，给出足够的理由
 13. 通用的小功能，经过讨论后写入 scryg 中
 14. 提交代码的要求， 说明 格式化 编译通过，如果提交编译不通过的代码需要有特别的理由
-15. 参考Effective Go中的建议  https://golang.org/doc/effective_go.html
 
-## Name
+## Name  
+
+[Words](./words_cn_en.md)
 1. 所有源代码文件名，使用小写，加下划线
 2. 所有目录文件名，使用小写，加下划线
 3. 命名使用有明确函义的英文单词
-4. 不使用数据库的关键字或保留字命名，如不能使用for来命名一个字段名
+4. 不使用数据库的关键字或保留字命名，如不能使用from,index来命名一个字段  
+5. 命名就是最好的注释，当命名能清楚地表达含义时，不要加注释，这时的注释就是画蛇添足
+
 ## 目录文件
 1. 单元测试与源代码文件放在同一目录下面，如代码文件为 “server.go”，单元测试文件为 “server_test.go”
 2. 所有的demo放入“ 仓库名/demo ” 目录中
 3. 如果是框架或基础库，需要“仓库名/sample”
-4. 所有项目使用包管理(go mod)
+4. 项目使用包管理(go mod)
 
 ## 代码
 1. 代码规则    
-    *. 函数内部结构使用数据为主线，分为三大块：定义数据，生成数据，使用数据 例子：
-
+    函数内部结构使用数据为主线，分为三大块：定义数据，生成数据，使用数据 例子：
 ```go
 func funName(){
     //定义数据
@@ -60,7 +59,7 @@ func funName(){
 }
 ```
 
-2. for i, v := range str { // code block } 中v是复制，为了避免不必要的复制，可以只使用i来遍历；值得注意的是，在code block中对i的修改会在下一轮循环前被重置。
+2. for i, v := range str { // code block } 中v是复制出的一个副本，为了避免不必要的复制，可以只使用i来遍历；值得注意的是，在code block中对i的修改会在下一轮循环前被重置。
 ```go
 str := "abc.def"
 for i := range str {
@@ -72,76 +71,108 @@ for i := range str {
 ```
 
 3. 如果匿名函数（也称闭包）有使用到循环变量时，有两种方式解决  
-   一通过传参数的方式，不在闭包中直接使用循环变量  
-   二定义一个新的变量
+   *. 通过传参数，不在闭包中直接使用循环变量  
+   *. 定义一个新的变量
 4. type T int 与 type T2 = int是不一样的， 前面一个定义一个新类型T，后一个定义T2为int的别名
 5. go的参数传递，全部是值传递（不支持引用传递，少数语言如C++，C#支持）进入函数的参数都是副本。
-   go中的引用类型实际上是一种特殊的指针，当引用类型在传值时，一种浅copy的复本（把指针地址复制到，而指向的值并没有复制）
+   go中的引用类型实际上是一种特殊的指针，当引用类型在传值时，是浅copy的副本（把指针地址复制到，而指向的值并没有复制），  
+   与传指针达到一样的效果，实质上还是传值。
    
-6. new 出来是指针类型，所以不能使用new来初始引用类型，一般不使用new，而使用“ &TypeName{...}”，如下
+6. new 出来是指针类型，一般不使用new，而使用“ &TypeName{...}”，如下
 ``` go
 var a = new([]int) //a 是 *[]int 类型
 var a2 = make([]int, 0) //a2 是 []int 类型
 ```
-7. slice copy, 如果size太小（不是容量），那么最多只复制size的内容，且不会出错
-8. 在使用append向slice增加内容时，如果size没有超出容量，不会重新分配sclice，也就是说原slice的地址不变
-9. slice中的两个冒号：对于v :=data\[ a : b : c\],a,b分别为上下界，c为容量
+7. 在使用map或slice时，尽量给出容量，这样减少不必要的内存分配及复制
+8. slice copy, 如果size太小（不是容量），那么最多只复制size的内容，且不会出错
+9. 在使用append向slice增加内容时，如果size没有超出容量，不会重新分配slice，也就是说原slice的地址不变
+10. slice中的两个冒号：对于v :=data\[ a : b : c\],a,b分别为上下界，c为容量
+11. clone slice的建议方法
 ```go
-//clone 一个slice的最高效方法
-clone := append(data[:0:0], data...)
-//不要使用下面的方法
-clone2 := append(data[:0:len(data)], data...)// 没有clone
-//先 make后再 copy， 也慢，且语句很多
-
-//合并两slice的最高效方法
-
-//合并clone的建议方法（可以依据len 与 cap的不同值进行clone，如果有特别的性能要求才需要这么处理） , see the scryg/sutils/skit/MergeClone
-clone := make([]type,0, len(a) + len(b))
-clone = append(clone, a...)
-clone = append(clone, b...)
-
-//最高效的合并clone
-alen, blen := len(a), len(b)
-switch alen + blen {
-case blen :
-    clone = append(b[:0:0], b...)
-case alen:
-    clone = append(a[:0:0], a...)
-default:
-    clone = append(a[:0:alen], a...)//不会产生clone
-    clone = append(clone, b...)//一定产生clone,因为 alen 与 blen 都不为零
+func TestSliceClone(t *testing.T){
+    data := []int{1}
+    //clone 一个slice的最高效方法， data为nil时也可以正确工作
+    clone1 := append(data[:0:0], data...)
+    clone2 := append([]int(nil), data...)
+    //不要使用下面的方法，他们都不会复制
+    clone3Not := append(data[:0:len(data)], data...)
+    clone4Not := append(data[:0],data...)
+    //先 make后再 copy， 且语句更多，且需要特别处理nil情况，所以不建议使用
+    
+    assert.NotSame(t, &data[0],&clone1[0])
+    assert.Equal(t,data, clone1)
+    assert.NotSame(t, &data[0],&clone2[0])
+    assert.Equal(t,data,clone2)
+    
+    assert.Same(t,&data[0],&clone3Not[0])
+    assert.Same(t,&data[0],&clone4Not[0])
 }
 ```
-
-特别注意：  
-*. 如果没有超出容量append不会新分配内存，slice常因为这个而出错  
-*. slice的第三个参数不能超过 cap的值， 不然运行时panic  (slice bounds out of range)
-下面是错误的示例
-
+12. 合并两个slice的方法
 ```go
-a := make([]int,0,4)
-b := a[:0:cap(a)]  //运行正确
-b2:= a[:0:10] //运行 panic
-
-data := []int{1}
-errClone := append(data[:0:len(data)], data...)
-errClone[0] = 6
-// data[0] == errClone[0] 这时值相等，因为并没有clone， data与errClone指向同一内存
-
+func TestSliceMergeClone(t *testing.T){
+    data1 := []int{1}
+    data2:= []int{4}
+    
+    //合并两个slice，建议方法
+    merge := make([]int,0,len(data1) + len(data2))
+    merge = append(merge,data1...)
+    merge = append(merge,data2...)
+    assert.Equal(t, data1, merge[0:len(data1)])
+    assert.Equal(t, data2, merge[len(data1):])
+    
+    //合并两个slice，高效方法，由于代码比较多所以不建议使用，如果把MergeClone做成库，那么应该使用下面的方法
+    merge = nil
+    data1Len, data2Len := len(data1), len(data2)
+    switch data1Len + data2Len {
+    case data2Len:
+    merge = append(data2[:0:0], data2...)
+    case data1Len:
+    merge = append(data1[:0:0], data1...)
+    default:
+    merge = append(data1, data2...)
+    }
+    assert.Equal(t, data1, merge[0:len(data1)])
+    assert.Equal(t, data2, merge[len(data1):])
+}
 ```
-10. mod管理依赖包时，要指定依赖的版本，如果直接依赖于master请说明充分的理由
-11. 已经声明的变量v可以出现在”:=”声明中的条件：
+MergeClone两个slice的高效方法，已经实现在库 scryg/sutils/skit/MergeClone 中
+13. nil是一个有效的slice
+    方法append的第一个参数可以为nil
+    len(nil) == 0，
+    优先使用var a1 []int，而不是a2 := []int{}。 a2是零长度的slice，len(a2) == 0， 而a1是nil的slice
+14. 优先使用 strconv 而不是 fmt，strconv性能更好
+
+15. mod管理依赖包时，要指定依赖的版本，如果直接依赖于master请说明充分的理由
+16. 已经声明的变量v可以出现在”:=”声明中的条件：
     * 本次声明的v与已经声明的v处于同一个作用域中（如果v已经在外层作用域中声明过，则此次声明会创建一个新的变量）。
     * 初始化中与v的值的类型相同的值才能赋予v。
     * 此次声明中至少有一个变量时新声明得。
-12. iota枚举器：
+17. iota枚举器：
     * iota常量自动生成器，每隔一行，自动累加1。
     * iota遇到const，重置为0。
     * 可以只写一个iota，常量声明省略值时，默认和之前一个字面得值相同。
     * 如果在同一行，值都一样。
     * iota被中断之后必须显式恢复。
-13. 常量表达式：除了移位运算符之外，如果二元运算符是不同类型的无类型常量，结果类型是靠后的一个。比如一个无类型的整数常量除以一个无类型的复数常量，结果是一个无类型的复数常量。
-14. fallthrough：强制执行switch匹配之后的case，但是它不会判断下一条case的表达式的结果是true或者false。并且fallthrough不能再type switch中使用。
+18. 常量表达式：除了移位运算符之外，如果二元运算符是不同类型的无类型常量，结果类型是靠后的一个。比如一个无类型的整数常量除以一个无类型的复数常量，结果是一个无类型的复数常量。
+19. fallthrough：强制执行switch匹配之后的case，但是它不会判断下一条case的表达式的结果是true或者false。并且fallthrough不能再type switch中使用。
+
+20. 减少导出方法或变量。如果函数或变量在外部不使用，就不要导出（不使用大写打头）
+21. 使用字段名初始化结构体，不要省略字段名
+22. 内嵌字段/embedded field  
+ "" | T| *T 
+----|----|----
+S | v | v and p
+*S | v and p | v and p
+v methods/v: receiver为value的方法集合
+p methods/p: receiver为pointer的方法集合
+S是结构体
+T是内嵌字段
+总结为：两个都是Value时，只包含T中接收者为Value的方法；其中一个为指针时，包含T的接收者为value与pointer的方法（所有方法）
+当T中的方法或字段与S中的名字（或多个不同类型T中的字段或方法名）有冲突时，要用全名使用
+23. 少使用init()函数  
+不要依赖init()运行的先后顺序。在修改代码之后，init函数之间的运行先后顺序可能会变化
+不要在init()函数中运行“重”的工作，如果文件或网络操作等耗时操作，它们会因环境变化而出错，且很难恢复
 
 ###反射
 1. 判断两个函数签名相同 ConvertibleTo AssignableTo
@@ -155,16 +186,19 @@ var (
 )
 ```
 go没有实现接口的语法，只要接口中所有的方法都有实现就认为是实现的接口，换句话说，检查是否实现接口是检查接口，是检查是否接口中的所有方法签名都能找到。如果两个接口有相同的方法，他们只会有一份实现
-*. receiver参数默认使用 pointer，如果要使用value给出足够的理由
-因为value方式会产生副本，如果需要产生副本，定义一个新变量或反返回一个新值是更新的方式。
+3. receiver参数默认使用 pointer，如果要使用value给出足够的理由
+因为value方式会产生副本，而go语言很容易产生一个副本，所以receiver的类型一般为pointer。
 下面是effective go中的说明
 [Receiver pointer vs value](https://golang.org/doc/effective_go#pointers_vs_values)
 规则是：
     *. pointer可以调用 receiver pointer/value
     *. value 只能调用 receiver value
 原因是，如果value调用receiver pointer，那么value会产生一个副本 value copy来调用，这里receiver pointer中修改了值，但是修改的是value copy中的，不会对原来的value产生影响，这个错误很因隐藏，很难发现，所以go语言不允许这样的调用发生
+4，“接口实现”是不区分receiver是pointer还是value类型
+*T：包含receiver 为pointer&value的方法集
+T：包含receiver为value的方法集
 
-3. interface{}的实现
+5. interface{}的实现
 [code see](https://github.com/golang/go/blob/master/src/runtime/runtime2.go)
 ```go
 type iface struct {
@@ -212,7 +246,7 @@ type _type struct {
    interface{}分为两种类型有方法的iface与无法的eface，有两个字段一个是data，另一个是type/tab。
 一看实现代码就很容易理解，两个interface{}相等的条件，就要结构体中的两个字段分别相等才可以
 一些可能使用的方法： func convI2I(inter *interfacetype, i iface) (r iface)，从a interface{}到b interface{}转换
-4. 赋值给interface{}类型（包含传参数时）
+6. 赋值给interface{}类型（包含传参数时）
 ```go
 var fat interface{}
 fat = nil //interface{} nil
@@ -226,7 +260,7 @@ fat =fat2
 当赋值给interface{}类型时，
 *. 如果右边是非interface{},会自动把右边的值转换为interface{}类型
 *. 如果右边是interface{}, 直接复制fat指针的值（非深复制）
-5. 检查接口最终对象是否为空
+7. 检查接口最终对象是否为空
 ```go
 //check if the final object pointed by interface is empty
 func IsNil(any interface{}) bool {
@@ -260,7 +294,7 @@ func IsNil(any interface{}) bool {
 }
 ```
 
-6. interface{}与nil interface{}为nill时它的类型与指向的对象都为nil
+8. interface{}与nil interface{}为nill时它的类型与指向的对象都为nil
 
 ```go
 var inter1 interface{} = nil  // == nil
@@ -295,7 +329,7 @@ type TypeInterface interface{}
 t := reflect.TypeOf((*TypeInterface)(nil)).Elem()
 //注：因为interface不能实例化，所以只有先拿到它的指针类型
 ```
-7. 不要在struct中定义没有名字的接口(embedding interface)
+9. 不要在struct中定义没有名字的接口(embedding interface)
 
 ```go
 package main
@@ -321,7 +355,7 @@ func Call() {
 ，hello.Hi的值为nil，所以运行时panic * 增加出错的机会，编译通过而运行出错 * 如果Hello真的实现了接口Hi，那么 hello.HiName调用的是自己的方法，而不是 hello.Hi.HiName，容易让人误解 *
 struct中嵌入的struct与inerface都是一个字段， 而interface中嵌入的interface，是要求实现对应方法的
 
-8. go "=="总结
+10. go "=="总结
 go语言不支持运算符重载
 
 类型 | == | ？
@@ -446,10 +480,22 @@ channel的三个操作send/recv/close，只要有一个是多线程的，就要�
 
 注：在sending或receiving的过程，close channel会发生什么？[建议查看代码与测试代码结合](https://github.com/golang/go/blob/master/src/runtime/chan.go) 来确定结果
 ###error
-10. recover:
+1. go主要有如下错误
+   errors.New
+   fmt.Errorf
+   实现Error的interface
+   github.com/pkg/errors: 
+如果没有什么特别的就使用 github.com/pkg/errors包。下面是它的主要函数
+   func New(message string) error //如果有一个现成的error，这时候有三个函数可以选择。  
+   func WithMessage(err error, message string) error //只附加新的信息  
+   func WithStack(err error) error //只附加调用堆栈信息  
+   func Wrap(err error, message string) error //同时附加堆栈和信息
+2. 不要使用panic做正常的错误处理  
+   panic仅当发生不可恢复的事情（例如：nil 引用）时，程序才必须 panic。当错误无法正常处理或再运行会产生更严重的问题时，才panic时。
+3. recover:
     * 使用recover来捕获panic时，只能捕获当前 goroutine的panic。
     * 只有在defer函数的内部，调用recover才有用。
-11. return 和 defer 的执行顺序，see https://github.com/googege/blog/blob/master/go/go/important/README.md
+4. return 和 defer 的执行顺序，see https://github.com/googege/blog/blob/master/go/go/important/README.md
     运行到return处，给返回值赋值，运行defer（defer之间是堆栈顺序，后进先出）。注意对返回值是否为同一变量（没有产生副本，是同一个），如果是那么在defer中的修改会影响到最后的返回值，下面是两个特殊的例子（更具体的内容参见网页）
 
 ``` go
@@ -514,9 +560,7 @@ func main() {
 //Print a in deferf:  1
 //Print a in defer :  0
 ```
-12. error的建议处理方式 see github.com/pkg/errors func New(message string) error //如果有一个现成的error，这时候有三个函数可以选择。 func
-    WithMessage(err error, message string) error //只附加新的信息 func WithStack(err error) error //只附加调用堆栈信息 func Wrap(err
-    error, message string) error //同时附加堆栈和信息
+
 ###编译选项
 1. 编译约束（go build constraint / tag）：一行以```// +build```开头的注释，后面需要跟一个空行；可能出现在任何类型的文件中，
     但需要放在文件的开头，上面只能有空行和其他注释（具体到.go文件，则表示该部分代码需要位于“包声明（即package行）”之前）
@@ -611,6 +655,7 @@ func main() {
     * 有多线程/超过一个线程
     * 运行过程中数据会变化  
       注： 只有一个线程写，多个线程读，是有线程安全问题的
+    使用-race参数检查是否有数据竟争，如“go run xxx -race”
 3. write copy，在函数中都使用临时变量，反写回去时，必须整体替换
 4. 尽量不使用time.Sleep函数，因为在sleep的过程中，不能正常退出
 5. 最多等待运行10秒  
@@ -661,11 +706,46 @@ for {
     5. mutex(Once, RWMutex, Mutex, Cond)
     6. channel
     7. timer或ticker
-8. go中的Mutex不可重入（不能在同一线程中调用两次lock，这样会死锁），没有获取锁超时功能（要么获取到，要么wait），  
-   不能检查其它线程是否已经获取锁(只能调用lock方法获取)，这些功能在<=1.14.6时。
-### 优化
-1. BCE: Bounds Check Elimination
-[see1](https://go101.org/article/bounds-check-elimination.html)
-[see2](https://docs.google.com/document/d/1vdAEAjYdzjnPA9WDOQ1e4e05cYVMpqSxJYZT33Cqw2g/edit)
+8. go中的Mutex是不可重入，没有获取锁超时功能（要么获取到，要么wait），
+   不能检查其它线程是否已经获取锁(只能调用lock方法获取)，这些功能在<=1.14.6时。  
+可重入锁/reentrant lock：同一线程中可以多次调用lock，而不发生死锁的。它还有一个名字叫“递归锁”，一般使用可重入锁，因为“可重入”名字的含义更容易理解。  
+从好的设计上来讲可重入锁是一种糟糕的设计，原理上是一个线程锁一次就好了，但由于实际函数调用层次等原因，
+很难做到一个线程只锁一次，所以可以在代码中使用可重入锁，不过go的sdk中没有提供。  
+自旋锁/spin lock：使用循环的方式获取锁，cpu使用较多，在并发比较少时性能更好。同一个lock可以是自旋且可重入的，也可以是不可以重入的。  
+[Discuss the reentrant in Experimenting with GO](https://groups.google.com/g/golang-nuts/c/XqW1qcuZgKg/m/Ui3nQkeLV80J)
+9. 不要依赖goroutine id或使用"thread local"
+go sdk并不直接提供方法返回当前的goroutine id，所以不要尝试去获得它，并做一些依赖
+go sdk并不支持thread local这们的功能，不尝试使用这样的功能
 
+### 优化
+1. BCE: Bounds Check Elimination  
+[see1](https://go101.org/article/bounds-check-elimination.html)  
+[see2](https://docs.google.com/document/d/1vdAEAjYdzjnPA9WDOQ1e4e05cYVMpqSxJYZT33Cqw2g/edit)  
+2. 逃逸分析/escape-analysis  
+[see1](https://github.com/golang/go/wiki/CompilerOptimizations#escape-analysis)
+
+### 库使用记要
+#### github.com/stretchr/testify
+1. assert.Equal 中使用的是“deepValueEqual”，比较的两个值是否相等。与"=="并不等价
+2. assert.Same比较两个指针地址是否相等，
+```go
+func TestSameEqual(t *testing.T) {
+	a1 := 10
+	a2 := 10
+	p1 := &a1
+	p2 := &a2
+	assert.Equal(t,p1,p2) //地址不同，但值相等，所以成立
+	assert.NotSame(t,p1,p2) //比较指针是否相等，所以成立
+}
 ```
+### 参考  
+[Effective Go](https://golang.org/doc/effective_go.html)  
+[The Go Programming Language Specification](https://golang.org/ref/spec)  
+[The Go Memory Model](https://golang.org/ref/mem)  
+[Go Keywords](https://golang.org/ref/spec#Keywords)  
+[Go Code Review Comments](https://github.com/golang/go/wiki/CodeReviewComments)
+[Uber Go Style](https://github.com/uber-go/guide)
+[Postgres Keywords](https://www.postgresql.org/docs/12/sql-keywords-appendix.html)   
+[SQLite Keywords](https://www.sqlite.org/lang_keywords.html)    
+[MySQL Keywords](https://dev.mysql.com/doc/refman/8.0/en/keywords.html)  
+

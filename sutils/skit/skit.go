@@ -73,7 +73,7 @@ func SetPrivateField(field *reflect.Value, newValue interface{}) error {
 		}
 
 		if field.Kind() == reflect.Ptr { //Pointer
-			fpp := ((**uintptr)(unsafe.Pointer(field.Addr().Pointer()))) //get the address of the field and transfer to the Pointer
+			fpp := (**uintptr)(unsafe.Pointer(field.Addr().Pointer())) //get the address of the field and transfer to the Pointer
 			vf2 := reflect.ValueOf(newValue)
 			if vf2.Kind() != reflect.Ptr || (!vf2.Type().AssignableTo(field.Type())) {
 				err = errors.New("new value is not pointer")
@@ -85,7 +85,7 @@ func SetPrivateField(field *reflect.Value, newValue interface{}) error {
 		}
 
 		if field.Kind() == reflect.Interface { //interface
-			fpp := ((*interface{})(unsafe.Pointer(field.Addr().Pointer())))
+			fpp := (*interface{})(unsafe.Pointer(field.Addr().Pointer()))
 
 			//{ // method one， require to decide the type of interface at complile time
 			//	var t2 sampleInterface = &sampleImp{F: 20}
@@ -125,8 +125,7 @@ func MergeClone(a []byte, b []byte) []byte {
 	case alen:
 		clone = append(a[:0:0], a...)
 	default:
-		clone = append(a[:0:alen], a...) //do not clone
-		clone = append(clone, b...)      //clone certainly,because alen and blen  are both not zero,   only alloc memory once
+		clone = append(a, b...) //clone certainly,because alen and blen are  both zero,  only alloc memory once
 	}
 	return clone
 }

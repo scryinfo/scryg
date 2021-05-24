@@ -94,4 +94,28 @@ func TestIsNil(t *testing.T) {
 	assert.Equal(t, true, r)
 }
 
+func TestMergeClone(t *testing.T) {
+	data1 := []byte{1}
+	data2 := []byte{4}
+	clone := MergeClone(data1, data2)
+	assert.Equal(t, data1, clone[0:len(data1)])
+	assert.Equal(t, data2, clone[len(data1):])
+	assert.NotSame(t, &data1[0], &clone[0]) //cloned
 
+	data2 = nil
+	clone = MergeClone(data1, data2)
+	assert.Equal(t, data1, clone[0:len(data1)])
+	assert.Equal(t, data1, clone)
+	assert.NotSame(t, &data1[0], &clone[0]) //cloned
+
+	data2 = nil
+	data1 = nil
+	clone = MergeClone(data1, data2)
+	assert.Equal(t, data1, clone)
+
+	data1 = nil
+	data2 = []byte{4}
+	clone = MergeClone(data1, data2)
+	assert.Equal(t, data2, clone[0:len(data2)])
+	assert.NotSame(t, &data2[0], &clone[0]) //cloned
+}
