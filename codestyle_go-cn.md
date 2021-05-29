@@ -160,18 +160,22 @@ MergeClone两个slice的高效方法，已经实现在库 scryg/sutils/skit/Merg
 20. 减少导出方法或变量。如果函数或变量在外部不使用，就不要导出（不使用大写打头）
 21. 使用字段名初始化结构体，不要省略字段名
 22. 内嵌字段/embedded field  
- "" | T| *T 
+
+ " " | T| *T 
 ----|----|----
 S | v | v and p
 *S | v and p | v and p
-v methods/v: receiver为value的方法集合
-p methods/p: receiver为pointer的方法集合
-S是结构体
+
+v methods/v: receiver为value的方法集合  
+p methods/p: receiver为pointer的方法集合  
+
+S是结构体  
 T是内嵌字段
-总结为：两个都是Value时，只包含T中接收者为Value的方法；其中一个为指针时，包含T的接收者为value与pointer的方法（所有方法）
+
+总结为：两个都是Value时，只包含T中接收者为Value的方法；其中一个为指针时，包含T的接收者为value与pointer的方法（所有方法）  
 当T中的方法或字段与S中的名字（或多个不同类型T中的字段或方法名）有冲突时，要用全名使用
 23. 少使用init()函数  
-不要依赖init()运行的先后顺序。在修改代码之后，init函数之间的运行先后顺序可能会变化
+不要依赖init()运行的先后顺序。在修改代码之后，init函数之间的运行先后顺序可能会变化  
 不要在init()函数中运行“重”的工作，如果文件或网络操作等耗时操作，它们会因环境变化而出错，且很难恢复
 
 ###反射
@@ -473,8 +477,8 @@ func TestCloseSendingChan(t *testing.T){
 	close(c)
 }
 ```
-8. Safe and high performance to close the channel
-[see](https://go101.org/article/channel-closing.html)
+8. Safe and high performance to close the channel  
+[see](https://go101.org/article/channel-closing.html)  
 channel的三个操作send/recv/close，只要有一个是多线程的，就要对channel进行保护
 9. receiving queue,sending queue, buffering queue are all fifo（先进先出）
 
@@ -495,7 +499,7 @@ channel的三个操作send/recv/close，只要有一个是多线程的，就要�
 3. recover:
     * 使用recover来捕获panic时，只能捕获当前 goroutine的panic。
     * 只有在defer函数的内部，调用recover才有用。
-4. return 和 defer 的执行顺序，see https://github.com/googege/blog/blob/master/go/go/important/README.md
+4. return 和 defer 的执行顺序,  [see](https://github.com/googege/blog/blob/master/go/go/important/README.md)  
     运行到return处，给返回值赋值，运行defer（defer之间是堆栈顺序，后进先出）。注意对返回值是否为同一变量（没有产生副本，是同一个），如果是那么在defer中的修改会影响到最后的返回值，下面是两个特殊的例子（更具体的内容参见网页）
 
 ``` go
