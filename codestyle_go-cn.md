@@ -724,6 +724,22 @@ go sdk并不支持thread local这们的功能，不尝试使用这样的功能
 2. 逃逸分析/escape-analysis  
 [see1](https://github.com/golang/go/wiki/CompilerOptimizations#escape-analysis)
 
+### 安全
+1. 在进行数字运算操作时，需要做好长度限制，防止外部输入运算导致异常  
+   *. 确保无符号整数运算时不会反转  
+   *. 确保有符号整数运算时不会出现溢出  
+   *. 确保整型转换时不会出现截断错误  
+   *. 确保整型转换时不会出现符号错误  
+   //todo 给出反例  
+2. 防止出现指针的循环引用
+//todo 给出例子
+3. 小心使用unsafe包
+4. SQL  
+   *. 使用参数邦定
+   *. 禁止使用参数拼接SQL语句
+5. Web  
+   *. 跨域资源共享CORS限制请求来源 //todo 使用例子
+   *. CSRF防护
 ### 库使用记要
 #### github.com/stretchr/testify
 1. assert.Equal 中使用的是“deepValueEqual”，比较的两个值是否相等。与"=="并不等价
@@ -744,6 +760,7 @@ func TestSameEqual(t *testing.T) {
 [The Go Memory Model](https://golang.org/ref/mem)  
 [Go Keywords](https://golang.org/ref/spec#Keywords)  
 [Go Code Review Comments](https://github.com/golang/go/wiki/CodeReviewComments)
+[Go安全指南](https://github.com/Tencent/secguide/blob/main/Go%E5%AE%89%E5%85%A8%E6%8C%87%E5%8D%97.md)
 [Uber Go Style](https://github.com/uber-go/guide)
 [Postgres Keywords](https://www.postgresql.org/docs/12/sql-keywords-appendix.html)   
 [SQLite Keywords](https://www.sqlite.org/lang_keywords.html)    
