@@ -85,19 +85,29 @@ dart中，所有类型都是对象，函数的对象类型是：Function。  可
 
 ****ps：mixin 在flutter源码中使用较多。****
 
-5. 基本操作符
+5. 基本操作符&&null safety操作符
 
 - 除法与整除 / 除号
-  ~/ 除号，但返回值是整数
-- 相等 操作符是 == // 其中两个对象代表 同样内容 的时候返回true。 如果要判两对象是否为 同一个对象，用identical（）方法。
+    - ~/ 除号，但返回值是整数
+- 相等 操作符是 ==
+    - 其中两个对象代表 同样内容 的时候返回true。 如果要判两对象是否为 同一个对象，用identical（）方法。
 - 类型判定 is 是指定类型，true is!    不是指定类型，true
-- 类型转换 as 类型转换 eg：num x=666; x as int;
-- 赋值操作符 ??= a??=value, 如果a为null，则赋值value给a;如果不为null，则a不变
-- 条件表达式 常见表达式 term ? expr1 : expr2 另一种 expr1 ?? expr2     (如果expr1是non-null，返回其值；否则执行expr2并返回其接口)。
+- 类型转换 as 类型转换
+    - eg：num x=666; x as int;
+- 赋值操作符 ??=
+    - a??=value, 如果a为null，则赋值value给a;如果不为null，则a不变
+- 条件表达式 常见表达式 term ? expr1 : expr2
+    - 另一种 expr1 ?? expr2
+    - (如果expr1是non-null，返回其值；否则执行expr2并返回其接口)
+- null safety 操作符
+    - ? 标识签名的类型可以为空
+        - eg:  String? n
+    - ! 标识类型不能为空
+        - eg:  ```var zero = ints[0]/*!*/;```加了以上的!提示
 
 6. 对象级联操作符
 
-* .. 一个对象上，多次调用该对象的多个方法或成员。
+- .. 一个对象上，多次调用该对象的多个方法或成员
 
 ``` 
    new Person()
@@ -108,7 +118,8 @@ dart中，所有类型都是对象，函数的对象类型是：Function。  可
 
 7. 条件成员访问操作符
 
-- 区分操作符 ?. 和操作符 . 之间的区别 ?. 和常规的成员访问操作符 . 相似， 但左边对象不能为null。 如果左边操作对象为null，则返回 null，否则，返回右边的成员。
+- 区分操作符 ?. 和操作符 . 之间的区别
+- ?. 和常规的成员访问操作符 . 相似， 但左边对象不能为null。 如果左边操作对象为null，则返回 null，否则，返回右边的成员。
 
 8. 流程控制
 
@@ -149,10 +160,10 @@ dart中，所有类型都是对象，函数的对象类型是：Function。  可
 
 11. future 最主要的功能就是提供了链式调用 多个future的执行顺序
 
--        规则一：Future 的执行顺序为Future的在 EventQueue 的排列顺序。类似于 JAVA 中的队列，先来先执行。
--        规则二：当任务需要延迟执行时，可以使用 new Future.delay() 来将任务延迟执行。
--        规则三： Future 如果执行完才添加 than ，该任务会被放入 microTask，当前 Future 执行完会执行 microTask，microTask 为空后才会执行下一个Future。
--        规则四：Future 是链式调用，意味着Future 的 then 未执行完，下一个then 不会执行。
+- 规则一：Future 的执行顺序为Future的在 EventQueue 的排列顺序。类似于 JAVA 中的队列，先来先执行。
+- 规则二：当任务需要延迟执行时，可以使用 new Future.delay() 来将任务延迟执行。
+- 规则三： Future 如果执行完才添加 than ，该任务会被放入 microTask，当前 Future 执行完会执行 microTask，microTask 为空后才会执行下一个Future。
+- 规则四：Future 是链式调用，意味着Future 的 then 未执行完，下一个then 不会执行。
 
 ```
     多组类型，代码示例：
@@ -197,7 +208,7 @@ dart中，所有类型都是对象，函数的对象类型是：Function。  可
 
 12. 多future和多micTask的执行顺序
 
-- 与nodejs中的机制非常类似
+-   与nodejs中的机制非常类似,NoBlock主线程模型
 
 ```
       代码示例：
