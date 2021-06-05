@@ -589,15 +589,16 @@ func main() {
 
 
 ### 多线程（goroutines）
-1. 退出/取消线程设计
+1. 退出/取消线程设计，线程退出是不确定的，不能保证百分百退出，线程退出没有完美方案
     * 如果线程会长时间运行，必须有退出/取消
     * 长时间运行的代码中，必须有退出/取消检查
     * 在任何形式的wait中加入退出/取消机制（参见定时任务实现）
     * 退出/取消功能的channel数据类型使用 struct{}，因为它的size为零
+    * go中没有强制退出goroutine的方法，只能正常退出，有一个例外是当main退出时，不会等待goroutine运行完成就会直接退出。[see](https://github.com/golang/go/issues/32610)
 
 ```go
    //一般的限出/取消
-    cancel := make(chan struct{})//使用channel 实现
+    cancel := make(<-chan struct{})//使用channel 实现
     go func() {
         for {
             //do something
@@ -676,30 +677,55 @@ go func() {
 }()
 select {
 case <-ctx.Done():
-//增加退出线程处理
+    //增加退出线程处理
 }
 ```
 
 6. 定时任务实现
 
 * 特别注意任务本身运行的时间，对定时时间的影响
-* 使用 ticker时，一定要想好任务本身运行的时间是否确定，是否会大于定时的时间，这些情况下定义器是否还有意义，  
-  比如：定时时间为1秒，而任务本身运行需要1秒钟，那么相当于这个任务一直连继在工作，与直接使用一个for循环效果是一样的，这此就没有必要使用定时器了。
+* 使用 ticker时，一定要想好任务本身运行的时间是否确定，是否会大于定时的时间，这些情况下定时器是否还有意义，  
+  比如：定时时间为1秒，而任务本身运行需要1秒钟，那么相当于这个任务一直连继在工作，与直接使用一个for循环效果是一样的，就没有必要使用定时器了。
 
 ```go
 //不计算定时任务本身运行时间
-timer := time.NewTimer(time.Second * 10)
+cancel := make(<-chan struct{})
+timer := time.NewTimer(time.Second * 10)//如果interval = 0，那么立刻运行
 for {
     select {
     case <-cancel:
         //退出清理
         timer.Stop() //尽快清理timer
         return
-    case <-timer.C:
+    case <-timer.C://这里也可以使用 “time.After(interval)”简化代码，但是不过After函数中，每次都会 new 一个新的timer出来，所以不建议使用
         //do something
     }
     timer.Reset(time.Second * 10)
 }
+
+//计算任务本身运行的时间
+cancel := make(<-chan struct{})
+const seconds = 10
+interval := time.Second * seconds
+timer := time.NewTimer(interval)//如果interval = 0，那么立刻运行
+for {
+    select {
+    case <-cancel:
+        //退出清理
+        timer.Stop() //尽快清理timer
+        return
+    case <-timer.C://这里也可以使用 “time.After(interval)”简化代码，但是不过After函数中，每次都会 new 一个新的timer出来，所以不建议使用
+        start := time.Now()
+        //do something
+        diff := seconds - int(time.Now().Sub(start).Seconds())
+        if diff <= 0 { //任务运行已经超过定时器了，依据业务选择怎么处理，这里只是简单的把定时改为一秒
+            diff = 1
+        }
+        interval = time.Second * time.Duration(diff)
+    }
+    timer.Reset(interval)
+}
+
 ```
 
 7. 线程安全性能先后顺序
@@ -719,7 +745,7 @@ for {
 [Discuss the reentrant in Experimenting with GO](https://groups.google.com/g/golang-nuts/c/XqW1qcuZgKg/m/Ui3nQkeLV80J)
 9. 不要依赖goroutine id或使用"thread local"
 go sdk并不直接提供方法返回当前的goroutine id，所以不要尝试去获得它，并做一些依赖
-go sdk并不支持thread local这们的功能，不尝试使用这样的功能
+go sdk并不支持thread local功能，不尝试使用这样的功能
 
 ### 优化
 1. BCE: Bounds Check Elimination  
@@ -755,7 +781,7 @@ func TestSameEqual(t *testing.T) {
 	p1 := &a1
 	p2 := &a2
 	assert.Equal(t,p1,p2) //地址不同，但值相等，所以成立
-	assert.NotSame(t,p1,p2) //比较指针是否相等，所以成立
+	assert.NotSame(t,p1,p2) //比较指针地址是否相等，所以成立
 }
 ```
 ### 参考  
