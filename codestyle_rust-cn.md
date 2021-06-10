@@ -39,13 +39,15 @@ are functions associated with a type
        //生成数据
        {}
        //使用数据
-       return data
+       return data;
    }
    ```
 
 ## Name
 
-[遵守Rust的命名](https://rust-lang.github.io/api-guidelines/naming.html)
+[遵守Rust的命名](https://rust-lang.github.io/api-guidelines/naming.html)  
+[RFC0430 finalizing naming conventions](https://github.com/rust-lang/rfcs/blob/master/text/0430-finalizing-naming-conventions.md)  
+常用单词[Words](./words_cn_en.md)
 
 1. 所有源代码文件名，使用小写，加下划线
 2. toml中的package或bin 命名使用下划线，不使用减号， 保持package name 与crate或lib 的名字一至
@@ -68,12 +70,12 @@ are functions associated with a type
 5. 个别字符看起是一个char，可能它是两个char。在使用时，容易产生混淆的字符，加上注释以示区别
 
 ```rust
-let chars = "é".chars().collect::<Vec<_>>();
+let chars = "é".chars().collect::<Vec<_ > > ();
 // U+00e9: 'latin small letter e with acute'
 assert_eq!(vec!['\u{00e9}'], chars);
-let chars2 = "é".chars().collect::<Vec<_>>();
+let chars2 = "é".chars().collect::<Vec<_ > > ();
 // U+0065: 'latin small letter e',U+0301: 'combining acute accent'
-assert_eq!(vec!['\u{0065}','\u{0301}'], chars2);
+assert_eq!(vec!['\u{0065}', '\u{0301}'], chars2);
 ```
 
 [see](https://doc.rust-lang.org/stable/std/primitive.char.html)
@@ -85,7 +87,7 @@ use std::io::Write;
 let mut stdout = std::io::stdout();
 let mut lock = stdout.lock();
 for line in lines {
-    writeln!(lock, "{}", line)?;
+writeln!(lock, "{}", line)?;
 }
 ```
 
@@ -111,32 +113,34 @@ for line in lines {
 8. Box::new 使用了一个神奇的单词“box”，它的作用是把对象安全的移动到heap上面，它在编译时可能会作优化以减少内存上的不必须的复制移动 ？分配两次
 
 ```rust
-let d = Box::new(Data::default());
+let d = Box::new(Data::default ());
 // Data这个对被分配了两次，一次是Data::default()，在stack上, 一次是Box::new，在heap
 // 有没有方法直接分配到heap上面，且是default的？
 // 网上参考，有人说编译可能会优化，让它只会分配一次，[see](https://github.com/rust-lang/rust/issues/53827)，[see2](https://stackoverflow.com/questions/31502597/do-values-in-return-position-always-get-allocated-in-the-parents-stack-frame-or/31506225#31506225)
 // 这个问题与C++中的placement new情况是一样的，但是没有找到在指定内存上调用default的方法，分析default的返回值是一个对象，没有转入参数的地方，它只产生一个对象，而不能在一个对象上运行。
 // 所以下面是解决方法的思路（这不是一个可靠的方法，只是为了说明思路，在实际的代码中不要这样使用）
-struct Data{
+struct Data {
     name: String,
 }
-impl Data{
-    pub fn _init(&mut self){
+
+impl Data {
+    pub fn _init(&mut self) {
         self.name = "test".to_owned();
     }
 }
-impl Default for Data{
+
+impl Default for Data {
     fn default() -> Self {
-        let mut d = Data{name:String::default(),};
+        let mut d = Data { name: String::default(), };
         d._init();
         d
     }
 }
 //这不是一个可靠的方法，只是为了说明思路，在实际的代码中不要这样使用
 let mut d = unsafe {
-    let ptr:*mut Data = alloc(Layout::new::<Data>()) as _;
-    (*ptr)._init();
-    Box::from_raw(ptr)
+let ptr: * mut Data = alloc(Layout::new::< Data > ()) as _;
+( * ptr)._init();
+Box::from_raw(ptr)
 };
 println!("{}", d.name);
 ```
@@ -159,6 +163,53 @@ println!("{}", d.name);
 
 ```
 
+### 多线程
+
+1. Sync或Send只是告诉编译器是安全的，并不会做什么动着，保证安全。注意在实现时使用“unsafe”，说明需要我们自己写来保证线程的安全。  
+   下面是一个反例
+
+```rust
+//这是错误代码
+struct Data {
+    c: Cell<i32>,
+}
+
+unsafe impl Sync for Data {}
+
+unsafe impl Send for Data {}
+
+impl Data {
+    pub fn add(&self) {
+        let t = self.c.get() + 1;
+        self.c.set(t);
+    }
+}
+
+let mut d = Arc::new(Data {
+c: Cell::new(0),
+});
+
+let mut d2 = d.clone();
+let t2 = spawn(move | | {
+for i in 0..101 {
+d2.add();
+}
+});
+let mut d3 = d.clone();
+let t3 = spawn(move | | {
+for i in 0..101 {
+d3.add();
+}
+});
+for i in 0..101 {
+d.add();
+}
+t2.join();
+t3.join();
+println!("len: {}", d.c.get());//输出的结果大部分情况都不是303
+
+```
+
 ### 代码提交前准备
 
 1. fmt --> clippy --> cargo test --no-run。这三样通过后，才提交代码
@@ -178,6 +229,85 @@ println!("{}", d.name);
     assert_eq!(true,v.is_err(),"{:?}", v);
     ```
 
+## 文档
+
+1. 在文档中使用 Errors、Panics、Safety
+
+```rust
+/// # Errors
+/// ....
+/// # Panics
+/// ....
+/// # Safety
+/// ....
+/// # Examples
+/// ....
+```
+
+[see](https://rust-lang.github.io/api-guidelines/documentation.html)
+
+2. 包含指向相关内容的超链接，下面是例子
+
+```rust
+//!Just doc sample for the mod mylib::doc_
+//!
+//!
+//! # Samples
+//! ```
+//! use mylib::doc_::Data;
+//!
+//! let modData = Data::new();
+//! ```
+//!
+
+/// Just doc sample for the mylib::doc_::Data
+///
+///
+/// # Samples
+///
+/// ```
+/// use mylib::doc_::Data;
+/// let data = Data::new();
+/// ```
+/// use the [`Data::new`]
+///
+/// use 2 the [crate::doc_::Data]
+///
+/// see the [`Vec`]
+///
+/// see1 the [Vec]
+///
+/// see2 the [std::vec::Vec]
+///
+pub struct Data {
+    /// data's name
+    /// see [Data::new]
+    pub name: String,
+    list: Vec<i32>,
+}
+
+impl Data {
+    /// new struct [Data]
+    /// see the field [Data::name]
+    pub fn new() -> Self {
+        Data {
+            name: "".to_owned(),
+            list: Vec::new(),
+        }
+    }
+}
+``` 
+
+说明：
+
+* [`Vec`]与[Vec]这两种连接方式都是可以的
+* 可以使用[std::vec::Vec]/[crate::doc_::Data]全路径增加link
+* 在lib.rs开头增加如下代码，会在Samples的右上角显示“Run”按钮
+
+```rust
+#![doc(html_playground_url = "https://play.rust-lang.org/")]
+```
+
 ## 库使用说明
 
 ### Rbatis
@@ -188,6 +318,17 @@ println!("{}", d.name);
 //tx 只处理异常情况下，事务的rollback，所以会在事务提交成功后，调用 tx.manager = None; 阻止 [rbatis::tx::TxGuard]再管理事务
 let mut tx = rb.begin_tx_defer(false).await?;
 // .... 
-rb.commit(&tx.tx_id).await?;
+rb.commit( & tx.tx_id).await?;
 tx.manager = None;
 ```
+
+## 参考
+
+[The Rust Programming Language](https://doc.rust-lang.org/book/)
+[The Rust Reference](https://doc.rust-lang.org/reference/index.html)
+[The Rustonomicon/Rust 秘典](https://doc.rust-lang.org/nomicon/index.html)
+[Rust API Guidelines](https://rust-lang.github.io/api-guidelines/)
+[Rust by Example](https://doc.rust-lang.org/stable/rust-by-example/)
+[The Cargo Book](https://doc.rust-lang.org/cargo/index.html)
+[The rustdoc book](https://doc.rust-lang.org/rustdoc/index.html)
+
