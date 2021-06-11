@@ -4,10 +4,13 @@
 
 SCRYINFO
 
-## 说明
+## 名词
 
-函数(function)：由fn定义的函数 方法(method)：是一种特殊的函数，第一个参数含self（与一个struct或trait关联的） 关联函数(Associated functions)：Associated functions
-are functions associated with a type
+函数(function)：由fn定义的函数  
+方法(method)：是一种特殊的函数，第一个参数含self（与一个struct或trait关联的）  
+关联函数(Associated functions)：Associated functions are functions associated with a type  
+孤儿原则：trait与实现trait，有这样的要求。 impl的代码要么在trait所在的crate，要么在struct所在的crate。
+
 
 ## 规则
 
@@ -54,6 +57,13 @@ are functions associated with a type
 2. 所有目录文件名，使用小写，加下划线
 3. 命名使用有明确函义的英文单词
 4. 不要翻译lifetime这个单词，因为它的通常翻译是“生命周期”，这个不能很准备的表达英文的意思，“生命周期”更适合与lifecycle对应
+5. 优先选用as_与into_打头的方法，然后再是to_打头的方法。  
+    std在实现时以as_/into_打头的方法，一般是没有代价的。而to_一般会做较多工作如内存分配等，如方法str::to_lowercase()转换为小写，一般会新分配内存。  
+    str::as_bytes查看str的uft-8的字节，没有内存分配。String::into_bytes进入内部的Vec<u8>数据。  
+    as 与 into很像， as转换类型查看，into是进入里面的类型查看。查看源代码String::to_bytes/into_bytes体会它们的区别
+6. iter/iter_mut/into_iter，其中into_iter是生成独立的iter，它会消耗容器，也就是owened。
+7. 使用一至的单词顺命名。  
+    一般是动词-名词-错误。这里有一种特殊的情况是，是某一分类下内容，可以在动词前面增加一个分类的前缀如 Eth---，或Btc---等
 
 ## 目录文件
 
@@ -162,6 +172,25 @@ println!("{}", d.name);
 ```rust
 
 ```
+12. 析构函数简单可靠，不要执行不确定或费时费力或阻塞操作  
+    析构函数主要是指像drop，close等方法，
+13. 如果trait不希望被crate外实现，使用private::Sealed
+```rust
+pub trait InnerTrait: private::Sealed {
+    //...
+}
+```    
+
+14. derive与trait bound都可以实现时，优先使用derive，它使用更简单
+```rust
+// 优先使用这个
+#[derive(Debug, PartialEq)]
+struct Good<T> { /* ... */ }
+
+// 不建议使用
+#[derive(Debug, PartialEq)]
+struct Bad<T: Debug + PartialEq> { /* ... */ }
+```
 
 ### 多线程
 
@@ -209,6 +238,8 @@ t3.join();
 println!("len: {}", d.c.get());//输出的结果大部分情况都不是303
 
 ```
+2. Send与Sync trait编译器会自动推断为struct实现这两个trait。  
+    如果struct中的所有字段都是Send或Sync的，那么这个struct也是Send或Sync的。只有编译器推断为不是Send或Sync时，我们才会手动实现它。一定注释，手机实现时是unsafe的。
 
 ### 代码提交前准备
 
@@ -331,4 +362,5 @@ tx.manager = None;
 [Rust by Example](https://doc.rust-lang.org/stable/rust-by-example/)
 [The Cargo Book](https://doc.rust-lang.org/cargo/index.html)
 [The rustdoc book](https://doc.rust-lang.org/rustdoc/index.html)
+[Elegant Library APIs in Rust](https://deterministic.space/elegant-apis-in-rust.html)
 
