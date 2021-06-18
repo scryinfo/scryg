@@ -10,7 +10,7 @@ SCRYINFO
 方法(method)：是一种特殊的函数，第一个参数含self（与一个struct或trait关联的）  
 关联函数(Associated functions)：Associated functions are functions associated with a type  
 孤儿原则：trait与实现trait，有这样的要求。 impl的代码要么在trait所在的crate，要么在struct所在的crate。
-
+FnX：是Fn,FnMut,FnOnce中的一种或多种
 
 ## 规则
 
@@ -109,7 +109,7 @@ writeln!(lock, "{}", line)?;
     * 它由编译器来保证reference的有效性
     * 在Rust的安全代码中，所有的引用都是有效的
     * 在c++中的引用，是一个变量的别名，他们就是同一个对象，没有产生新的内存或对象 rust的reference就是个特别的指针，与C++中的引用不是一个概念。 C++与C#支持C++的引用， java go dart
-      rust等都不支持C++的引用，而这些语言中的所谓“引用”，只是类似指针 rust函数参数不支持C++的引用传参，因为rust在传参时使用的是指针，存放指针值的对象产生了副本 java go dart
+      rust等都不支持C++的引用，而这些语言中的所谓“引用”，只是类似指针 rust函数参数不支持C++的引用传参，因为rust传参是值传递，存放指针值的对象产生了副本 java go dart
       rust等语言也不支持引用传参，都是传值 ？不确定&self/&mut self是否也产生传数时的副本，从调用工具上看没有产生。
 
 ```rust
@@ -164,24 +164,184 @@ println!("{}", d.name);
 ```rust
 
 ```
+11. 永远不要把local variable的引用赋给raw pointer；  
+    double raw要二次free内存；  
+    分配内存时需要认真确认是否需要zero内存，没有特别的理由都需要；  
+    free岂有内存后，记得赋值为null
+    
+```rust
+//error sample, never use it
+fn err_d_raw() -> *mut *mut i32 {
+    let t: *mut *mut i32 = &mut std::ptr::null_mut();
+    t
+}
 
-11. std::Vec实现说明
+fn ok1_d_raw<T>() -> *mut *mut T {
+    let t = Box::new(std::ptr::null_mut());
+    Box::into_raw(t)
+}
+fn ok2_d_raw<T>() -> *mut *mut T {//可以正确工作，但为了统一free内存，不建议这种方式
+    let layout = std::alloc::Layout::new::<*mut *mut T>();
+    //注意分配内存时，一定注意是否需要 zeroed.
+    let t = unsafe { std::alloc::alloc_zeroed(layout) } as *mut *mut T;
+    t
+}
+
+fn free_d_raw<T>(d: &mut *mut *mut T) {
+    if *d != std::ptr::null_mut(){
+        unsafe {
+            let mut f =  &mut **d;//是两个*号，第一个对应的是 &mut
+            if *f != std::ptr::null_mut() {
+                let _ = Box::from_raw(*f);
+                *f = std::ptr::null_mut();
+            }
+            let _ = Box::from_raw(*d);
+            *d = std::ptr::null_mut();
+        }
+    }
+}
+let d1 = err_d_raw();//不要释放这个内存，它是stack，释放会产生未知错误
+let mut d2 = ok1_d_raw::<i32>();
+free_d_raw(&mut d2);
+let mut d3 = ok2_d_raw::<i32>(); //由于使用的alloc直接分配的内存，最好使用dealloc来free内存，配对使用
+free_d_raw(&mut d3);
+
+let mut d4= ok1_d_raw::<i32>();
+unsafe { *d4 = Box::into_raw(Box::new(10)); }
+free_d_raw(&mut d4);
+
+assert_ne!(d1,std::ptr::null_mut());
+assert_eq!(d2, std::ptr::null_mut());
+assert_eq!(d3, std::ptr::null_mut());
+assert_eq!(d4, std::ptr::null_mut());
+
+println!("err_d_raw d1: {:p}\nok1_d_raw d2: {:p}\nok2_d_raw d3: {:p}", d1, d2, d3);
+```
+
+注意  
+    * "&mut std::ptr::null_mut()" 构造一个local variable(命名为 temp)，取temp的引用，转换为raw pointer。temp的lifetime只在函数内有效且是stack内存  
+    * 内存的分配与释放需要配对，都使用Box，或都直接使用alloc/dealloc，不要交叉使用  
+    * 统一使用Box，不直接使用alloc/dealloc，如果需要给出说明  
+
+
+12. &closure会自动实现closure的FnX。  
+    *. closure是一个匿名的结构体  
+    *. 两个closure的代码完全相同，它们的类型也不相同  
+    *. 有move的closure，也可能是Fn或FnMut的。move的含义是让closure获得拥有权，多次调用closure，所有权并没有改变  
+    *. [&closure](https://github.com/rust-lang/rust/blob/master/library/core/src/ops/function.rs) 的实现，这个不在doc中  
+    *. &closure与closure的效果相同，当closure传参需要获得closure所有权时，可以解决多次调用的问题。
+```rust
+    fn fn_once<F>(func: F) where F: FnOnce() {
+        func();//只能调用一次，&func也不行
+    }
+    {
+        let mut a = "fn_once".to_owned();
+        let f = || {
+            // a = capture(a);
+            println!("{}", a)
+        };
+        let f2 = f;
+        fn_once(f);//f 自动实现了 Copy,所以可以再一次使用变量f
+        fn_once(f2);
+    }
+    {
+        fn fn_once<F>(func: F) where F: FnOnce() { func() }
+        let a = "fn_once move".to_owned();
+        let f = move || println!("{}", a);
+        f();
+        (&f)();
+        fn_once(&f);//可以多次调用
+        fn_once(f);
+        //fn_once(f); //error[E0382]: use of moved value: `f`。有move时不会实现 Copy
+    }
+    fn fn_<F>(func: F) where F: Fn() {
+        func();
+    }
+    {
+        let a = "fn".to_owned();
+        let f = || println!("{}", a);
+        let f2 = f;
+        fn_(f);//f 自动实现了 Copy,所以可以再一次使用变量f
+        fn_(f2);
+    }
+    {
+        let a = "fn move".to_owned();
+        let f = move || println!("{}", a);
+        fn_(&f);
+        fn_(f);
+    }
+
+    fn fn_mut<F>(mut func: F) where F: FnMut() {
+        func();
+    }
+    {
+        let mut a = "FnMut".to_owned();
+        let mut f = || {
+            a.push_str("X");
+            println!("{}", a);
+        };
+        f();
+        (&mut f)();
+        fn_mut(&mut f);
+        fn_mut(f);
+    }
+    {
+        let mut a = "FnMut move".to_owned();
+        let f = move || {
+            a.push_str("X");
+            println!("{}", a);
+        };
+        fn_mut(f);
+        // fn_mut(f);
+    }
+```
+下面是nightly下手动实FnX的代码
+```rust
+//需要增加到lib.rs文件开头
+#![feature(unboxed_closures)]
+#![feature(fn_traits)]
+
+struct Data {}
+
+impl FnOnce<()> for Data {
+    type Output = ();
+    extern "rust-call" fn call_once(self, args: ()) -> Self::Output {
+        ()
+    }
+}
+
+impl FnMut<()> for Data {
+    extern "rust-call" fn call_mut(&mut self, args: ()) -> Self::Output {
+        ()
+    }
+}
+
+impl Fn<()> for Data {
+    extern "rust-call" fn call(&self, args: ()) -> Self::Output {
+        ()
+    }
+}
+let d = Data {};
+d();
+(&d)();
+```
+13. std::Vec实现说明
     * set_len是不安全函数，要小心使用
     *
 
 ```rust
 
 ```
-12. 析构函数简单可靠，不要执行不确定或费时费力或阻塞操作  
+13. 析构函数简单可靠，不要执行不确定或费时费力或阻塞操作  
     析构函数主要是指像drop，close等方法，
-13. 如果trait不希望被crate外实现，使用private::Sealed
+14. 如果trait不希望被crate外实现，使用private::Sealed
 ```rust
 pub trait InnerTrait: private::Sealed {
     //...
 }
 ```    
 
-14. derive与trait bound都可以实现时，优先使用derive，它使用更简单
+15. derive与trait bound都可以实现时，优先使用derive，它使用更简单
 ```rust
 // 优先使用这个
 #[derive(Debug, PartialEq)]
@@ -246,7 +406,7 @@ println!("len: {}", d.c.get());//输出的结果大部分情况都不是303
 1. fmt --> clippy --> cargo test --no-run。这三样通过后，才提交代码
 2. 清除编译警告
 
-### 单元测试
+### 测试
 
 1. 在assert语句中如果使用了对象的字段或函数，建议打印整个对象。
     * 检测Option为None
@@ -259,6 +419,7 @@ println!("len: {}", d.c.get());//输出的结果大部分情况都不是303
     //let data = Result ....
     assert_eq!(true,v.is_err(),"{:?}", v);
     ```
+2. 可以安装运行[miri](https://github.com/rust-lang/miri) 来测试代码
 
 ## 文档
 

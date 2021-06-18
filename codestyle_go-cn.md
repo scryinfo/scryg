@@ -804,9 +804,9 @@ return dbInstance
 stopChannel := make(chan bool)
 closing := int32(0) //atomic没有操作bool的
 closeByAtomic := func () {
-if atomic.CompareAndSwapInt32(&closing, 0, 1) {
-close(stopChannel)
-}
+    if atomic.CompareAndSwapInt32(&closing, 0, 1) {
+        close(stopChannel)
+    }
 }
 
 go closeByAtomic() //多次并发关闭，是安全的
@@ -817,9 +817,9 @@ closeByAtomic()
 stopChannel := make(chan bool)
 once := sync.Once{} //atomic没有操作bool的
 closeByOnce := func () {
-once.Do(func (){
-close(stopChannel)
-})
+    once.Do(func (){
+        close(stopChannel)
+    })
 }
 
 go closeByOnce() //多次并发关闭，是安全的
@@ -828,7 +828,16 @@ closeByOnce()
 //两次实现的区别是，sync.Once是确定完成的，而atomic是不确定的。sync.Once时，closeByOnce()方法返回，那么close函数一定运行完成了。
 //而使用atomic实现时，closeByAtomic()方法返回，close函数并不确定是否运行或完成，可能运行完成，可能还没有运行，可能运行到一半
 ```
-
+12. Mutex,Cond,Once,WaitGroup,Channel选择  
+   * 在不线程之间传递数据时，一个生产一个消费，使用channel  
+   * 在多个线程中共享数据时（反复多次读写），使用Mutex，这时数据会被反复使用
+   * 只做一次，且等运行完成时，使用Once
+   * 多线程之间相互通知时，使用Cond，可以反复多次使用。这里有点像事件，当发生什么事件时，然后做什么事情。  
+     比如当上课时间时，触发一个事件“打上课铃”，同学们收到事件通过“听到上课铃”（注这里是多人），然后就进入教室。
+   * 一个任务需要多部分或分步骤完成时，使用WaitGroup。如果数量只有一时，使用Cond与WaitGroup效果类似，但还是建议使用WaitGroup。  
+     比如做一个实验要分5步完成，每一步完成时，都做一次记录，直接所有的步骤都完成时，整个实验完成
+   * 
+   
 ## 文档
 
 1. 注释与代码同步
