@@ -909,6 +909,36 @@ assert.NotSame(t, p1, p2) //比较指针地址是否相等，所以成立
 }
 ```
 
+#### json
+1. 自定义json的MarshalJSON函数时，小心receiver的类型。先看代码
+```go
+type JsonData struct {
+	name string
+}
+
+func (c *JsonData) MarshalJSON() (bytes []byte, err error) {
+	return json.Marshal(c.name)
+}
+
+func (c *JsonData) UnmarshalJSON(bytes []byte) error {
+	return json.Unmarshal(bytes, &c.name)
+}
+
+func TestJsonData(t *testing.T) {
+	d := JsonData{name: "test"}
+	bytes, err := json.Marshal(d)
+	assert.Equal(t, nil, err)
+	var d2 JsonData
+	err = json.Unmarshal(bytes, &d2)
+	assert.Equal(t, nil, err) //has error，为什么？
+	assert.Equal(t, d, d2)    //not eq， 有两种方法，可以更正结果，一种是增加一个符号“&”,一种是删除一个符号“*”
+}
+```
+  以上代码中Unmarshal的结构不是预期的结果，原因是“func (c *JsonData) MarshalJSON() (bytes []byte, err error)”中的receiver是pointer。  
+这样如果在使用时如果没有使用pointer类型那么这个方法就不会生效。终上建议如下：  
+* MarshalJSON方法的receiver不要使用pointer，如果要使用给出足够的理由及详细的文档说明  
+* 自定义实现MarshalJSON与UnmarshalJSON的，在test中需要包含指针及非指针的测试用例
+
 ### 参考
 
 [Effective Go](https://golang.org/doc/effective_go.html)  
