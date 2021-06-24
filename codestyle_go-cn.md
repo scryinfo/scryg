@@ -214,7 +214,8 @@ T是内嵌字段
 23. 少使用init()函数  
     不要依赖init()运行的先后顺序。在修改代码之后，init函数之间的运行先后顺序可能会变化  
     不要在init()函数中运行“重”的工作，如果文件或网络操作等耗时操作，它们会因环境变化而出错，且很难恢复
-
+24. go代码如果没有通过main入口引入，是不会被编译进来。
+  代码必须要有引用才会被编译进可执行文件
 ### 反射
 
 1. 判断两个函数签名相同 ConvertibleTo AssignableTo
@@ -937,7 +938,7 @@ func TestJsonData(t *testing.T) {
   以上代码中Unmarshal的结构不是预期的结果，原因是“func (c *JsonData) MarshalJSON() (bytes []byte, err error)”中的receiver是pointer。  
 这样如果在使用时如果没有使用pointer类型那么这个方法就不会生效。终上建议如下：  
 * MarshalJSON方法的receiver不要使用pointer，如果要使用给出足够的理由及详细的文档说明  
-* 自定义实现MarshalJSON与UnmarshalJSON的，在test中需要包含指针及非指针的测试用例
+* 自定义实现MarshalJSON与UnmarshalJSON的，在test中需要包含指针及非指针的测试用例  
 
 ### 参考
 

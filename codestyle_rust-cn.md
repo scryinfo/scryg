@@ -351,6 +351,8 @@ struct Good<T> { /* ... */ }
 #[derive(Debug, PartialEq)]
 struct Bad<T: Debug + PartialEq> { /* ... */ }
 ```
+16. 小心使用Copy trait。
+   在绝大部分情况下都不需要实现Copy trait，因为一但实现，它会在变量赋值或传参数时自动隐式调用，这个过程很难被注意到，会产生很大的浪费。
 
 ### 多线程
 
