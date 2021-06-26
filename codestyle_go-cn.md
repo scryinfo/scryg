@@ -167,9 +167,9 @@ func TestSliceMergeClone(t *testing.T){
 ```
 MergeClone两个slice的高效方法，已经实现在库 scryg/sutils/skit/MergeClone 中  
 13. nil是一个有效的slice 方法append的第一个参数可以为nil len(nil) == 0， 优先使用var a1 []int，而不是a2 := []int{}。 a2是零长度的slice，len(a2) == 0，
-    而a1是nil的slice
-14. 优先使用 strconv 而不是 fmt，strconv性能更好
-15. mod管理依赖包时，要指定依赖的版本，如果直接依赖于master请说明充分的理由
+    而a1是nil的slice  
+14. 优先使用 strconv 而不是 fmt，strconv性能更好  
+15. mod管理依赖包时，要指定依赖的版本，如果直接依赖于master请说明充分的理由  
 16. 已经声明的变量v可以出现在”:=”声明中的条件：  
    * 本次声明的v与已经声明的v处于同一个作用域中（如果v已经在外层作用域中声明过，则此次声明会创建一个新的变量）。
    * 初始化中与v的值的类型相同的值才能赋予v。
