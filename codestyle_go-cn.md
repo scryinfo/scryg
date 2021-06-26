@@ -165,7 +165,7 @@ func TestSliceMergeClone(t *testing.T){
    assert.Equal(t, data2, merge[len(data1):])
 }
 ```
-MergeClone两个slice的高效方法，已经实现在库 scryg/sutils/skit/MergeClone 中
+MergeClone两个slice的高效方法，已经实现在库 scryg/sutils/skit/MergeClone 中  
 13. nil是一个有效的slice 方法append的第一个参数可以为nil len(nil) == 0， 优先使用var a1 []int，而不是a2 := []int{}。 a2是零长度的slice，len(a2) == 0，
     而a1是nil的slice
 14. 优先使用 strconv 而不是 fmt，strconv性能更好
