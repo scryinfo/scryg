@@ -54,12 +54,12 @@ SCRYINFO
 
 ```go
 func funName(){
-    //定义数据
-    var data []int
-    //生成数据
-    {}
-    //使用数据
-    return data
+//定义数据
+var data []int
+//生成数据
+{}
+//使用数据
+return data
 }
 ```
 
@@ -68,10 +68,10 @@ func funName(){
 ```go
 str := "abc.def"
 for i := range str {
-    if str[i] == '.' {
-        i += 2
-    }
-    fmt.Println(i, string(str[i]))
+if str[i] == '.' {
+i += 2
+}
+fmt.Println(i, string(str[i]))
 }
 ```
 
@@ -81,27 +81,27 @@ for i := range str {
 
 ```go
 {//下面是错误的使用方法
-    wg := sync.WaitGroup{}
-    wg.Add(3)
-    for i := 0; i < 3; i++ {
-        go func () {
-            fmt.Print(i)
-            wg.Done()
-        }()
-    }
-    wg.Wait()
-    //“0123”中的三个数的重复组合，而不是三个数字"012"的组合
+wg := sync.WaitGroup{}
+wg.Add(3)
+for i := 0; i < 3; i++ {
+go func () {
+fmt.Print(i)
+wg.Done()
+}()
+}
+wg.Wait()
+//“0123”中的三个数的重复组合，而不是三个数字"012"的组合
 }
 {//下面是正确做法，会输出三个数字"012"的组合
-    wg := sync.WaitGroup{}
-    wg.Add(3)
-    for i:= 0; i< 3; i++ {
-        go func (d int){
-            fmt.Print(d)
-            wg.Done()
-        }(i)
-    }
-    wg.Wait()
+wg := sync.WaitGroup{}
+wg.Add(3)
+for i:= 0; i< 3; i++ {
+go func (d int){
+fmt.Print(d)
+wg.Done()
+}(i)
+}
+wg.Wait()
 }
 ```
 
@@ -162,11 +162,11 @@ merge = nil
 data1Len, data2Len := len(data1), len(data2)
 switch data1Len + data2Len {
 case data2Len:
-    merge = append(data2[:0:0], data2...)
+merge = append(data2[:0:0], data2...)
 case data1Len:
-    merge = append(data1[:0:0], data1...)
+merge = append(data1[:0:0], data1...)
 default:
-    merge = append(data1, data2...)
+merge = append(data1, data2...)
 }
 assert.Equal(t, data1, merge[0:len(data1)])
 assert.Equal(t, data2, merge[len(data1):])
@@ -213,8 +213,8 @@ T是内嵌字段
 23. 少使用init()函数  
     不要依赖init()运行的先后顺序。在修改代码之后，init函数之间的运行先后顺序可能会变化  
     不要在init()函数中运行“重”的工作，如果文件或网络操作等耗时操作，它们会因环境变化而出错，且很难恢复
-24. go代码如果没有通过main入口引入，是不会被编译进来。
-  代码必须要有引用才会被编译进可执行文件
+24. go代码如果没有通过main入口引入，是不会被编译进来。 代码必须要有引用才会被编译进可执行文件
+
 ### 反射
 
 1. 判断两个函数签名相同 ConvertibleTo AssignableTo
@@ -226,7 +226,7 @@ T是内嵌字段
 
 ```go
 var (
-    _ interfaceName = (*interfaceImpl)(nil)
+_ interfaceName = (*interfaceImpl)(nil)
 )
 ```
 
@@ -235,10 +235,11 @@ go没有实现接口的语法，只要接口中所有的方法都有实现就认
 3. receiver参数默认使用 pointer，如果要使用value给出足够的理由 因为value方式会产生副本，而go语言很容易产生一个副本，所以receiver的类型一般为pointer。 下面是effective go中的说明
    [Receiver pointer vs value](https://golang.org/doc/effective_go#pointers_vs_values)
    规则是：
-   *. pointer可以调用 receiver pointer/value
-   *. value 只能调用 receiver value 原因是，如果value调用receiver pointer，那么value会产生一个副本 value copy来调用，这里receiver
-   pointer中修改了值，但是修改的是value copy中的，不会对原来的value产生影响，这个错误很因隐藏，很难发现，所以go语言不允许这样的调用发生 4，“接口实现”是不区分receiver是pointer还是value类型
-   *T：包含receiver 为pointer&value的方法集 T：包含receiver为value的方法集
+    * pointer可以调用 receiver pointer/value
+    * value 只能调用 receiver value 原因是，如果value调用receiver pointer，那么value会产生一个副本 value copy来调用，这里receiver  
+      pointer中修改了值，但是修改的是value copy中的，不会对原来的value产生影响，这个错误很因隐藏，很难发现，所以go语言不允许这样的调用发生
+    * “接口实现”是不区分receiver是pointer还是value类型
+    * T：包含receiver 为pointer&value的方法集 T：包含receiver为value的方法集
 
 5. interface{}的实现
    [code see](https://github.com/golang/go/blob/master/src/runtime/runtime2.go)
@@ -246,49 +247,49 @@ go没有实现接口的语法，只要接口中所有的方法都有实现就认
 ```go
 
 type iface struct {
-    tab  *itab
-    data unsafe.Pointer
+tab  *itab
+data unsafe.Pointer
 }
 type eface struct {
-    _type *_type
-    data  unsafe.Pointer
+_type *_type
+data  unsafe.Pointer
 }
 // layout of Itab known to compilers
 // allocated in non-garbage-collected memory
 // Needs to be in sync with
 // ../cmd/compile/internal/gc/reflect.go:/^func.dumptabs.
 type itab struct {
-    inter *interfacetype
-    _type *_type
-    hash  uint32 // copy of _type.hash. Used for type switches.
-    _     [4]byte
-    fun   [1]uintptr // variable sized. fun[0]==0 means _type does not implement inter.
+inter *interfacetype
+_type *_type
+hash  uint32 // copy of _type.hash. Used for type switches.
+_     [4]byte
+fun   [1]uintptr // variable sized. fun[0]==0 means _type does not implement inter.
 }
 // Needs to be in sync with ../cmd/link/internal/ld/decodesym.go:/^func.commonsize,
 // ../cmd/compile/internal/gc/reflect.go:/^func.dcommontype and
 // ../reflect/type.go:/^type.rtype.
 // ../internal/reflectlite/type.go:/^type.rtype.
 type _type struct {
-    size       uintptr
-    ptrdata    uintptr // size of memory prefix holding all pointers
-    hash       uint32
-    tflag      tflag
-    align      uint8
-    fieldAlign uint8
-    kind       uint8
-    // function for comparing objects of this type
-    // (ptr to object A, ptr to object B) -> ==?
-    equal func (unsafe.Pointer, unsafe.Pointer) bool
-    // gcdata stores the GC type data for the garbage collector.
-    // If the KindGCProg bit is set in kind, gcdata is a GC program.
-    // Otherwise it is a ptrmask bitmap. See mbitmap.go for details.
-    gcdata    *byte
-    str       nameOff
-    ptrToThis typeOff
+size       uintptr
+ptrdata    uintptr // size of memory prefix holding all pointers
+hash       uint32
+tflag      tflag
+align      uint8
+fieldAlign uint8
+kind       uint8
+// function for comparing objects of this type
+// (ptr to object A, ptr to object B) -> ==?
+equal func (unsafe.Pointer, unsafe.Pointer) bool
+// gcdata stores the GC type data for the garbage collector.
+// If the KindGCProg bit is set in kind, gcdata is a GC program.
+// Otherwise it is a ptrmask bitmap. See mbitmap.go for details.
+gcdata    *byte
+str       nameOff
+ptrToThis typeOff
 }
 ```
 
-interface{}分为两种类型有方法的iface与无法的eface，有两个字段一个是data，另一个是type/tab。 一看实现代码就很容易理解，两个interface{}相等的条件，就要结构体中的两个字段分别相等才可以
+interface{}分为两种类型有方法的iface与无方法的eface，有两个字段一个是data，另一个是type/tab。 一看实现代码就很容易理解，两个interface{}相等的条件，就要结构体中的两个字段分别相等才可以
 一些可能使用的方法： func convI2I(inter *interfacetype, i iface) (r iface)，从a interface{}到b interface{}转换
 
 6. 赋值给interface{}类型（包含传参数时）
@@ -304,46 +305,47 @@ var fat2 interface{} = i
 fat = fat2
 ```
 
-当赋值给interface{}类型时，
-*. 如果右边是非interface{},会自动把右边的值转换为interface{}类型
-*. 如果右边是interface{}, 直接复制fat指针的值（非深复制）
+当赋值给interface{}类型时
+
+* 如果右边是非interface{},会自动把右边的值转换为interface{}类型
+* 如果右边是interface{}, 直接复制fat指针的值（非深复制）
 
 7. 检查接口最终对象是否为空
 
 ```go
 //check if the final object pointed by interface is empty
 func IsNil(any interface{}) bool {
-    re := true
-    if any != nil {
-        v := reflect.ValueOf(any)
-        switch v.Kind() {
-        case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.UnsafePointer, reflect.Interface, reflect.Slice:
-            re = v.IsNil()
-        default:
-            re = false
-            return re
-        }
-        if !re {
-            for v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface { //如果为指针或interface类型，要检查指向的值
-                v = v.Elem() //Ptr或Interface时，返回内部的值
-                switch v.Kind() {
-                case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.UnsafePointer, reflect.Interface, reflect.Slice:
-                    re = v.IsNil()
-                default:
-                    re = false
-                    return re
-                }
-                if re {
-                    break
-                }
-            }
-        }
-    }
-    return re
+re := true
+if any != nil {
+v := reflect.ValueOf(any)
+switch v.Kind() {
+case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.UnsafePointer, reflect.Interface, reflect.Slice:
+re = v.IsNil()
+default:
+re = false
+return re
+}
+if !re {
+for v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface { //如果为指针或interface类型，要检查指向的值
+v = v.Elem() //Ptr或Interface时，返回内部的值
+switch v.Kind() {
+case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.UnsafePointer, reflect.Interface, reflect.Slice:
+re = v.IsNil()
+default:
+re = false
+return re
+}
+if re {
+break
+}
+}
+}
+}
+return re
 }
 ```
 
-8. interface{}与nil interface{}为nill时它的类型与指向的对象都为nil
+8. interface{}与nil interface{}为nil时它的类型与指向的对象都为nil
 
 ```go
 var inter1 interface{} = nil // == nil
@@ -402,8 +404,11 @@ func Call() {
 ```
 
 这段代码是可以编译通过的， 运行时panic。为什么没有实现接口 Hi 就编译通过了，因为嵌入struct中的Hi只是一个字段而已，且是没有名字的，完整调用这样的： hello.Hi.HiName()
-，hello.Hi的值为nil，所以运行时panic * 增加出错的机会，编译通过而运行出错 * 如果Hello真的实现了接口Hi，那么 hello.HiName调用的是自己的方法，而不是 hello.Hi.HiName，容易让人误解 *
-struct中嵌入的struct与inerface都是一个字段， 而interface中嵌入的interface，是要求实现对应方法的
+，hello.Hi的值为nil，所以运行时panic
+
+* 增加出错的机会，编译通过而运行出错
+* 如果Hello真的实现了接口Hi，那么 hello.HiName调用的是自己的方法，而不是 hello.Hi.HiName，容易让人误解
+* struct中嵌入的struct与inerface都是一个字段， 而interface中嵌入的interface，是要求实现对应方法的
 
 10. go "=="总结 go语言不支持运算符重载
 
@@ -462,15 +467,15 @@ send： “chan <- 0”；recv: "<- chan"。在go的实现代码中使用的是s
 ```go
 //recv的关闭chan
 func TestRecvClosedChan(t *testing.T){
-    c := make(chan int, 1)
-    c <- 1
-    close(c)
-    v, ok := <- c
-    assert.Equal(t, 1, v)
-    assert.Equal(t, true, ok) //特别注意,buffer非空且closed时 true。如果这时用ok来判断channel是否关闭那真是个空难
-    v,ok = <- c
-    assert.Equal(t, 0, v)
-    assert.Equal(t, false, ok) //特别注意，buffer为空且closed时 false
+c := make(chan int, 1)
+c <- 1
+close(c)
+v, ok := <- c
+assert.Equal(t, 1, v)
+assert.Equal(t, true, ok) //特别注意,buffer非空且closed时 true。如果这时用ok来判断channel是否关闭那真是个空难
+v,ok = <- c
+assert.Equal(t, 0, v)
+assert.Equal(t, false, ok) //特别注意，buffer为空且closed时 false
 }
 ```
 
@@ -483,23 +488,23 @@ func TestRecvClosedChan(t *testing.T){
 ```go
 //关闭 receiving的channel
 func TestCloseReceivingChan(t *testing.T){
-    c := make(chan int)
-    var wg sync.WaitGroup
-    wg.Add(1)
-    go func () {
-        defer func () {
-            if r := recover(); r != nil {
-                t.Fatalf("CloseReceivingChan is panic")
-                fmt.Println(r)
-            }
-        }()
-        wg.Done()
-        t := <- c
-        fmt.Println(t)
-    }()
-    wg.Wait() //确定goroutine 已经运行，这里不要使用 channel实现，这不是channel的正常功能，性能也不如WaitGroup
-    time.Sleep(1) //确定goroutine 已经运行
-    close(c)
+c := make(chan int)
+var wg sync.WaitGroup
+wg.Add(1)
+go func () {
+defer func () {
+if r := recover(); r != nil {
+t.Fatalf("CloseReceivingChan is panic")
+fmt.Println(r)
+}
+}()
+wg.Done()
+t := <- c
+fmt.Println(t)
+}()
+wg.Wait() //确定goroutine 已经运行，这里不要使用 channel实现，这不是channel的正常功能，性能也不如WaitGroup
+time.Sleep(1) //确定goroutine 已经运行
+close(c)
 }
 
 ```
@@ -509,22 +514,22 @@ func TestCloseReceivingChan(t *testing.T){
 ```go
 //关闭 sending的channel
 func TestCloseSendingChan(t *testing.T){
-    c := make(chan int)
-    var wg sync.WaitGroup
-    wg.Add(1)
-    go func () {
-        defer func () {
-            if r := recover(); r != nil {
-                fmt.Println(r)
-            }
-        }()
-        wg.Done()
-        c <- 1
-        t.Fatalf("CloseSendingChan is not panic")
-    }()
-    wg.Wait() //确定goroutine 已经运行，这里不要使用 channel实现，这不是channel的正常功能，性能也不如WaitGroup
-    time.Sleep(1) //确定goroutine 已经运行
-    close(c)
+c := make(chan int)
+var wg sync.WaitGroup
+wg.Add(1)
+go func () {
+defer func () {
+if r := recover(); r != nil {
+fmt.Println(r)
+}
+}()
+wg.Done()
+c <- 1
+t.Fatalf("CloseSendingChan is not panic")
+}()
+wg.Wait() //确定goroutine 已经运行，这里不要使用 channel实现，这不是channel的正常功能，性能也不如WaitGroup
+time.Sleep(1) //确定goroutine 已经运行
+close(c)
 }
 ```
 
@@ -554,45 +559,45 @@ func TestCloseSendingChan(t *testing.T){
 ```go
 //返回值为 1，不是2
 func tt3() int {
-	var i = 0
-	defer func() {
-		i++
-	}()
-	i++
-	return i
+var i = 0
+defer func () {
+i++
+}()
+i++
+return i
 }
 //返回的函数运行结果为 2， 不是1
-func tt4() func() int {
-	var i = 0
-	defer func() {
-		i++
-	}()
-	i++
-	return func() int {
-		return i // 引用变量/同一变量
-	}
+func tt4() func () int {
+var i = 0
+defer func () {
+i++
+}()
+i++
+return func () int {
+return i // 引用变量/同一变量
+}
 }
 //返回值为 13，不是12
 func tt5() (num int) {
-	defer func() {
-		num++
-	}()
-	return 12 // 给返回值 num 赋值为12
+defer func () {
+num++
+}()
+return 12 // 给返回值 num 赋值为12
 }
 //返回值为 1
 func tt6() (num int) {
-	defer func() {
-		num++
-	}()
-	return
+defer func () {
+num++
+}()
+return
 }
 //返回值指向 1
 func tt7() (*int) {
-    num := 0
-	defer func() {
-		num++
-	}()
-	return &num
+num := 0
+defer func () {
+num++
+}()
+return &num
 }
 ```
 
@@ -600,13 +605,13 @@ func tt7() (*int) {
 
 ```go
 func main() {
-	var a int
-	defer fmt.Println("Print a in defer : ", a)
-	defer func() {
-		fmt.Println("Print a in deferf: ", a)
-	}()
-	a++
-	fmt.Println("Print a in main  : ", a)
+var a int
+defer fmt.Println("Print a in defer : ", a)
+defer func () {
+fmt.Println("Print a in deferf: ", a)
+}()
+a++
+fmt.Println("Print a in main  : ", a)
 }
 //output
 //Print a in main  :  1
@@ -628,58 +633,58 @@ func main() {
    //一般的限出/取消
 cancel := make(<-chan struct{}) //使用channel 实现
 go func () {
-    for {
-        //do something
-        select {
-        case <-cancel:
-            //清理
-        return
-            // 其它的case
-        }
-    }
+for {
+//do something
+select {
+case <-cancel:
+//清理
+return
+// 其它的case
+}
+}
 }()
 
 ctx := context.Background()//使用 context 实现
 go func () {
-    for {
-        select {
-        case <-ctx.Done():
-            //清理
-        return
-            //其它case
-        }
-    }
+for {
+select {
+case <-ctx.Done():
+//清理
+return
+//其它case
+}
+}
 }()
 //长时间运行，比如在一个for循环中，每10次检查一次是否需要退出（做到1秒内检查一次，可以依据实际的代码来提高或降低检查的频率）
 go func () {//方式一使用channel
-    const maxCheck = 10
-    for count := 0; true; count++ {
-        if count > maxCheck {
-            count = 0
-            select {
-            case <-cancel:
-                //清理
-                return
-            default:
-                //do nothing
-            }
-        }
-        //do something
-    }
+const maxCheck = 10
+for count := 0; true; count++ {
+if count > maxCheck {
+count = 0
+select {
+case <-cancel:
+//清理
+return
+default:
+//do nothing
+}
+}
+//do something
+}
 }()
 
 cancelValue := int32(0) //方式二 使用变量
 go func () {
-    const maxCheck = 10
-    for count := 0; true; count++ {
-        if count > maxCheck {
-            if 1 == atomic.LoadInt32(&cancelValue) {
-                //清理
-                return
-            }
-        }
-        //do something
-    }
+const maxCheck = 10
+for count := 0; true; count++ {
+if count > maxCheck {
+if 1 == atomic.LoadInt32(&cancelValue) {
+//清理
+return
+}
+}
+//do something
+}
 }()
 ```
 
@@ -695,15 +700,15 @@ go func () {
 ```go
 ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 go func () {
-    _, err := bind.WaitMined(ctx, client, ts)
-    if err != nil {
-        log.Println(err)
-    }
-    cancel() //没有到时间就运行完成，主动调用 
+_, err := bind.WaitMined(ctx, client, ts)
+if err != nil {
+log.Println(err)
+}
+cancel() //没有到时间就运行完成，主动调用 
 }()
 select {
 case <-ctx.Done():
-    //增加退出线程处理
+//增加退出线程处理
 }
 ```
 
@@ -718,15 +723,15 @@ case <-ctx.Done():
 cancel := make(<-chan struct{})
 timer := time.NewTimer(time.Second * 10) //如果interval = 0，那么立刻运行
 for {
-    select {
-    case <-cancel:
-        //退出清理
-        timer.Stop() //尽快清理timer
-        return
-    case <-timer.C: //这里也可以使用 “time.After(interval)”简化代码，但是不过After函数中，每次都会 new 一个新的timer出来，所以不建议使用
-        //do something
-    }
-    timer.Reset(time.Second * 10)
+select {
+case <-cancel:
+//退出清理
+timer.Stop() //尽快清理timer
+return
+case <-timer.C: //这里也可以使用 “time.After(interval)”简化代码，但是不过After函数中，每次都会 new 一个新的timer出来，所以不建议使用
+//do something
+}
+timer.Reset(time.Second * 10)
 }
 
 //计算任务本身运行的时间
@@ -735,21 +740,21 @@ const seconds = 10
 interval := time.Second * seconds
 timer := time.NewTimer(interval) //如果interval = 0，那么立刻运行
 for {
-    select {
-    case <-cancel:
-        //退出清理
-        timer.Stop() //尽快清理timer
-        return
-    case <-timer.C: //这里也可以使用 “time.After(interval)”简化代码，但是不过After函数中，每次都会 new 一个新的timer出来，所以不建议使用
-        start := time.Now()
-        //do something
-        diff := seconds - int(time.Now().Sub(start).Seconds())
-        if diff <= 0 { //任务运行已经超过定时器了，依据业务选择怎么处理，这里只是简单的把定时改为一秒
-            diff = 1
-        }
-        interval = time.Second * time.Duration(diff)
-    }
-    timer.Reset(interval)
+select {
+case <-cancel:
+//退出清理
+timer.Stop() //尽快清理timer
+return
+case <-timer.C: //这里也可以使用 “time.After(interval)”简化代码，但是不过After函数中，每次都会 new 一个新的timer出来，所以不建议使用
+start := time.Now()
+//do something
+diff := seconds - int(time.Now().Sub(start).Seconds())
+if diff <= 0 { //任务运行已经超过定时器了，依据业务选择怎么处理，这里只是简单的把定时改为一秒
+diff = 1
+}
+interval = time.Second * time.Duration(diff)
+}
+timer.Reset(interval)
 }
 
 ```
@@ -777,21 +782,21 @@ for {
 //它们都会运行dbInstance = &sql.Open(...) 新建一个连接
 var dbInstance *DB
 func DBConnection() *DB {
-    if dbInstance != nil {
-        return dbInstance
-    }
-    dbInstance = &sql.Open(...)
-    return dbInstance
+if dbInstance != nil {
+return dbInstance
+}
+dbInstance = &sql.Open(...)
+return dbInstance
 }
 
 //正确的实现
 var dbOnce sync.Once
 var dbInstance *DB
 func DBConnection() *DB {
-    dbOnce.Do(func () {
-        dbInstance = &sql.Open(...)
-    }
-    return dbInstance
+dbOnce.Do(func () {
+dbInstance = &sql.Open(...)
+}
+return dbInstance
 }
 ```
 
@@ -804,9 +809,9 @@ func DBConnection() *DB {
 stopChannel := make(chan bool)
 closing := int32(0) //atomic没有操作bool的
 closeByAtomic := func () {
-    if atomic.CompareAndSwapInt32(&closing, 0, 1) {
-        close(stopChannel)
-    }
+if atomic.CompareAndSwapInt32(&closing, 0, 1) {
+close(stopChannel)
+}
 }
 
 go closeByAtomic() //多次并发关闭，是安全的
@@ -817,9 +822,9 @@ closeByAtomic()
 stopChannel := make(chan bool)
 once := sync.Once{} //atomic没有操作bool的
 closeByOnce := func () {
-    once.Do(func (){
-        close(stopChannel)
-    })
+once.Do(func (){
+close(stopChannel)
+})
 }
 
 go closeByOnce() //多次并发关闭，是安全的
@@ -828,16 +833,17 @@ closeByOnce()
 //两次实现的区别是，sync.Once是确定完成的，而atomic是不确定的。sync.Once时，closeByOnce()方法返回，那么close函数一定运行完成了。
 //而使用atomic实现时，closeByAtomic()方法返回，close函数并不确定是否运行或完成，可能运行完成，可能还没有运行，可能运行到一半
 ```
-12. Mutex,Cond,Once,WaitGroup,Channel选择  
-   * 在不线程之间传递数据时，一个生产一个消费，使用channel  
-   * 在多个线程中共享数据时（反复多次读写），使用Mutex，这时数据会被反复使用
-   * 只做一次，且等运行完成时，使用Once
-   * 多线程之间相互通知时，使用Cond，可以反复多次使用。这里有点像事件，当发生什么事件时，然后做什么事情。  
-     比如当上课时间时，触发一个事件“打上课铃”，同学们收到事件通过“听到上课铃”（注这里是多人），然后就进入教室。
-   * 一个任务需要多部分或分步骤完成时，使用WaitGroup。如果数量只有一时，使用Cond与WaitGroup效果类似，但还是建议使用WaitGroup。  
-     比如做一个实验要分5步完成，每一步完成时，都做一次记录，直接所有的步骤都完成时，整个实验完成
-   * 
-   
+
+12. Mutex,Cond,Once,WaitGroup,Channel选择
+
+* 在不线程之间传递数据时，一个生产一个消费，使用channel
+* 在多个线程中共享数据时（反复多次读写），使用Mutex，这时数据会被反复使用
+* 只做一次，且等运行完成时，使用Once
+* 多线程之间相互通知时，使用Cond，可以反复多次使用。这里有点像事件，当发生什么事件时，然后做什么事情。  
+  比如当上课时间时，触发一个事件“打上课铃”，同学们收到事件通过“听到上课铃”（注这里是多人），然后就进入教室。
+* 一个任务需要多部分或分步骤完成时，使用WaitGroup。如果数量只有一时，使用Cond与WaitGroup效果类似，但还是建议使用WaitGroup。  
+  比如做一个实验要分5步完成，每一步完成时，都做一次记录，直接所有的步骤都完成时，整个实验完成
+
 ## 文档
 
 1. 注释与代码同步
@@ -849,22 +855,24 @@ closeByOnce()
    但需要放在文件的开头，上面只能有空行和其他注释（具体到.go文件，则表示该部分代码需要位于“包声明（即package行）”之前）
 
    规则：
-    1. 符号—— ","：and； " "：or； "!"：not。  
-       举例来说：```// +build linux,386 darwin,!cgo```表示```(linux AND 386) OR (darwin AND (NOT cgo))```
-    1. 如果约束分为多行，则每行之间是“and”关系：
-       ```go
-       // +build windows
-       // +build cgo
-       //     ↓
-       // +build windows,cgo
-       ```
-    1. 如果文件名符合以下特殊匹配规则，视为该文件具有对应的隐式约束：
+    * 符号—— ","：and； " "：or； "!"：not。  
+      举例来说：```// +build linux,386 darwin,!cgo```表示```(linux AND 386) OR (darwin AND (NOT cgo))```
+    * 如果约束分为多行，则每行之间是“and”关系：
+
+```go
+// +build windows
+// +build cgo
+//
+// +build windows,cgo
+```
+
+    * 如果文件名符合以下特殊匹配规则，视为该文件具有对应的隐式约束：
         1. *_GOOS
         1. *_GOARCH
         1. *_GOOS_GOARCH
 
        举例来说：source_windows_amd64.go，在编译时，会应用隐式约束：GOOS=windows, GOARCH=amd64
-    1. 可以通过```// +build ignore```忽略该文件的build约束
+    * 可以通过```// +build ignore```忽略该文件的build约束
 
 ## 优化
 
@@ -876,20 +884,20 @@ closeByOnce()
 
 ## 安全
 
-1. 在进行数字运算操作时，需要做好长度限制，防止外部输入运算导致异常  
-   *. 确保无符号整数运算时不会反转  
-   *. 确保有符号整数运算时不会出现溢出  
-   *. 确保整型转换时不会出现截断错误  
-   *. 确保整型转换时不会出现符号错误  
-   //todo 给出反例
+1. 在进行数字运算操作时，需要做好长度限制，防止外部输入运算导致异常
+    * 确保无符号整数运算时不会反转
+    * 确保有符号整数运算时不会出现溢出
+    * 确保整型转换时不会出现截断错误
+    * 确保整型转换时不会出现符号错误  
+      //todo 给出反例
 2. 防止出现指针的循环引用 //todo 给出例子
 3. 小心使用unsafe包
-4. SQL  
-   *. 使用参数邦定
-   *. 禁止使用参数拼接SQL语句
-5. Web  
-   *. 跨域资源共享CORS限制请求来源 //todo 使用例子
-   *. CSRF防护
+4. SQL
+    * 使用参数邦定
+    * 禁止使用参数拼接SQL语句
+5. Web
+    * 跨域资源共享CORS限制请求来源 //todo 使用例子
+    * CSRF防护
 
 ### 库使用记要
 
@@ -900,44 +908,48 @@ closeByOnce()
 
 ```go
 func TestSameEqual(t *testing.T) {
-    a1 := 10
-    a2 := 10
-    p1 := &a1
-    p2 := &a2
-    assert.Equal(t, p1, p2) //地址不同，但值相等，所以成立
-    assert.NotSame(t, p1, p2) //比较指针地址是否相等，所以成立
+a1 := 10
+a2 := 10
+p1 := &a1
+p2 := &a2
+assert.Equal(t, p1, p2) //地址不同，但值相等，所以成立
+assert.NotSame(t, p1, p2) //比较指针地址是否相等，所以成立
 }
 ```
 
 #### json
+
 1. 自定义json的MarshalJSON函数时，小心receiver的类型。先看代码
+
 ```go
 type JsonData struct {
-	name string
+name string
 }
 
 func (c *JsonData) MarshalJSON() (bytes []byte, err error) {
-	return json.Marshal(c.name)
+return json.Marshal(c.name)
 }
 
 func (c *JsonData) UnmarshalJSON(bytes []byte) error {
-	return json.Unmarshal(bytes, &c.name)
+return json.Unmarshal(bytes, &c.name)
 }
 
 func TestJsonData(t *testing.T) {
-	d := JsonData{name: "test"}
-	bytes, err := json.Marshal(d)
-	assert.Equal(t, nil, err)
-	var d2 JsonData
-	err = json.Unmarshal(bytes, &d2)
-	assert.Equal(t, nil, err) //has error，为什么？
-	assert.Equal(t, d, d2)    //not eq， 有两种方法，可以更正结果，一种是增加一个符号“&”,一种是删除一个符号“*”
+d := JsonData{name: "test"}
+bytes, err := json.Marshal(d)
+assert.Equal(t, nil, err)
+var d2 JsonData
+err = json.Unmarshal(bytes, &d2)
+assert.Equal(t, nil, err) //has error，为什么？
+assert.Equal(t, d, d2)    //not eq， 有两种方法，可以更正结果，一种是增加一个符号“&”,一种是删除一个符号“*”
 }
 ```
-  以上代码中Unmarshal的结构不是预期的结果，原因是“func (c *JsonData) MarshalJSON() (bytes []byte, err error)”中的receiver是pointer。  
-这样如果在使用时如果没有使用pointer类型那么这个方法就不会生效。终上建议如下：  
-* MarshalJSON方法的receiver不要使用pointer，如果要使用给出足够的理由及详细的文档说明  
-* 自定义实现MarshalJSON与UnmarshalJSON的，在test中需要包含指针及非指针的测试用例  
+
+以上代码中Unmarshal的结构不是预期的结果，原因是“func (c *JsonData) MarshalJSON() (bytes []byte, err error)”中的receiver是pointer。  
+这样如果在使用时如果没有使用pointer类型那么这个方法就不会生效。终上建议如下：
+
+* MarshalJSON方法的receiver不要使用pointer，如果要使用给出足够的理由及详细的文档说明
+* 自定义实现MarshalJSON与UnmarshalJSON的，在test中需要包含指针及非指针的测试用例
 
 ### 参考
 
