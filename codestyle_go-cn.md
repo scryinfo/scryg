@@ -68,10 +68,10 @@ return data
 ```go
 str := "abc.def"
 for i := range str {
-if str[i] == '.' {
-i += 2
-}
-fmt.Println(i, string(str[i]))
+    if str[i] == '.' {
+        i += 2
+    }
+    fmt.Println(i, string(str[i]))
 }
 ```
 
@@ -84,10 +84,10 @@ fmt.Println(i, string(str[i]))
 wg := sync.WaitGroup{}
 wg.Add(3)
 for i := 0; i < 3; i++ {
-go func () {
-fmt.Print(i)
-wg.Done()
-}()
+    go func () {
+        fmt.Print(i)
+        wg.Done()
+    }()
 }
 wg.Wait()
 //“0123”中的三个数的重复组合，而不是三个数字"012"的组合
@@ -96,10 +96,10 @@ wg.Wait()
 wg := sync.WaitGroup{}
 wg.Add(3)
 for i:= 0; i< 3; i++ {
-go func (d int){
-fmt.Print(d)
-wg.Done()
-}(i)
+    go func (d int){
+        fmt.Print(d)
+        wg.Done()
+    }(i)
 }
 wg.Wait()
 }
@@ -162,15 +162,14 @@ merge = nil
 data1Len, data2Len := len(data1), len(data2)
 switch data1Len + data2Len {
 case data2Len:
-merge = append(data2[:0:0], data2...)
+    merge = append(data2[:0:0], data2...)
 case data1Len:
-merge = append(data1[:0:0], data1...)
+    merge = append(data1[:0:0], data1...)
 default:
-merge = append(data1, data2...)
+    merge = append(data1, data2...)
 }
 assert.Equal(t, data1, merge[0:len(data1)])
 assert.Equal(t, data2, merge[len(data1):])
-}
 ```
 
 MergeClone两个slice的高效方法，已经实现在库 scryg/sutils/skit/MergeClone 中
@@ -246,45 +245,45 @@ go没有实现接口的语法，只要接口中所有的方法都有实现就认
 
 ```go
 type iface struct {
-tab  *itab
-data unsafe.Pointer
+    tab  *itab
+    data unsafe.Pointer
 }
 type eface struct {
-_type *_type
-data  unsafe.Pointer
+    _type *_type
+    data  unsafe.Pointer
 }
 // layout of Itab known to compilers
 // allocated in non-garbage-collected memory
 // Needs to be in sync with
 // ../cmd/compile/internal/gc/reflect.go:/^func.dumptabs.
 type itab struct {
-inter *interfacetype
-_type *_type
-hash  uint32 // copy of _type.hash. Used for type switches.
-_     [4]byte
-fun   [1]uintptr // variable sized. fun[0]==0 means _type does not implement inter.
+    inter *interfacetype
+    _type *_type
+    hash  uint32 // copy of _type.hash. Used for type switches.
+    _     [4]byte
+    fun   [1]uintptr // variable sized. fun[0]==0 means _type does not implement inter.
 }
 // Needs to be in sync with ../cmd/link/internal/ld/decodesym.go:/^func.commonsize,
 // ../cmd/compile/internal/gc/reflect.go:/^func.dcommontype and
 // ../reflect/type.go:/^type.rtype.
 // ../internal/reflectlite/type.go:/^type.rtype.
 type _type struct {
-size       uintptr
-ptrdata    uintptr // size of memory prefix holding all pointers
-hash       uint32
-tflag      tflag
-align      uint8
-fieldAlign uint8
-kind       uint8
-// function for comparing objects of this type
-// (ptr to object A, ptr to object B) -> ==?
-equal func (unsafe.Pointer, unsafe.Pointer) bool
-// gcdata stores the GC type data for the garbage collector.
-// If the KindGCProg bit is set in kind, gcdata is a GC program.
-// Otherwise it is a ptrmask bitmap. See mbitmap.go for details.
-gcdata    *byte
-str       nameOff
-ptrToThis typeOff
+    size       uintptr
+    ptrdata    uintptr // size of memory prefix holding all pointers
+    hash       uint32
+    tflag      tflag
+    align      uint8
+    fieldAlign uint8
+    kind       uint8
+    // function for comparing objects of this type
+    // (ptr to object A, ptr to object B) -> ==?
+    equal func (unsafe.Pointer, unsafe.Pointer) bool
+    // gcdata stores the GC type data for the garbage collector.
+    // If the KindGCProg bit is set in kind, gcdata is a GC program.
+    // Otherwise it is a ptrmask bitmap. See mbitmap.go for details.
+    gcdata    *byte
+    str       nameOff
+    ptrToThis typeOff
 }
 ```
 
@@ -313,33 +312,33 @@ fat = fat2
 ```go
 //check if the final object pointed by interface is empty
 func IsNil(any interface{}) bool {
-re := true
-if any != nil {
-v := reflect.ValueOf(any)
-switch v.Kind() {
-case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.UnsafePointer, reflect.Interface, reflect.Slice:
-re = v.IsNil()
-default:
-re = false
-return re
-}
-if !re {
-for v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface { //如果为指针或interface类型，要检查指向的值
-v = v.Elem() //Ptr或Interface时，返回内部的值
-switch v.Kind() {
-case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.UnsafePointer, reflect.Interface, reflect.Slice:
-re = v.IsNil()
-default:
-re = false
-return re
-}
-if re {
-break
-}
-}
-}
-}
-return re
+    re := true
+    if any != nil {
+        v := reflect.ValueOf(any)
+        switch v.Kind() {
+        case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.UnsafePointer, reflect.Interface, reflect.Slice:
+            re = v.IsNil()
+        default:
+            re = false
+            return re
+        }
+        if !re {
+            for v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface { //如果为指针或interface类型，要检查指向的值
+                v = v.Elem() //Ptr或Interface时，返回内部的值
+                switch v.Kind() {
+                case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.UnsafePointer, reflect.Interface, reflect.Slice:
+                    re = v.IsNil()
+                default:
+                    re = false
+                    return re
+                }
+                if re {
+                    break
+                }
+            }
+        }
+    }
+    return re
 }
 ```
 
@@ -462,15 +461,15 @@ send： “chan <- 0”；recv: "<- chan"。在go的实现代码中使用的是s
 ```go
 //recv的关闭chan
 func TestRecvClosedChan(t *testing.T){
-c := make(chan int, 1)
-c <- 1
-close(c)
-v, ok := <- c
-assert.Equal(t, 1, v)
-assert.Equal(t, true, ok) //特别注意,buffer非空且closed时 true。如果这时用ok来判断channel是否关闭那真是个空难
-v,ok = <- c
-assert.Equal(t, 0, v)
-assert.Equal(t, false, ok) //特别注意，buffer为空且closed时 false
+    c := make(chan int, 1)
+    c <- 1
+    close(c)
+    v, ok := <- c
+    assert.Equal(t, 1, v)
+    assert.Equal(t, true, ok) //特别注意,buffer非空且closed时 true。如果这时用ok来判断channel是否关闭那真是个空难
+    v,ok = <- c
+    assert.Equal(t, 0, v)
+    assert.Equal(t, false, ok) //特别注意，buffer为空且closed时 false
 }
 ```
 
@@ -483,23 +482,23 @@ assert.Equal(t, false, ok) //特别注意，buffer为空且closed时 false
 ```go
 //关闭 receiving的channel
 func TestCloseReceivingChan(t *testing.T){
-c := make(chan int)
-var wg sync.WaitGroup
-wg.Add(1)
-go func () {
-defer func () {
-if r := recover(); r != nil {
-t.Fatalf("CloseReceivingChan is panic")
-fmt.Println(r)
-}
-}()
-wg.Done()
-t := <- c
-fmt.Println(t)
-}()
-wg.Wait() //确定goroutine 已经运行，这里不要使用 channel实现，这不是channel的正常功能，性能也不如WaitGroup
-time.Sleep(1) //确定goroutine 已经运行
-close(c)
+    c := make(chan int)
+    var wg sync.WaitGroup
+    wg.Add(1)
+    go func () {
+        defer func () {
+            if r := recover(); r != nil {
+                t.Fatalf("CloseReceivingChan is panic")
+                fmt.Println(r)
+            }
+        }()
+        wg.Done()
+        t := <- c
+        fmt.Println(t)
+    }()
+    wg.Wait() //确定goroutine 已经运行，这里不要使用 channel实现，这不是channel的正常功能，性能也不如WaitGroup
+    time.Sleep(1) //确定goroutine 已经运行
+    close(c)
 }
 
 ```
@@ -509,22 +508,22 @@ close(c)
 ```go
 //关闭 sending的channel
 func TestCloseSendingChan(t *testing.T){
-c := make(chan int)
-var wg sync.WaitGroup
-wg.Add(1)
-go func () {
-defer func () {
-if r := recover(); r != nil {
-fmt.Println(r)
-}
-}()
-wg.Done()
-c <- 1
-t.Fatalf("CloseSendingChan is not panic")
-}()
-wg.Wait() //确定goroutine 已经运行，这里不要使用 channel实现，这不是channel的正常功能，性能也不如WaitGroup
-time.Sleep(1) //确定goroutine 已经运行
-close(c)
+    c := make(chan int)
+    var wg sync.WaitGroup
+    wg.Add(1)
+    go func () {
+        defer func () {
+            if r := recover(); r != nil {
+                fmt.Println(r)
+            }
+        }()
+        wg.Done()
+        c <- 1
+        t.Fatalf("CloseSendingChan is not panic")
+    }()
+    wg.Wait() //确定goroutine 已经运行，这里不要使用 channel实现，这不是channel的正常功能，性能也不如WaitGroup
+    time.Sleep(1) //确定goroutine 已经运行
+    close(c)
 }
 ```
 
@@ -551,7 +550,7 @@ close(c)
 4. return 和 defer 的执行顺序,  [see](https://github.com/googege/blog/blob/master/go/go/important/README.md)  
    运行到return处，给返回值赋值，运行defer（defer之间是堆栈顺序，后进先出）。注意对返回值是否为同一变量（没有产生副本，是同一个），如果是那么在defer中的修改会影响到最后的返回值，下面是两个特殊的例子（更具体的内容参见网页）
 
-``` go
+```go
 //返回值为 1，不是2
 func tt3() int {
 	var i = 0
@@ -598,7 +597,7 @@ func tt7() (*int) {
 
 注意：如果defer后面只有一条语句，则其中的变量会立刻被赋值；如果defer后面是一个函数，则其中的变量会在执行时才被赋值。
 
-``` go
+```go
 func main() {
 	var a int
 	defer fmt.Println("Print a in defer : ", a)
@@ -628,59 +627,58 @@ func main() {
    //一般的限出/取消
 cancel := make(<-chan struct{}) //使用channel 实现
 go func () {
-for {
-//do something
-select {
-case <-cancel:
-//清理
-return
-// 其它的case
-}
-
-}
+    for {
+        //do something
+        select {
+        case <-cancel:
+            //清理
+        return
+            // 其它的case
+        }
+    }
 }()
 
 ctx := context.Background()//使用 context 实现
 go func () {
-for {
-select {
-case <-ctx.Done():
-//清理
-return
-//其它case
-}
-}
+    for {
+        select {
+        case <-ctx.Done():
+            //清理
+        return
+            //其它case
+        }
+    }
 }()
 //长时间运行，比如在一个for循环中，每10次检查一次是否需要退出（做到1秒内检查一次，可以依据实际的代码来提高或降低检查的频率）
 go func () {//方式一使用channel
-const maxCheck = 10
-for count := 0; true; count++ {
-if count > maxCheck {
-count = 0
-select {
-case <-cancel:
-//清理
-return
-default:
-//do nothing
-}
-}
-//do something
-}
+    const maxCheck = 10
+    for count := 0; true; count++ {
+        if count > maxCheck {
+            count = 0
+            select {
+            case <-cancel:
+                //清理
+                return
+            default:
+                //do nothing
+            }
+        }
+        //do something
+    }
 }()
 
 cancelValue := int32(0) //方式二 使用变量
 go func () {
-const maxCheck = 10
-for count := 0; true; count++ {
-if count > maxCheck {
-if 1 == atomic.LoadInt32(&cancelValue) {
-//清理
-return
-}
-}
-//do something
-}
+    const maxCheck = 10
+    for count := 0; true; count++ {
+        if count > maxCheck {
+            if 1 == atomic.LoadInt32(&cancelValue) {
+                //清理
+                return
+            }
+        }
+        //do something
+    }
 }()
 ```
 
@@ -696,15 +694,15 @@ return
 ```go
 ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 go func () {
-_, err := bind.WaitMined(ctx, client, ts)
-if err != nil {
-log.Println(err)
-}
-cancel() //没有到时间就运行完成，主动调用 
+    _, err := bind.WaitMined(ctx, client, ts)
+    if err != nil {
+        log.Println(err)
+    }
+    cancel() //没有到时间就运行完成，主动调用 
 }()
 select {
 case <-ctx.Done():
-//增加退出线程处理
+    //增加退出线程处理
 }
 ```
 
@@ -719,15 +717,15 @@ case <-ctx.Done():
 cancel := make(<-chan struct{})
 timer := time.NewTimer(time.Second * 10) //如果interval = 0，那么立刻运行
 for {
-select {
-case <-cancel:
-//退出清理
-timer.Stop() //尽快清理timer
-return
-case <-timer.C: //这里也可以使用 “time.After(interval)”简化代码，但是不过After函数中，每次都会 new 一个新的timer出来，所以不建议使用
-//do something
-}
-timer.Reset(time.Second * 10)
+    select {
+    case <-cancel:
+        //退出清理
+        timer.Stop() //尽快清理timer
+        return
+    case <-timer.C: //这里也可以使用 “time.After(interval)”简化代码，但是不过After函数中，每次都会 new 一个新的timer出来，所以不建议使用
+        //do something
+    }
+    timer.Reset(time.Second * 10)
 }
 
 //计算任务本身运行的时间
@@ -736,21 +734,21 @@ const seconds = 10
 interval := time.Second * seconds
 timer := time.NewTimer(interval) //如果interval = 0，那么立刻运行
 for {
-select {
-case <-cancel:
-//退出清理
-timer.Stop() //尽快清理timer
-return
-case <-timer.C: //这里也可以使用 “time.After(interval)”简化代码，但是不过After函数中，每次都会 new 一个新的timer出来，所以不建议使用
-start := time.Now()
-//do something
-diff := seconds - int(time.Now().Sub(start).Seconds())
-if diff <= 0 { //任务运行已经超过定时器了，依据业务选择怎么处理，这里只是简单的把定时改为一秒
-diff = 1
-}
-interval = time.Second * time.Duration(diff)
-}
-timer.Reset(interval)
+    select {
+    case <-cancel:
+        //退出清理
+        timer.Stop() //尽快清理timer
+        return
+    case <-timer.C: //这里也可以使用 “time.After(interval)”简化代码，但是不过After函数中，每次都会 new 一个新的timer出来，所以不建议使用
+        start := time.Now()
+        //do something
+        diff := seconds - int(time.Now().Sub(start).Seconds())
+        if diff <= 0 { //任务运行已经超过定时器了，依据业务选择怎么处理，这里只是简单的把定时改为一秒
+            diff = 1
+        }
+        interval = time.Second * time.Duration(diff)
+    }
+    timer.Reset(interval)
 }
 
 ```
@@ -778,21 +776,21 @@ timer.Reset(interval)
 //它们都会运行dbInstance = &sql.Open(...) 新建一个连接
 var dbInstance *DB
 func DBConnection() *DB {
-if dbInstance != nil {
-return dbInstance
-}
-dbInstance = &sql.Open(...)
-return dbInstance
+    if dbInstance != nil {
+        return dbInstance
+    }
+    dbInstance = &sql.Open(...)
+    return dbInstance
 }
 
 //正确的实现
 var dbOnce sync.Once
 var dbInstance *DB
 func DBConnection() *DB {
-dbOnce.Do(func () {
-dbInstance = &sql.Open(...)
-}
-return dbInstance
+    dbOnce.Do(func () {
+        dbInstance = &sql.Open(...)
+    }
+    return dbInstance
 }
 ```
 
@@ -901,12 +899,12 @@ closeByOnce()
 
 ```go
 func TestSameEqual(t *testing.T) {
-a1 := 10
-a2 := 10
-p1 := &a1
-p2 := &a2
-assert.Equal(t, p1, p2) //地址不同，但值相等，所以成立
-assert.NotSame(t, p1, p2) //比较指针地址是否相等，所以成立
+    a1 := 10
+    a2 := 10
+    p1 := &a1
+    p2 := &a2
+    assert.Equal(t, p1, p2) //地址不同，但值相等，所以成立
+    assert.NotSame(t, p1, p2) //比较指针地址是否相等，所以成立
 }
 ```
 
