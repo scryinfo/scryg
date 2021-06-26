@@ -386,7 +386,7 @@ func Call() {
 这段代码是可以编译通过的， 运行时panic。为什么没有实现接口 Hi 就编译通过了，因为嵌入struct中的Hi只是一个字段而已，且是没有名字的，完整调用这样的： hello.Hi.HiName()，hello.Hi的值为nil，所以运行时panic  
    * 增加出错的机会，编译通过而运行出错
    * 如果Hello真的实现了接口Hi，那么 hello.HiName调用的是自己的方法，而不是 hello.Hi.HiName，容易让人误解
-   * struct中嵌入的struct与inerface都是一个字段， 而interface中嵌入的interface，是要求实现对应方法的
+   * struct中嵌入的struct与interface都是一个字段， 而interface中嵌入的interface，是要求实现对应方法的
 
 10. go "=="总结 go语言不支持运算符重载
 
@@ -439,10 +439,10 @@ send： “chan <- 0”
 recv: "<- chan"  
 在go的实现代码中使用的是send/recv不是write/read，这可能为了说明channel是用于通过而不是读写 block：就是卡死，不动了
 
-1. close nil或已经closed的channel，都会panic
-2. channel如果为nil时，send/recv，不是panic，而是block
-3. send 关闭的channel会panic
-4. recv 闭关的channel会立刻返回，如果buffer中有值，v, ok := <-c，v为正常的值，特别注意ok为true。当buffer为空时，v类型的默认值（int为0，引用为nil）,特别注意ok为false
+1. close nil或已经closed的channel，都会panic  
+2. channel如果为nil时，send/recv，不是panic，而是block  
+3. send 关闭的channel会panic  
+4. recv 闭关的channel会立刻返回，如果buffer中有值，v, ok := <-c，v为正常的值，特别注意ok为true。当buffer为空时，v类型的默认值（int为0，引用为nil）,特别注意ok为false  
 
 ```go
 //recv的关闭chan
@@ -461,7 +461,7 @@ func TestRecvClosedChan(t *testing.T){
 
 5. 没有直接判断一个channel是否关闭的方法，这个方法_, ok := <-c 有副作且不准确。 副作用是会recv chnnel中的数据，如果没有数据时且非closed时，还会block
 不准准确，如上面的代码，如果buffer非空且closed时，ok的值为true  
-[Receive_operator](https://golang.org/ref/spec#Receive_operator) 中说的很清楚，ok只是判断通过是否成功，并不是channel是否关闭
+[Receive_operator](https://golang.org/ref/spec#Receive_operator) 中说的很清楚，ok只是判断通信是否成功，并不是channel是否关闭
 下面说一下并发的情况
 6. close时，receiving立即返回
 
@@ -584,7 +584,7 @@ func tt7() (*int) {
 }
 ```
 
-注意：如果defer后面只有一条语句，则其中的变量会立刻被赋值；如果defer后面是一个函数，则其中的变量会在执行时才被赋值。
+如果defer后面只有一条语句或者函数调用的参数，则其中的变量会立刻被计算赋值；如果defer后面是一个closure，则其中的变量会在执行时才被计算的，这是closure的特点。
 
 ```go
 func main() {
@@ -601,6 +601,8 @@ func main() {
 //Print a in deferf: 1
 //Print a in defer : 0
 ```
+“defer fmt.Println("Print a in defer : ", a)” 运行到这个语句时，a的值为0，这时a变量已经被计算了。 当main返回时，运行“fmt.Println("Print a in defer : ", 0)”时，也就是说它是在注册时就计算了a的值。  
+而第二个defer func(){...}是一个closure，它是使用a这个变量，并没有计算a的值， 当main返回前运行closure时，才取a当前的值。
 
 ### 多线程（goroutines）
 
