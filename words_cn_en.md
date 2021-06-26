@@ -92,11 +92,12 @@ EdDSA|EdDSA|Edwards-curve Digital Signature Algorithm (EdDSA)，是基于Edwards
 signature|签名|名词，表示签名后的数据
 sign|签名|动词，表示签名的动着
 verify| |验证签名，当使用在签名时
-secp256k1|secp256k1|NIST系列曲线之一，被用来做签名算法，属于ECDSA，这条曲线也可以用于ECDH
-ed25519|ed25519|25519椭圆曲线的一种，爱德华曲线（Edwards Curve），被用来做签名算法，属于EdDSA
-curve25519/x25519|curve25519|25519椭圆曲线的一种，蒙哥马利曲线（Montgomery Curve），被用来做ECDH的
-ECDH|ECDH|椭圆曲线迪菲-赫尔曼密钥交换（英语：Elliptic Curve Diffie–Hellman key exchange，缩写为ECDH）
 DH|DH|迪菲-赫尔曼密钥交换（英语：Diffie–Hellman key exchange，缩写为D-H）
+ECDH|ECDH|椭圆曲线迪菲-赫尔曼密钥交换（英语：Elliptic Curve Diffie–Hellman key exchange，缩写为ECDH）
+secp256k1|secp256k1|NIST系列曲线之一，被用来做签名算法，属于ECDSA，这条曲线也可以用于ECDH
+curve25519|curve25519|25519椭圆曲线的一种，蒙哥马利曲线（Montgomery Curve）
+ed25519|ed25519|使用curve25519，爱德华曲线（Edwards Curve），做签名，属于EdDSA
+x25519| | 使用curve25519来做ECDH的
 Forward Secrecy| |前向保密（英语：Forward Secrecy，FS）
 Perfect Forward Secrecy| |完全前向保密（英语：Perfect Forward Secrecy，PFS）
 DHE|DHE|迪菲-赫尔曼密钥交换（DHE，DH Ephemeral）的前向安全通讯
