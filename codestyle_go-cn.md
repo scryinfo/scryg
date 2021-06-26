@@ -54,12 +54,12 @@ SCRYINFO
 
 ```go
 func funName(){
-//定义数据
-var data []int
-//生成数据
-{}
-//使用数据
-return data
+    //定义数据
+    var data []int
+    //生成数据
+    {}
+    //使用数据
+    return data
 }
 ```
 
@@ -81,27 +81,27 @@ for i := range str {
 
 ```go
 {//下面是错误的使用方法
-wg := sync.WaitGroup{}
-wg.Add(3)
-for i := 0; i < 3; i++ {
-    go func () {
-        fmt.Print(i)
-        wg.Done()
-    }()
-}
-wg.Wait()
-//“0123”中的三个数的重复组合，而不是三个数字"012"的组合
+    wg := sync.WaitGroup{}
+    wg.Add(3)
+    for i := 0; i < 3; i++ {
+        go func () {
+            fmt.Print(i)
+            wg.Done()
+        }()
+    }
+    wg.Wait()
+    //“0123”中的三个数的重复组合，而不是三个数字"012"的组合
 }
 {//下面是正确做法，会输出三个数字"012"的组合
-wg := sync.WaitGroup{}
-wg.Add(3)
-for i:= 0; i< 3; i++ {
-    go func (d int){
-        fmt.Print(d)
-        wg.Done()
-    }(i)
-}
-wg.Wait()
+    wg := sync.WaitGroup{}
+    wg.Add(3)
+    for i:= 0; i< 3; i++ {
+        go func (d int){
+            fmt.Print(d)
+            wg.Done()
+        }(i)
+    }
+    wg.Wait()
 }
 ```
 
@@ -226,7 +226,7 @@ T是内嵌字段
 
 ```go
 var (
-_ interfaceName = (*interfaceImpl)(nil)
+    _ interfaceName = (*interfaceImpl)(nil)
 )
 ```
 
@@ -244,6 +244,7 @@ go没有实现接口的语法，只要接口中所有的方法都有实现就认
    [code see](https://github.com/golang/go/blob/master/src/runtime/runtime2.go)
 
 ```go
+
 type iface struct {
     tab  *itab
     data unsafe.Pointer
