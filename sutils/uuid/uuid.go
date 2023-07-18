@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-//return uuid
+// GetUuid return uuid
 func GetUuid() string {
 	u1 := uuid.New()
 	return u1.String()

@@ -1,0 +1,36 @@
+package uuid
+
+import (
+	"fmt"
+	"testing"
+)
+
+func TestUuid(t *testing.T) {
+	for range [5]struct{}{} {
+		fmt.Println(GetUuid())
+	}
+
+	//9149cd0f-8dad-484d-b105-81d01c9feb1b
+	//529fbddf-9fd5-45b6-b333-b3a54a641539
+	//d7a1acd1-c407-42ed-8824-108cf1bcac01
+	//68a35c7c-c239-413e-901d-540a176e9f46
+	//a10ab277-6b3e-4561-a5a1-e2a3ae22d3cc
+}
+
+func TestUlid(t *testing.T) {
+	for range [5]struct{}{} {
+		fmt.Println(GetUuidForDB())
+	}
+
+	//01H5NM6S4457KWA8MK9EZ4NYXZ
+	//01H5NM6S4457KWA8MK9G84D2EY
+	//01H5NM6S4457KWA8MK9M4WWJVS
+	//01H5NM6S4457KWA8MK9MZ4J91B
+	//01H5NM6S4457KWA8MK9P45H1T8
+
+	//01H5NM76CMF3DW94SRS7CEWWNH
+	//01H5NM76CMF3DW94SRSAMVYS2Y
+	//01H5NM76CMF3DW94SRSATV4520
+	//01H5NM76CMF3DW94SRSB483R0X
+	//01H5NM76CMF3DW94SRSDMKGP4C
+}
