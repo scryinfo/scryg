@@ -84,13 +84,14 @@
 
 [Google Ts Style](https://google.github.io/styleguide/tsguide.html)  
 [TypeScript style guide -- ts dev](https://ts.dev/style/)  
+[ECMAScript 2020](https://262.ecma-international.org/11.0/#sec-intro)  
+[TypeScript 5.2](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-2.html)
 
 1. 统一使用“;”结尾
 2. 定义变量
     * 不使用var
     * 在类型明确的情况下可以不给出类型
     * 尽量不使用any类型
-    * 不使用 Object.create(null)
 
     ```ts
     // 不可修改，首选。 
@@ -99,13 +100,11 @@
     let amount = 0;
     // 明确类型
     let name: string| null = null;
-    // 不使用，因为一般的ts语法不能给object给null值，当使用Object.create(null)时就绕过空值检查
-    let obj = Object.create(null)
     ```
 
 3. string类型  
     * 没有特别原因不使用大写开头的String，它是一个object类型，而小写的string是基本类型
-    * 字符串使用单引号。原因是html的属性，使用的双引，这样方便在里面表示字符串
+    * 字符串使用单引号。原因是html的属性，使用双引，这样方便在里面表示字符串
     * 当字符串中有相互包含时，不受“字符串使用单引号的聘限制”
     * 有格式字符时，建议使用 "Template literal types "/字符模板
 
@@ -119,10 +118,10 @@
     const name3 = `key: ${name}`;
     const name4 = name + name2; //简单连接
     const name5 = [name,name2,'none'].join();
-
+    const name6 = name.concat(name2);
     ```
 
-4. 定义Array
+4. Array
 
     ```ts
     let keys = [''];//类型明确，可以不指定类型
@@ -130,20 +129,95 @@
     let keys3 = new Array(); //不允许
     let keys4 = []; //不允许
     let keys5 = {}; //不允许
+    //合并数组
+    
+    //调整数组大小
+
     ```
 
-5. 定义Map
-6. "可空类型"
-7. 通过控制光标，可让移动端软键盘收回。
-8. 一个域对应一组localStorage cookie。
-9. document.referrer 只会是进入这个页面的url。
-10. removeEventListener的时候永远不需写 passive 和 once。
-11. 数字减一后再取模可以保持数据模运算后的顺序性。
-12. 不使用null返回值
-    * null是一种程序异常，不是返回值
-    * 字符串时，如果没有值返回“”零长度字符
-    * Object时可以提供一个全局的空对象
-    * 如果有特殊情况，需要特别处理null的，给出足够的理由
+5. Map
+
+    ```ts
+    let m = new Map<string, number>;//类型明确，可以不指定类型
+    let m2 = new Map(); //不允许
+    let m3 = {}; //不允许
+    let m4 = {'s':0};//这种方式可以，但不推荐
+    //合并数组
+    
+    //调整数组大小
+
+    ```
+
+6. 类型
+    * primitives: string,number,boolean  
+        number包含整数与浮点数，实际上它是浮点数，所以不要使用number 来存储特别大的int64的整数。  
+        它是f64的浮点数，最大存储的整数是2^53 - 1，如果超过这个值就会有问题。[js number](https://en.wikipedia.org/wiki/IEEE_754)  
+        Number.MAX_VALUE = 1.7976931348623157e+308  
+        Number.MIN_VALUE = 5e-324  
+        在使用时，一定注意它的最大值不是int64的最大值  
+        在ES2020 中有 [BigInt](https://v8.dev/features/bigint) 类型，这个类型不用担心int64的问题  
+    * null，它是一个特殊的object类型，有唯一值 null  
+        不要定义一个null类型的变量  
+        null使用在可空类型上  
+        typeof 返回的类型是 object  
+
+        ```ts
+        const v: null = null; //不允许，也不可以定义class的字符，函数参数
+        const v2: string|null = null; //可空的string
+        ```
+
+    * undefined，是一个特殊类型，有唯一值 undefined  
+        不要定义undefined类型的变量，它是为了解决一个变量或字段是否定义而引入的关键字，并不是用来定义变量的  
+        typeof 返回的类型是 undefined  
+
+    * Symbol 类型: 不可变唯一,不建议使用,[see](https://www.typescriptlang.org/docs/handbook/symbols.html)
+
+        ```ts
+        let id2 = Symbol('key');
+        let id3 = Symbol('key');
+        id2 === id3; // false, 因为 symbol是唯一
+        ```
+
+    * object类型  
+
+    * “可空类型”
+
+        ```ts
+        let v3: string|null = null; //可空的string，正常会修改它的值所以使用let
+        let v4: string|null|undefined; //不允许，undefined是表示没有定义，而这里在定义一个变量。
+
+        ```
+
+    * any类型，尽量不要使用，使用它相当于把ts退回来js
+
+7. if(v)
+
+    ```ts
+    if (undefined || null ){} //false
+    if ("" || '' || false || 0 || 0.0 ){
+        console.log("any true");// not print
+    }else{
+        console.log("false");// 输出 false
+    }
+    if ({} && [] && Object.create(null)){} // true
+    // 特别说明Object.create(null)值为null，但是if(Object.create(null)) 这里为true
+    const empty = Object.create(null);// empty 的值是 {}， 所以它在if中是true
+    empty.toString(); //toString 不是一个方法
+    empty.toString; //可以正常运行，因为toString是一个不在在的字段，返回值为 undefined
+    let v: any;
+    if (v){} //false， 此时v的值为 undefined
+    let v2: Object;
+    if (v2){} //编译不通过 “Variable 'v2' is used before being assigned”
+    // 
+
+    ```
+
+8. 通过控制光标，可让移动端软键盘收回。
+9. 一个域对应一组localStorage cookie。
+10. document.referrer 只会是进入这个页面的url。
+11. removeEventListener的时候永远不需写 passive 和 once。
+12. 数字减一后再取模可以保持数据模运算后的顺序性。
+
 13. 取数组的一部分时，slice更快
 
     ```ts
