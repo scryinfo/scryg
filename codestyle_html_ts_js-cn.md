@@ -87,8 +87,22 @@
 [ECMAScript 2020](https://262.ecma-international.org/11.0/#sec-intro)  
 [TypeScript 5.2](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-2.html)
 
-1. 统一使用“;”结尾
-2. 定义变量
+1. ECMA, ECMAScript, Typescript, JS-Engine  
+    ECMA: 是一个组织，全称 European Computer Manufacturers Association，它制定了很多标准规范，其中就有ECMAScript  
+    ECMAScript: 简称ES，在ECMA中的编号为 [ECMA-262](https://www.ecma-international.org/publications-and-standards/standards/ecma-262/) ，  
+        JSON也是由ECMA制定的，JSON的代号为 [ECMA-404](https://www.ecma-international.org/publications-and-standards/standards/ecma-404/)  
+    TS39: Technical Committee 39, 是ECMA的一个技术委员会，主要制定ECMAScript，所以也会看到 TS39-ECMAScript的字样  
+    ES6： ECMA-262 6th Edition, [ECMA-262的第六版](https://262.ecma-international.org/6.0/)  
+    ES7： [ES2016](https://262.ecma-international.org/7.0/)，  
+        从这里开始，更多的以年来表示版本，现在最新的是[ES2022](https://262.ecma-international.org/13.0/)  
+    Javascript: 简称JS，是（符合）ECMAScript的一个语言实现，它们大体相容，有相互不同的内容  
+    Typescript: 简称TS，TypeScript is a strongly typed programming language that builds on JavaScript, giving you better tooling at any scale  
+
+    汇总： 有一个组织叫ECMA，有代号为ECMA-262的规范，名叫ECMAScript，TC39是ECMA其中的一个技术委员会，由它来做ECMAScript，Javascript是ECMAScript大体相容的语言实现，  
+        Typescript是基于Js的强类型语言。
+
+2. 统一使用“;”结尾
+3. 定义变量
     * 不使用var
     * 在类型明确的情况下可以不给出类型
     * 尽量不使用any类型
@@ -102,7 +116,7 @@
     let name: string| null = null;
     ```
 
-3. string类型  
+4. string类型  
     * 没有特别原因不使用大写开头的String，它是一个object类型，而小写的string是基本类型
     * 字符串使用单引号。原因是html的属性，使用双引，这样方便在里面表示字符串
     * 当字符串中有相互包含时，不受“字符串使用单引号的聘限制”
@@ -121,7 +135,7 @@
     const name6 = name.concat(name2);
     ```
 
-4. Array
+5. Array
 
     ```ts
     let keys = [''];//类型明确，可以不指定类型
@@ -135,7 +149,7 @@
 
     ```
 
-5. Map
+6. Map
 
     ```ts
     let m = new Map<string, number>;//类型明确，可以不指定类型
@@ -148,7 +162,7 @@
 
     ```
 
-6. 类型
+7. 类型特点
     * primitives: string,number,boolean  
         number包含整数与浮点数，实际上它是浮点数，所以不要使用number 来存储特别大的int64的整数。  
         它是f64的浮点数，最大存储的整数是2^53 - 1，如果超过这个值就会有问题。[js number](https://en.wikipedia.org/wiki/IEEE_754)  
@@ -156,6 +170,7 @@
         Number.MIN_VALUE = 5e-324  
         在使用时，一定注意它的最大值不是int64的最大值  
         在ES2020 中有 [BigInt](https://v8.dev/features/bigint) 类型，这个类型不用担心int64的问题  
+        如果想要表示准备的整数，请使用BigInt等类型，而不要使用number类型
     * null，它是一个特殊的object类型，有唯一值 null  
         不要定义一个null类型的变量  
         null使用在可空类型上  
@@ -190,7 +205,23 @@
 
     * any类型，尽量不要使用，使用它相当于把ts退回来js
 
-7. if(v)
+    * 没有byte/i8类型，使byte相关的操作都要传化为其它类型，如bytes使用BufferByte
+
+8. 可空参数  
+
+    ```ts
+    function f1(name?:string) {} //不建议使用，是一种语法糖， string|undefined
+    function f2(name: string|null){} //建议使用
+    function f3(name: string|undefined){} //不建议使用
+    function f4(name: string|null|undefined){} //不建议使用
+    function f5(name = '10') {} //建议使用
+    //建议使用 string | null方式的原因是
+    //函数在使用时，会给出明确的参数，减少调用者发生错的可能性
+    //带undefined时，与默认值不好区，所以不建议使用
+    
+    ```
+
+8. if(v)
 
     ```ts
     if (undefined || null ){} //false
@@ -212,7 +243,8 @@
 
     ```
 
-8. 通过控制光标，可让移动端软键盘收回。
+
+9. 通过控制光标，可让移动端软键盘收回。
 9. 一个域对应一组localStorage cookie。
 10. document.referrer 只会是进入这个页面的url。
 11. removeEventListener的时候永远不需写 passive 和 once。
