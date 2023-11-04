@@ -82,12 +82,7 @@
 
 ### ts
 
-[Google Ts Style](https://google.github.io/styleguide/tsguide.html)  
-[TypeScript style guide -- ts dev](https://ts.dev/style/)  
-[ECMAScript 2020](https://262.ecma-international.org/11.0/#sec-intro)  
-[TypeScript 5.2](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-2.html)
-
-1. ECMA, ECMAScript, Typescript, JS-Engine  
+1. ECMA, ECMAScript,JavaScript, TypeScript  
     ECMA: 是一个组织，全称 European Computer Manufacturers Association，它制定了很多标准规范，其中就有ECMAScript  
     ECMAScript: 简称ES，在ECMA中的编号为 [ECMA-262](https://www.ecma-international.org/publications-and-standards/standards/ecma-262/) ，  
         JSON也是由ECMA制定的，JSON的代号为 [ECMA-404](https://www.ecma-international.org/publications-and-standards/standards/ecma-404/)  
@@ -95,13 +90,13 @@
     ES6： ECMA-262 6th Edition, [ECMA-262的第六版](https://262.ecma-international.org/6.0/)  
     ES7： [ES2016](https://262.ecma-international.org/7.0/)，  
         从这里开始，更多的以年来表示版本，现在最新的是[ES2022](https://262.ecma-international.org/13.0/)  
-    Javascript: 简称JS，是（符合）ECMAScript的一个语言实现，它们大体相容，有相互不同的内容  
-    Typescript: 简称TS，TypeScript is a strongly typed programming language that builds on JavaScript, giving you better tooling at any scale  
+    JavaScript: 简称JS，是（符合）ECMAScript的一个语言实现，它们大体相容，有不相的。[JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)  
+    TypeScript: 简称TS，TypeScript is a strongly typed programming language that builds on JavaScript, giving you better tooling at any scale. [TypeScript](https://www.typescriptlang.org/docs/handbook/typescript-from-scratch.html)  
 
-    汇总： 有一个组织叫ECMA，有代号为ECMA-262的规范，名叫ECMAScript，TC39是ECMA其中的一个技术委员会，由它来做ECMAScript，Javascript是ECMAScript大体相容的语言实现，  
-        Typescript是基于Js的强类型语言。
+    汇总： 有一个组织叫ECMA，有代号为ECMA-262的规范，名叫ECMAScript，TC39是ECMA其中的一个技术委员会，由它来做ECMAScript，  
+        Javascript是ECMAScript大体相容的语言实现，Typescript是基于Js的强类型语言。  
 
-2. 统一使用“;”结尾
+2. 统一使用“;”结尾，方便于在html等插入代码。  
 3. 定义变量
     * 不使用var
     * 在类型明确的情况下可以不给出类型
@@ -111,12 +106,13 @@
     // 不可修改，首选。 
     const count =  0;
     // 可修改
-    let amount = 0;
+    const amount = 0;
     // 明确类型
-    let name: string| null = null;
+    const name: string| null = null;
     ```
 
 4. string类型  
+    * string的编码是utf-16
     * 没有特别原因不使用大写开头的String，它是一个object类型，而小写的string是基本类型
     * 字符串使用单引号。原因是html的属性，使用双引，这样方便在里面表示字符串
     * 当字符串中有相互包含时，不受“字符串使用单引号的聘限制”
@@ -138,13 +134,16 @@
 5. Array
 
     ```ts
-    let keys = [''];//类型明确，可以不指定类型
-    let keys2 = new Array<string>(); //明确指出类型
-    let keys3 = new Array(); //不允许
-    let keys4 = []; //不允许
-    let keys5 = {}; //不允许
+    const keys = [''];//不建议
+    const key: string[] = ['']; //明确给出类型
+    const keys2 = new Array<string>(); //明确指出类型
+    const keys3 = new Array(); //不允许
+    const keys4 = []; //不允许
+    const keys5 = {}; //不允许
     //合并数组
-    
+    const a1: number[] = [1,2,3];
+    const a2: number[] = [4,5];
+    const a12 = [...a1,...a2];
     //调整数组大小
 
     ```
@@ -152,14 +151,17 @@
 6. Map
 
     ```ts
-    let m = new Map<string, number>;//类型明确，可以不指定类型
-    let m2 = new Map(); //不允许
-    let m3 = {}; //不允许
-    let m4 = {'s':0};//这种方式可以，但不推荐
-    //合并数组
+    const m = new Map<string, number>();//类型明确
+    const m2 : Map<number,number> = new Map([[1,2]]);//可以
+    const m3 = new Map(); //不允许
+    const m4 = {}; //不允许
+    const m5 = {"1":2}; //不允许
     
-    //调整数组大小
-
+    //合并Map
+    const data1: Map<number,number> = new Map([[1,2],[3,4]]);
+    const data2: Map<number,number> = new Map([[1,2],[3,4]]);
+    const data = new Map([...data1,...data2]);
+    console.log(data.size);// 2, 已去掉重复
     ```
 
 7. 类型特点
@@ -188,24 +190,45 @@
     * Symbol 类型: 不可变唯一,不建议使用,[see](https://www.typescriptlang.org/docs/handbook/symbols.html)
 
         ```ts
-        let id2 = Symbol('key');
-        let id3 = Symbol('key');
+        const id2 = Symbol('key');
+        const id3 = Symbol('key');
         id2 === id3; // false, 因为 symbol是唯一
         ```
 
     * object类型  
-
+        除了“基础类型”外，都是object类型，如Array,Map,DateTime等 build-in object，null也是一种特殊的object类型
     * “可空类型”
 
         ```ts
-        let v3: string|null = null; //可空的string，正常会修改它的值所以使用let
-        let v4: string|null|undefined; //不允许，undefined是表示没有定义，而这里在定义一个变量。
-
+        const v3: string|null = null; //可空的string，正常会修改它的值所以使用let
+        const v4: string|null|undefined; //不允许，undefined是表示没有定义，而这里在定义一个变量。
         ```
 
     * any类型，尽量不要使用，使用它相当于把ts退回来js
 
-    * 没有byte/i8类型，使byte相关的操作都要传化为其它类型，如bytes使用BufferByte
+    * 没有byte类型
+        一般使用Uint8Array来处理bytes，如果是stream或很大的bytes可以使用ArrayBuffer类型
+
+        ```ts
+        // bytes to hex string
+        const uint8Array = new Uint8Array([72, 101, 108, 108, 111]);
+        const hexString = Array.from(uint8Array, (byte) => byte.toString(16).padStart(2, '0')).join('');
+        //上一行代码中 (byte) 的括号可以省略
+
+        // number to hex string
+        const number = 26;
+        const hexString = number.toString(16);
+        
+        // hex string to bytes
+        const hexArray = hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16));
+        return new Uint8Array(hexArray);
+        
+        // 可以使用库buffer（在node中有Buffer而在浏览器中没有，所以可以使用库）
+        cosnt buf = Buffer.from('0236','hex'); //hex string to buffer
+        const bytes = Uint8Array.from(buf); //buffer to Uint8Array
+        const buf2 = Buffer.from(bytes); //Uint8Array to buffer
+        const hexString = buf.toString('hex');// buffer to hex string
+        ```
 
 8. 可空参数  
 
@@ -217,11 +240,10 @@
     function f5(name = '10') {} //建议使用
     //建议使用 string | null方式的原因是
     //函数在使用时，会给出明确的参数，减少调用者发生错的可能性
-    //带undefined时，与默认值不好区，所以不建议使用
-    
+    //带undefined时，与默认值不好区分，所以不建议使用
     ```
 
-8. if(v)
+9. if(v)
 
     ```ts
     if (undefined || null ){} //false
@@ -235,68 +257,64 @@
     const empty = Object.create(null);// empty 的值是 {}， 所以它在if中是true
     empty.toString(); //toString 不是一个方法
     empty.toString; //可以正常运行，因为toString是一个不在在的字段，返回值为 undefined
-    let v: any;
+    const v: any;
     if (v){} //false， 此时v的值为 undefined
-    let v2: Object;
+    const v2: Object;
     if (v2){} //编译不通过 “Variable 'v2' is used before being assigned”
     // 
 
     ```
 
+10. for循环
 
-9. 通过控制光标，可让移动端软键盘收回。
+    * 不要循环中改变判断条件，如果业务实现需要更改，请给出足够的理由
+    * 在使用for循环时，不要在第二个参数上调用函数，因为每一次循环都会运行对应的函数，浪费cpu。如果判断条件在变化，需要运行函数时，请给出足够的理由。  
+        如下是错误做法：
+
+    ```ts
+    //let array = [];
+    //for(let i = 0; i < array.length; i++){}
+    ```
+
+    正确的做法是：
+
+    ```ts
+    let array = [];
+    for(let i = 0, len = array.length; i < len; i++){}
+    ```
+
+    * for ... in 与 for ... of的区别
+
+    ```ts
+    let a = ["one","two"];
+    for(let it in a){
+        console.log(it); //,"0,1"
+    }
+    //for ... in
+    //输出属性，当为数组时，输出数组的下标
+    //类型为string
+
+    for(let it of a){
+        console.log(it); //"one, two"
+    }
+    //for ... of
+    //输出集合的元素
+    //类型为集合元素的类型
+    ```
+
+    * 最快的循环是for，如果特别需要性能，就不使用 foreach for .. in for .. of等这些循环  
+
+<!-- 9. 通过控制光标，可让移动端软键盘收回。
 9. 一个域对应一组localStorage cookie。
 10. document.referrer 只会是进入这个页面的url。
 11. removeEventListener的时候永远不需写 passive 和 once。
-12. 数字减一后再取模可以保持数据模运算后的顺序性。
+12. 数字减一后再取模可以保持数据模运算后的顺序性。 -->
 
-13. 取数组的一部分时，slice更快
-
-    ```ts
-    let a = [0,1,2,3,4,5];
-    a.length = 2;//第一种
-    //或者
-    a = a.slice(0,2);//第二种更快
-    ```
-
-14. 循环
-
-* 不要循环中改变判断条件，如果业务实现需要更改，请给出足够的理由
-* 在使用for循环时，不要在第二个参数上调用函数，因为每一次循环都会运行对应的函数，浪费cpu。如果判断条件在变化，需要运行函数时，请给出足够的理由。  
-  如下是错误做法：
-
-```ts
-//let array = [];
-//for(let i = 0; i < array.length; i++){}
-```
-
-正确的做法是：
-
-```ts
-let array = [];
-for(let i = 0, len = array.length; i < len; i++){}
-```
-
-* for ... in 与 for ... of的区别
-
-```ts
-let a = ["one","two"];
-for(let it in a){
-    console.log(it); //,"0,1"
-}
-//for ... in
-//输出属性，当为数组时，输出数组的下标
-//类型为string
-
-for(let it of a){
-    console.log(it); //"one, two"
-}
-//for ... of
-//输出集合的元素
-//类型为集合元素的类型
-```
-
-* 最快的循环是for，如果特别需要性能，就不使用 foreach for .. in for .. of等这些循环
+[Google Ts Style](https://google.github.io/styleguide/tsguide.html)  
+[TypeScript style guide -- ts dev](https://ts.dev/style/)  
+[ECMAScript 2020](https://262.ecma-international.org/11.0/#sec-intro)  
+[TypeScript 5.2](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-2.html)  
+[v8](https://github.com/v8/v8)  
 
 ### vue
 
