@@ -80,7 +80,15 @@
     width:10em 相对于元素的font-size的，如果没有设置会继承元素的  
     width:10rem 相对于html的font-size的，如果没有设置为16px
 
-### ts
+### TS name
+
+* 类型使用 UUpperCamelCase命名
+* 变量使用 lowerCamelCase
+* 全局常理使用 CONSTANT_CASE
+* 不使用"_"下划线来作为前缀或后缀
+* 
+
+### TS
 
 1. ECMA, ECMAScript,JavaScript, TypeScript  
     ECMA: 是一个组织，全称 European Computer Manufacturers Association，它制定了很多标准规范，其中就有ECMAScript  
@@ -96,11 +104,18 @@
     汇总： 有一个组织叫ECMA，有代号为ECMA-262的规范，名叫ECMAScript，TC39是ECMA其中的一个技术委员会，由它来做ECMAScript，  
         Javascript是ECMAScript大体相容的语言实现，Typescript是基于Js的强类型语言。  
 
-2. 统一使用“;”结尾，方便于在html等插入代码。  
-3. 定义变量
-    * 不使用var
-    * 在类型明确的情况下可以不给出类型
-    * 尽量不使用any类型
+2. 统一使用“;”结尾，方便于在html等插入代码  
+3. 定义变量  
+    * 不使用var  
+    * 在类型明确的情况下可以不给出类型  
+    * 尽量不使用any类型  
+    * const 与 readonly  
+        const是不能给变量重新赋值，可以修改内部的数据  
+        readonly是只赋值一次，
+        readonly不能修改修改对象内的数据  
+        readonly可以在构选函数中赋一次值  
+        readonly不能使用于所有类型（'readonly' type modifier is only permitted on array and tuple literal types）  
+        在定义变量时，const与readonly可以一起使用，使用变量内外都不能修改
 
     ```ts
     // 不可修改，首选。 
@@ -134,12 +149,14 @@
 5. Array
 
     ```ts
-    const keys = [''];//不建议
+    const keys = [''];//可以
     const key: string[] = ['']; //明确给出类型
     const keys2 = new Array<string>(); //明确指出类型
     const keys3 = new Array(); //不允许
     const keys4 = []; //不允许
     const keys5 = {}; //不允许
+
+    const keys6 = Array.from<number>({length: 5}).fill(0);//
     //合并数组
     const a1: number[] = [1,2,3];
     const a2: number[] = [4,5];
@@ -230,10 +247,25 @@
         const hexString = buf.toString('hex');// buffer to hex string
         ```
 
-8. 可空参数  
+8. 函数  
+
+    * => 函数，只使用在变量或参数上  
+        不使用 => 函数定义成员函数  
+        不使用 => 定义全局函数  
+        可以使用 => 定义局部变量  
+        可以使用 => 调用函数时  
+        可以使用 => 实现接口
+    * 使用默认值参数代替可选参数  
+        默认值在写代码时，更不容易出。而在使用上是一样的  
+
+    * 明确 Destructuring 参数类型  
+    * Destructuring 参数默认值，不建议整个{}给默认值  
+    * 如果语法可以，尽量给方法参数加上readonly说明，表明方法不修改参数值
+    * 明确函数的返回类型，如果没有返回值，那为void
+    * 如果函数不返回任务类型，那么使用never
 
     ```ts
-    function f1(name?:string) {} //不建议使用，是一种语法糖， string|undefined
+    function f1(name?:string) {} //可选参，不建议使用，是一种语法糖， string|undefined
     function f2(name: string|null){} //建议使用
     function f3(name: string|undefined){} //不建议使用
     function f4(name: string|null|undefined){} //不建议使用
@@ -241,9 +273,20 @@
     //建议使用 string | null方式的原因是
     //函数在使用时，会给出明确的参数，减少调用者发生错的可能性
     //带undefined时，与默认值不好区分，所以不建议使用
+    function f6({a,b}) {} //不建议使用，给出明确的类型
+    // readonly
+    function f7(data: readonly number[]) {
+        data.pop();// 编译错误，没有方法pop
+        data[0] = 0;//编译错误，不能赋值
+    }
     ```
 
-9. if(v)
+9. this，是明确，不像js中的this
+    * 成员函数this就是对像自己  
+    * => 函数，在类中时，this就是对象自己  
+    * => 类函数外，不要使用this  
+
+10. if(v)
 
     ```ts
     if (undefined || null ){} //false
@@ -265,44 +308,54 @@
 
     ```
 
-10. for循环
+11. for循环
 
     * 不要循环中改变判断条件，如果业务实现需要更改，请给出足够的理由
     * 在使用for循环时，不要在第二个参数上调用函数，因为每一次循环都会运行对应的函数，浪费cpu。如果判断条件在变化，需要运行函数时，请给出足够的理由。  
         如下是错误做法：
+    * 不使用 for in循环，它容易误解，实际上是遍历对象的属性
+    * 使用 for of循环或明确要遍历的内容，如使用 for(const entry of a.entries()){}
 
     ```ts
-    //let array = [];
-    //for(let i = 0; i < array.length; i++){}
-    ```
-
-    正确的做法是：
-
-    ```ts
+    // 不建议做法
     let array = [];
-    for(let i = 0, len = array.length; i < len; i++){}
-    ```
-
-    * for ... in 与 for ... of的区别
-
-    ```ts
+    for(const i = 0; i < array.length; i++){}
+    // 建议做法 
+    let array = [];
+    for(const i = 0, len = array.length; i < len; i++){}
+    // * for ... in 与 for ... of的区别
+    // for in 遍历的是属性，for of遍历可iterable的集合中的元素
     let a = ["one","two"];
-    for(let it in a){
+    for(const it in a){
         console.log(it); //,"0,1"
     }
     //for ... in
     //输出属性，当为数组时，输出数组的下标
     //类型为string
-
-    for(let it of a){
+    for(const it of a){
         console.log(it); //"one, two"
     }
     //for ... of
     //输出集合的元素
     //类型为集合元素的类型
+
+    // 也可以使用使用，明确要遍历的内容
+    for(const it of a.entries()){}
+
     ```
 
     * 最快的循环是for，如果特别需要性能，就不使用 foreach for .. in for .. of等这些循环  
+
+12. Destructuring/解构
+
+    ```ts
+    // 变量赋值中
+
+
+    // 函数参数
+
+
+    ```
 
 <!-- 9. 通过控制光标，可让移动端软键盘收回。
 9. 一个域对应一组localStorage cookie。
@@ -315,6 +368,7 @@
 [ECMAScript 2020](https://262.ecma-international.org/11.0/#sec-intro)  
 [TypeScript 5.2](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-2.html)  
 [v8](https://github.com/v8/v8)  
+[TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)  
 
 ### vue
 
