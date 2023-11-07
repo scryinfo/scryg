@@ -105,7 +105,8 @@
         Javascript是ECMAScript大体相容的语言实现，Typescript是基于Js的强类型语言。  
 
 2. 统一使用“;”结尾，方便于在html等插入代码  
-3. 定义变量  
+3. 优先使用小写类型，如string,number; 尽量不使用String,Number等类型
+4. 定义变量  
     * 不使用var  
     * 在类型明确的情况下可以不给出类型  
     * 尽量不使用any类型  
@@ -127,7 +128,7 @@
     const obj = {name:"test", h: 10} as const;
     ```
 
-4. string类型  
+5. string类型  
     * string的编码是utf-16
     * 没有特别原因不使用大写开头的String，它是一个object类型，而小写的string是基本类型
     * 字符串使用单引号。原因是html的属性，使用双引，这样方便在里面表示字符串
@@ -147,17 +148,18 @@
     const name6 = name.concat(name2);
     ```
 
-5. Array
+6. Array
+    优先使用type[]这种类型的数组
 
     ```ts
     const keys = [''];//可以
     const key: string[] = ['']; //明确给出类型
-    const keys2 = new Array<string>(); //明确指出类型
+    const keys2 = new Array<string>(); //不建议使用Array类型，直接使用string[]
     const keys3 = new Array(); //不允许
     const keys4 = []; //不允许
     const keys5 = {}; //不允许
 
-    const keys6 = Array.from<number>({length: 5}).fill(0);//
+    const keys6 = Array.from<number>({length: 5}).fill(0);//这个可以 Array.from的返回类型为 number[]
     //合并数组
     const a1: number[] = [1,2,3];
     const a2: number[] = [4,5];
@@ -166,7 +168,8 @@
 
     ```
 
-6. Map
+7. Map
+    没有小写的map类型或关键字
 
     ```ts
     const m = new Map<string, number>();//类型明确
@@ -182,7 +185,7 @@
     console.log(data.size);// 2, 已去掉重复
     ```
 
-7. 类型特点
+8. 类型特点
     * primitives: string,number,boolean  
         number包含整数与浮点数，实际上它是浮点数，所以不要使用number 来存储特别大的int64的整数。  
         它是f64的浮点数，最大存储的整数是2^53 - 1，如果超过这个值就会有问题。[js number](https://en.wikipedia.org/wiki/IEEE_754)  
@@ -248,7 +251,7 @@
         const hexString = buf.toString('hex');// buffer to hex string
         ```
 
-8. 函数  
+9. 函数  
 
     * => 函数，只使用在变量或参数上  
         不使用 => 函数定义成员函数  
@@ -282,12 +285,12 @@
     }
     ```
 
-9. this，是明确，不像js中的this
+10. this，是明确，不像js中的this
     * 成员函数this就是对像自己  
     * => 函数，在类中时，this就是对象自己  
     * => 类函数外，不要使用this  
 
-10. if(v)
+11. if(v)
 
     ```ts
     if (undefined || null ){} //false
@@ -309,7 +312,7 @@
 
     ```
 
-11. === and !==  
+12. === and !==  
     尽量使用三等或不等，这个比较结果是明确的，而“==”不明确。
     当与null 或undefined比较时，可以使用“==”或 “！=”，这个要看比较的结果
 
@@ -322,7 +325,7 @@
     if(v2 == null) {} // true, 不要这样使用
     ```
   
-12. for循环
+13. for循环
 
     * 不要循环中改变判断条件，如果业务实现需要更改，请给出足够的理由
     * 在使用for循环时，不要在第二个参数上调用函数，因为每一次循环都会运行对应的函数，浪费cpu。如果判断条件在变化，需要运行函数时，请给出足够的理由。  
@@ -361,32 +364,65 @@
 
     ```
 
-13. Destructuring/解构
+14. Destructuring/解构
 
     ```ts
-    // 变量赋值中
+    // 数组
+    const data = [0,6];
+    const [f1,l1] = data;// f = 0, l = 6
+    const [f2,,l2] = data;// f = 0, l = undefined
+    const [f3,l3, ...t] = data;// f = 0, l = 6, t = [] 不是undefined
+    const [f4,...t2,l4] = data; //语法错误，并不支持这种方式
+    const [f5 = 2, l5 = 4] = data; // f = 0, l = 6， 有对应的值，不会使用默认值
+    const [f6,,l6 = 8] = data;// f = 0, l = 8， 
 
+    // 对象
 
     // 函数参数
 
 
     ```
 
-14. class
-    尽量减少使用this
-    在单个函中，不能使用this,可以明确的传参数
-    不要要构造函数中使用this,这时的this并不明确或没有构造出来
-    不能使用 => 字义成员函数
-    可以使用 => 定义事件触发函数，这时它相当于一个成员变量
-    不要在成员函数上使用bind, 它会让人误解，且可能会有内容问题
+15. class
+    1. 尽量减少使用this
+    2. 在单个函中，不能使用this,可以明确的传参数
+    3. 不要要构造函数中使用this,这时的this并不明确或没有构造出来
+    4. 不能使用 => 字义成员函数
+    5. 可以使用 => 定义事件触发函数，这时它相当于一个成员变量
+    6. 不要在成员函数上使用bind, 它会让人误解，且可能会有内容问题
+
+    7. object to interface时，不要使用as  
+
+        ```ts
+            interface Data {
+                index: number;
+                nam?: string;
+            }
+
+            // 正确做法
+            const foo: Data = {
+                index: 123,
+                name: "abc", 
+            };
+            // 错误做法
+            const foo = {
+                index: 123,
+                name: "abc", 
+            } as Data;
+
+        ```
+
+    8. 可以使用 parameter propertied(在构造函数上定义属性)
+    9. 可以使用getters与setters
 
 
+16. 不要使用’// @ts-ignore’
 
-<!-- 9. 通过控制光标，可让移动端软键盘收回。
-9. 一个域对应一组localStorage cookie。
-10. document.referrer 只会是进入这个页面的url。
-11. removeEventListener的时候永远不需写 passive 和 once。
-12. 数字减一后再取模可以保持数据模运算后的顺序性。 -->
+17. 当使用“a as Type”或"a!" 一定要加上明确的说明，为什么类型一定是对的。不要使用 (<Type>a)这种语法
+
+18. 使用model, 不使用 namespace  
+
+19. 不使用default export,它的含义不明确（除非代码不能正常编译）
 
 [Google Ts Style](https://google.github.io/styleguide/tsguide.html)  
 [TypeScript style guide -- ts dev](https://ts.dev/style/)  
