@@ -111,11 +111,10 @@
     * 尽量不使用any类型  
     * const 与 readonly  
         const是不能给变量重新赋值，可以修改内部的数据  
-        readonly是只赋值一次，
-        readonly不能修改修改对象内的数据  
-        readonly可以在构选函数中赋一次值  
+        readonly在修辞变量时，是不可以修改内部数据，与是否重新赋值无关
+        readonly在定义字段时是只赋值一次，且在构造时  
         readonly不能使用于所有类型（'readonly' type modifier is only permitted on array and tuple literal types）  
-        在定义变量时，const与readonly可以一起使用，使用变量内外都不能修改
+    * as const 使用在定义对象时
 
     ```ts
     // 不可修改，首选。 
