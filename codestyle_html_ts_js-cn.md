@@ -114,7 +114,7 @@
         readonly在修辞变量时，是不可以修改内部数据，与是否重新赋值无关
         readonly在定义字段时是只赋值一次，且在构造时  
         readonly不能使用于所有类型（'readonly' type modifier is only permitted on array and tuple literal types）  
-    * as const 使用在定义对象时
+    * as const 用在 literal values定义时，他们变成readonly
 
     ```ts
     // 不可修改，首选。 
@@ -123,6 +123,8 @@
     const amount = 0;
     // 明确类型
     const name: string| null = null;
+    // 使用 as const
+    const obj = {name:"test", h: 10} as const;
     ```
 
 4. string类型  
@@ -307,7 +309,20 @@
 
     ```
 
-11. for循环
+11. === and !==  
+    尽量使用三等或不等，这个比较结果是明确的，而“==”不明确。
+    当与null 或undefined比较时，可以使用“==”或 “！=”，这个要看比较的结果
+
+    ```ts
+    const v : string | null = null;
+    if (v === null) {} //false
+
+    //注意，在“== null”时如果变量为undefined, 结果为true
+    const v2: string | undefined = undefined;
+    if(v2 == null) {} // true, 不要这样使用
+    ```
+  
+12. for循环
 
     * 不要循环中改变判断条件，如果业务实现需要更改，请给出足够的理由
     * 在使用for循环时，不要在第二个参数上调用函数，因为每一次循环都会运行对应的函数，浪费cpu。如果判断条件在变化，需要运行函数时，请给出足够的理由。  
@@ -325,7 +340,7 @@
     // * for ... in 与 for ... of的区别
     // for in 遍历的是属性，for of遍历可iterable的集合中的元素
     let a = ["one","two"];
-    for(const it in a){
+    for(const it in a){ //不建议使用
         console.log(it); //,"0,1"
     }
     //for ... in
@@ -341,11 +356,12 @@
     // 也可以使用使用，明确要遍历的内容
     for(const it of a.entries()){}
 
+    // 明确遍历属性
+    for(const it of Object.keys(a)){}
+
     ```
 
-    * 最快的循环是for，如果特别需要性能，就不使用 foreach for .. in for .. of等这些循环  
-
-12. Destructuring/解构
+13. Destructuring/解构
 
     ```ts
     // 变量赋值中
@@ -355,6 +371,16 @@
 
 
     ```
+
+14. class
+    尽量减少使用this
+    在单个函中，不能使用this,可以明确的传参数
+    不要要构造函数中使用this,这时的this并不明确或没有构造出来
+    不能使用 => 字义成员函数
+    可以使用 => 定义事件触发函数，这时它相当于一个成员变量
+    不要在成员函数上使用bind, 它会让人误解，且可能会有内容问题
+
+
 
 <!-- 9. 通过控制光标，可让移动端软键盘收回。
 9. 一个域对应一组localStorage cookie。
