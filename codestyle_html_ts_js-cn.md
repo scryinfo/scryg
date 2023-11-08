@@ -35,7 +35,7 @@
 1. 所有源代码文件名，使用小写，加下划线
 2. 所有目录文件名，使用小写，加下划线
 3. 命名使用有明确函义的英文单词
-4. 不使用数据库的关键字或保留字命名，如不能使用for来命名一个字段名
+4. 不使用数据库的关键字或保留字命名，如不能使用for来命名一个property名
 
 ## 目录文件
 
@@ -86,7 +86,6 @@
 * 变量使用 lowerCamelCase
 * 全局常理使用 CONSTANT_CASE
 * 不使用"_"下划线来作为前缀或后缀
-* 
 
 ### TS
 
@@ -104,89 +103,122 @@
     汇总： 有一个组织叫ECMA，有代号为ECMA-262的规范，名叫ECMAScript，TC39是ECMA其中的一个技术委员会，由它来做ECMAScript，  
         Javascript是ECMAScript大体相容的语言实现，Typescript是基于Js的强类型语言。  
 
-2. 统一使用“;”结尾，方便于在html等插入代码  
-3. 优先使用小写类型，如string,number; 尽量不使用String,Number等类型
-4. 定义变量  
-    * 不使用var  
-    * 在类型明确的情况下可以不给出类型  
-    * 尽量不使用any类型  
-    * const 与 readonly  
+2. 定义变量  
+    1. 不使用var  
+    2. 在类型明确的情况下可以不给出类型  
+    3. 尽量不使用any类型  
+    4. const 与 readonly  
         const是不能给变量重新赋值，可以修改内部的数据  
         readonly在修辞变量时，是不可以修改内部数据，与是否重新赋值无关
-        readonly在定义字段时是只赋值一次，且在构造时  
+        readonly在定义property时是只赋值一次，且在构造时  
         readonly不能使用于所有类型（'readonly' type modifier is only permitted on array and tuple literal types）  
-    * as const 用在 literal values定义时，他们变成readonly
+    5. as const 用在 literal values定义时，他们变成readonly
+
+        ```ts
+        // 不可修改，首选。 
+        const count =  0;
+        // 可修改
+        const amount = 0;
+        // 明确类型
+        const name: string| null = null;
+        // 使用 as const
+        const obj = {name:'test', h: 10} as const;
+        ```
+
+    6. Destructuring/解构
+
+        ```ts
+        // 数组
+        const data = [0,6];
+        const [f1,l1] = data;// f = 0, l = 6
+        const [f2,,l2] = data;// f = 0, l = undefined
+        const [f3,l3, ...t] = data;// f = 0, l = 6, t = [] 不是undefined
+        const [f4,...t2,l4] = data; //语法错误，并不支持这种方式
+        const [f5 = 2, l5 = 4] = data; // f = 0, l = 6， 有对应的值，不会使用默认值
+        const [f6,,l6 = 8] = data;// f = 0, l = 8， 
+
+        // 对象
+
+        // 函数参数
+
+        ```
+
+    7. 展开
+
+        ```ts
+        //数组
+        const a1 = [1,2];
+        const a2 = [3,4];
+        const a3 = [...a1, ...a2,5];
+        //map
+        const m1: Map<number,number> = new Map([[1,2]]); // key: 1, value: 2
+        const m2: Map<number,number> = new Map([[3,4]]);
+        const array3 = [...m1, ...m2]; // 不建议这样使用，小心，array3是一个数组，不是map
+        const m4 = new Map([...m1, ...m2]); // 
+        const m5 = {...m1, ...m2}; // 结果为 {}， 不允许这样使用
+        // map在初始化与展开，都使用的是是kv的数组，特别小心
+
+        //object 
+        const o1 = {name:'x'};
+        const o2 = {point: 10};
+        const o3 = {...o1,...o2,other:'data'}
+
+        ```
+
+    8. {} 是什么类型
+
+        ```ts
+        const v1 = {}; //v是什么
+        const v2 = Object.create(null);// console.log输出的结果是一样
+        if (v1 === v2) {} // false
+        if (v1 == v2){} // false
+        // 不建议使用 Object.create()来创建对象
+
+        ```
+
+3. 函数  
+
+    * => 函数，只使用在变量或参数上  
+        不使用 => 函数定义成员函数  
+        不使用 => 定义全局函数  
+        可以使用 => 定义局部变量  
+        可以使用 => 调用函数时  
+        可以使用 => 实现接口
+    * 使用默认值参数代替可选参数  
+        默认值在写代码时，更不容易出。而在使用上是一样的  
+
+    * 明确 Destructuring 参数类型  
+    * Destructuring 参数默认值，不建议整个{}给默认值，除非默认值是导入或定义的外部分变量  
+    * 如果语法可以，尽量给方法参数加上readonly说明，表明方法不修改参数值
+    * 明确函数的返回类型，如果没有返回值，那为void
+    * 如果函数不返回任务类型，那么使用never
 
     ```ts
-    // 不可修改，首选。 
-    const count =  0;
-    // 可修改
-    const amount = 0;
-    // 明确类型
-    const name: string| null = null;
-    // 使用 as const
-    const obj = {name:"test", h: 10} as const;
-    ```
+    function f1(name?:string) {} //可选参，不建议使用，是一种语法糖， string|undefined
+    function f2(name: string|null){} //建议使用
+    function f3(name: string|undefined){} //不建议使用
+    function f4(name: string|null|undefined){} //不建议使用
+    function f5(name = '10') {} //建议使用
+    //建议使用 string | null方式的原因是
+    //函数在使用时，会给出明确的参数，减少调用者发生错的可能性
+    //带undefined时，与默认值不好区分，所以不建议使用
+    function f6({a,b}) {} //不建议使用，给出明确的类型
+    // readonly
+    function f7(data: readonly number[]) {
+        data.pop();// 编译错误，没有方法pop
+        data[0] = 0;//编译错误，不能赋值
+    }
 
-5. string类型  
-    * string的编码是utf-16
-    * 没有特别原因不使用大写开头的String，它是一个object类型，而小写的string是基本类型
-    * 字符串使用单引号。原因是html的属性，使用双引，这样方便在里面表示字符串
-    * 当字符串中有相互包含时，不受“字符串使用单引号的聘限制”
-    * 有格式字符时，建议使用 "Template literal types "/字符模板
+    // 检查是否为可空参数，一定使用 三个“=”
+    if (p === null) { }
 
-    ```ts
-    // 字符串
-    const name = '';
-    // 如果包含单引用时
-    const name2 = "'";
-    // 字符拼接
-    // Template literal types
-    const name3 = `key: ${name}`;
-    const name4 = name + name2; //简单连接
-    const name5 = [name,name2,'none'].join();
-    const name6 = name.concat(name2);
-    ```
-
-6. Array
-    优先使用type[]这种类型的数组
-
-    ```ts
-    const keys = [''];//可以
-    const key: string[] = ['']; //明确给出类型
-    const keys2 = new Array<string>(); //不建议使用Array类型，直接使用string[]
-    const keys3 = new Array(); //不允许
-    const keys4 = []; //不允许
-    const keys5 = {}; //不允许
-
-    const keys6 = Array.from<number>({length: 5}).fill(0);//这个可以 Array.from的返回类型为 number[]
-    //合并数组
-    const a1: number[] = [1,2,3];
-    const a2: number[] = [4,5];
-    const a12 = [...a1,...a2];
-    //调整数组大小
+    // 检查是否为可选参数，一定使用 三个“=”
+    if (p === undefined) {} 
 
     ```
 
-7. Map
-    没有小写的map类型或关键字
-
-    ```ts
-    const m = new Map<string, number>();//类型明确
-    const m2 : Map<number,number> = new Map([[1,2]]);//可以
-    const m3 = new Map(); //不允许
-    const m4 = {}; //不允许
-    const m5 = {"1":2}; //不允许
-    
-    //合并Map
-    const data1: Map<number,number> = new Map([[1,2],[3,4]]);
-    const data2: Map<number,number> = new Map([[1,2],[3,4]]);
-    const data = new Map([...data1,...data2]);
-    console.log(data.size);// 2, 已去掉重复
-    ```
-
-8. 类型特点
-    * primitives: string,number,boolean  
+4. 类型
+    1. primitives type : string,number,boolean，优先使用 primitives type，少使用内部Wrap类型  
         number包含整数与浮点数，实际上它是浮点数，所以不要使用number 来存储特别大的int64的整数。  
         它是f64的浮点数，最大存储的整数是2^53 - 1，如果超过这个值就会有问题。[js number](https://en.wikipedia.org/wiki/IEEE_754)  
         Number.MAX_VALUE = 1.7976931348623157e+308  
@@ -194,7 +226,7 @@
         在使用时，一定注意它的最大值不是int64的最大值  
         在ES2020 中有 [BigInt](https://v8.dev/features/bigint) 类型，这个类型不用担心int64的问题  
         如果想要表示准备的整数，请使用BigInt等类型，而不要使用number类型
-    * null，它是一个特殊的object类型，有唯一值 null  
+    2. null，它是一个特殊的object类型，有唯一值 null  
         不要定义一个null类型的变量  
         null使用在可空类型上  
         typeof 返回的类型是 object  
@@ -204,11 +236,11 @@
         const v2: string|null = null; //可空的string
         ```
 
-    * undefined，是一个特殊类型，有唯一值 undefined  
-        不要定义undefined类型的变量，它是为了解决一个变量或字段是否定义而引入的关键字，并不是用来定义变量的  
+    3. undefined，是一个特殊类型，有唯一值 undefined  
+        不要定义undefined类型的变量，它是为了解决一个变量或property是否定义而引入的关键字，并不是用来定义变量的  
         typeof 返回的类型是 undefined  
 
-    * Symbol 类型: 不可变唯一,不建议使用,[see](https://www.typescriptlang.org/docs/handbook/symbols.html)
+    4. Symbol 类型: 不可变唯一,不建议使用,[see](https://www.typescriptlang.org/docs/handbook/symbols.html)
 
         ```ts
         const id2 = Symbol('key');
@@ -216,18 +248,18 @@
         id2 === id3; // false, 因为 symbol是唯一
         ```
 
-    * object类型  
+    5. object类型  
         除了“基础类型”外，都是object类型，如Array,Map,DateTime等 build-in object，null也是一种特殊的object类型
-    * “可空类型”
+    6. “可空类型”
 
         ```ts
         const v3: string|null = null; //可空的string，正常会修改它的值所以使用let
         const v4: string|null|undefined; //不允许，undefined是表示没有定义，而这里在定义一个变量。
         ```
 
-    * any类型，尽量不要使用，使用它相当于把ts退回来js
+    7. any类型，尽量不要使用，使用它相当于把ts退回来js
 
-    * 没有byte类型
+    8. 没有byte类型
         一般使用Uint8Array来处理bytes，如果是stream或很大的bytes可以使用ArrayBuffer类型
 
         ```ts
@@ -251,46 +283,102 @@
         const hexString = buf.toString('hex');// buffer to hex string
         ```
 
-9. 函数  
+    9. string类型  
+        * string的编码是utf-16
+        * 没有特别原因不使用大写开头的String，它是一个object类型，而小写的string是基本类型
+        * 字符串使用单引号。原因是html的属性，使用双引，这样方便在里面表示字符串
+        * 当字符串中有相互包含时，不受“字符串使用单引号的聘限制”
+        * 有格式字符时，建议使用 "Template literal types "/字符模板
 
-    * => 函数，只使用在变量或参数上  
-        不使用 => 函数定义成员函数  
-        不使用 => 定义全局函数  
-        可以使用 => 定义局部变量  
-        可以使用 => 调用函数时  
-        可以使用 => 实现接口
-    * 使用默认值参数代替可选参数  
-        默认值在写代码时，更不容易出。而在使用上是一样的  
+        ```ts
+        // 字符串
+        const name = '';
+        // 如果包含单引用时
+        const name2 = "'";
+        // 字符拼接
+        // Template literal types
+        const name3 = `key: ${name}`;
+        const name4 = name + name2; //简单连接
+        const name5 = [name,name2,'none'].join();
+        const name6 = name.concat(name2);
+        ```
 
-    * 明确 Destructuring 参数类型  
-    * Destructuring 参数默认值，不建议整个{}给默认值  
-    * 如果语法可以，尽量给方法参数加上readonly说明，表明方法不修改参数值
-    * 明确函数的返回类型，如果没有返回值，那为void
-    * 如果函数不返回任务类型，那么使用never
+    10. array
+        优先使用type[]这种类型的数组
 
-    ```ts
-    function f1(name?:string) {} //可选参，不建议使用，是一种语法糖， string|undefined
-    function f2(name: string|null){} //建议使用
-    function f3(name: string|undefined){} //不建议使用
-    function f4(name: string|null|undefined){} //不建议使用
-    function f5(name = '10') {} //建议使用
-    //建议使用 string | null方式的原因是
-    //函数在使用时，会给出明确的参数，减少调用者发生错的可能性
-    //带undefined时，与默认值不好区分，所以不建议使用
-    function f6({a,b}) {} //不建议使用，给出明确的类型
-    // readonly
-    function f7(data: readonly number[]) {
-        data.pop();// 编译错误，没有方法pop
-        data[0] = 0;//编译错误，不能赋值
-    }
-    ```
+        ```ts
+        const keys = [''];//可以
+        const key: string[] = ['']; //明确给出类型
+        const keys2 = new Array<string>(); //不建议使用Array类型，直接使用string[]
+        const keys3 = new Array(); //不允许, 没有明确的类型
+        const keys4 = []; //不允许
+        const keys5 = {}; //不允许
 
-10. this，是明确，不像js中的this
-    * 成员函数this就是对像自己  
-    * => 函数，在类中时，this就是对象自己  
-    * => 类函数外，不要使用this  
+        const keys6 = Array.from<number>({length: 5}).fill(0);//这个可以 Array.from的返回类型为 number[]
+        //合并数组
+        const a1: number[] = [1,2,3];
+        const a2: number[] = [4,5];
+        const a12 = [...a1,...a2];
+        //调整数组大小
 
-11. if(v)
+        ```
+
+    11. Map
+        没有小写的map类型或关键字
+
+        ```ts
+        const m = new Map<string, number>();//类型明确
+        const m2 : Map<number,number> = new Map([[1,2]]);//可以
+        const m3 = new Map(); //不允许
+        const m4 = {}; //不允许
+        const m5 = {"1":2}; //不允许
+        
+        //合并Map
+        const data1: Map<number,number> = new Map([[1,2],[3,4]]);
+        const data2: Map<number,number> = new Map([[1,2],[3,4]]);
+        const data = new Map([...data1,...data2]);
+        console.log(data.size);// 2, 已去掉重复
+        ```
+
+5. class
+    1. 在单个函中，不能使用this,可以明确的传参数  
+    2. 不要要构造函数中使用this,这时的this并不明确或没有构造出来
+    3. this，是明确，不像js中的this
+        * 成员函数this就是对像自己  
+        * => 函数，在类中时，this就是对象自己  
+        * => 类函数外，不要使用this  
+
+    4. 不能使用 => 字义成员函数
+    5. 可以使用 => 定义事件触发函数，这时它相当于一个成员变量
+    6. 不要在成员函数上使用bind, 它会让人误解，且可能会有内容问题
+
+    7. object to interface时，不要使用as  
+
+        ```ts
+            interface Data {
+                index: number;
+                nam?: string;
+            }
+
+            // 正确做法
+            const foo: Data = {
+                index: 123,
+                name: "abc", 
+            };
+            // 错误做法
+            const foo = {
+                index: 123,
+                name: "abc", 
+            } as Data;
+
+        ```
+
+    8. 可以使用 parameter propertied(在构造函数上定义属性)
+    9. 可以使用getters与setters
+
+6. 统一使用“;”结尾，明确表明代码结束，也方便于在html等插入代码  
+
+7. if(v)
 
     ```ts
     if (undefined || null ){} //false
@@ -300,32 +388,34 @@
         console.log("false");// 输出 false
     }
     if ({} && [] && Object.create(null)){} // true
+    
     // 特别说明Object.create(null)值为null，但是if(Object.create(null)) 这里为true
     const empty = Object.create(null);// empty 的值是 {}， 所以它在if中是true
     empty.toString(); //toString 不是一个方法
-    empty.toString; //可以正常运行，因为toString是一个不在在的字段，返回值为 undefined
+    empty.toString; //可以正常运行，因为toString是一个不在在的property，返回值为 undefined
+    
     const v: any;
     if (v){} //false， 此时v的值为 undefined
     const v2: Object;
     if (v2){} //编译不通过 “Variable 'v2' is used before being assigned”
-    // 
-
+    
     ```
 
-12. === and !==  
+8. === and !==  
     尽量使用三等或不等，这个比较结果是明确的，而“==”不明确。
     当与null 或undefined比较时，可以使用“==”或 “！=”，这个要看比较的结果
 
     ```ts
     const v : string | null = null;
-    if (v === null) {} //false
+    if (v === null) {} //true，建议这样使用
 
     //注意，在“== null”时如果变量为undefined, 结果为true
     const v2: string | undefined = undefined;
     if(v2 == null) {} // true, 不要这样使用
+    if(v2 === null) {} // false, 可以这样使用
     ```
   
-13. for循环
+9. for循环
 
     * 不要循环中改变判断条件，如果业务实现需要更改，请给出足够的理由
     * 在使用for循环时，不要在第二个参数上调用函数，因为每一次循环都会运行对应的函数，浪费cpu。如果判断条件在变化，需要运行函数时，请给出足够的理由。  
@@ -364,65 +454,22 @@
 
     ```
 
-14. Destructuring/解构
+10. 不要使用’// @ts-ignore’
+
+11. 当使用“a as Type”或"a!" 一定要加上明确的说明，为什么类型一定是对的。不要使用 (<Type>a)这种语法
+
+12. 使用model, 不使用 namespace  
+
+13. 不使用default export,它的含义不明确（除非代码不能正常编译）
+
+14. import
 
     ```ts
-    // 数组
-    const data = [0,6];
-    const [f1,l1] = data;// f = 0, l = 6
-    const [f2,,l2] = data;// f = 0, l = undefined
-    const [f3,l3, ...t] = data;// f = 0, l = 6, t = [] 不是undefined
-    const [f4,...t2,l4] = data; //语法错误，并不支持这种方式
-    const [f5 = 2, l5 = 4] = data; // f = 0, l = 6， 有对应的值，不会使用默认值
-    const [f6,,l6 = 8] = data;// f = 0, l = 8， 
-
-    // 对象
-
-    // 函数参数
-
+    import * from 'x'; //不允许
+    import * as name from 'x'; // 可以, 给整个导入定义别名
+    import {name} from 'x'; // 可以
 
     ```
-
-15. class
-    1. 尽量减少使用this
-    2. 在单个函中，不能使用this,可以明确的传参数
-    3. 不要要构造函数中使用this,这时的this并不明确或没有构造出来
-    4. 不能使用 => 字义成员函数
-    5. 可以使用 => 定义事件触发函数，这时它相当于一个成员变量
-    6. 不要在成员函数上使用bind, 它会让人误解，且可能会有内容问题
-
-    7. object to interface时，不要使用as  
-
-        ```ts
-            interface Data {
-                index: number;
-                nam?: string;
-            }
-
-            // 正确做法
-            const foo: Data = {
-                index: 123,
-                name: "abc", 
-            };
-            // 错误做法
-            const foo = {
-                index: 123,
-                name: "abc", 
-            } as Data;
-
-        ```
-
-    8. 可以使用 parameter propertied(在构造函数上定义属性)
-    9. 可以使用getters与setters
-
-
-16. 不要使用’// @ts-ignore’
-
-17. 当使用“a as Type”或"a!" 一定要加上明确的说明，为什么类型一定是对的。不要使用 (<Type>a)这种语法
-
-18. 使用model, 不使用 namespace  
-
-19. 不使用default export,它的含义不明确（除非代码不能正常编译）
 
 [Google Ts Style](https://google.github.io/styleguide/tsguide.html)  
 [TypeScript style guide -- ts dev](https://ts.dev/style/)  
@@ -439,4 +486,4 @@
 4. 如果列表是不可修改的，使用Object.freeze来告诉vue，以提高长列表的性能 Vue通过Object.defineProperty对数据进行劫持，实现视图响应数据的变化，直接告诉vue数据不可改，减少vue做无用的事情
 5. 如果在Promise中修改邦定的数据，不能正常刷新到界面时，可以使用 this.$nextTick方法
 6. 在像tree这样的递归组件使用时，记得在所有使用tree标签时，都要邦定事情，不然只能有第一层有效
-7. 使用@Prop的字段时，记得处理@Watch它，以保证产生相应的变化
+7. 使用@Prop的property时，记得处理@Watch它，以保证产生相应的变化
