@@ -110,7 +110,7 @@
     4. const 与 readonly  
         const是不能给变量重新赋值，可以修改内部的数据  
         readonly在修辞变量时，是不可以修改内部数据，与是否重新赋值无关
-        readonly在定义property时是只赋值一次，且在构造时  
+        readonly在定义字段时是只赋值一次，且在构造时  
         readonly不能使用于所有类型（'readonly' type modifier is only permitted on array and tuple literal types）  
     5. as const 用在 literal values定义时，他们变成readonly
 
@@ -237,7 +237,7 @@
         ```
 
     3. undefined，是一个特殊类型，有唯一值 undefined  
-        不要定义undefined类型的变量，它是为了解决一个变量或property是否定义而引入的关键字，并不是用来定义变量的  
+        不要定义undefined类型的变量，它是为了解决一个变量或字段是否定义而引入的关键字，并不是用来定义变量的  
         typeof 返回的类型是 undefined  
 
     4. Symbol 类型: 不可变唯一,不建议使用,[see](https://www.typescriptlang.org/docs/handbook/symbols.html)
