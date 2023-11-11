@@ -82,8 +82,26 @@
 
 ### TS name
 
-* 类型使用 UUpperCamelCase命名
-* 变量使用 lowerCamelCase
+* 函数Function, 是广义的，所有函数的统称，有全局函数，局部函数，=> 函数，成员函数/方法，等都是函数
+* 全局变量，定义在函数外的变量
+* 局部变量，定义在函数内的变量
+* 函数变量，函数类型的变量
+* 变量，是各种变量的统称，当单独使用变量时，不包含Field
+* const变量，由const定义的变量
+* let变量，由let定义的变量
+* 常量，指不会被修改的变量，可以由const readonly定义与修辞。注：const变量，并不一定是常量，如使用const定义一个数组，是可以在定义后修改数组中元素
+* Class函数，与Class相关的函数，包含有this与无this的
+* 成员函数Memeber Function，就是class函数，在本文档中不使用成员函数一说（成员函数，一般C++中使用的比较多）
+* static Function, 没有this的class函数
+* 方法Method，有this的class函数
+* 字段Field, 与Class的this相关，可以使用this使用的“变量”，单独使用时，不包括static Field
+* static Field, 与Class相关，直接使用Class可以使用的变量
+* Class字段，包含Field与static Field
+* Property, 包含Field，并不包含static Field, static Function, get set property，在本文档中不使用property
+* get set Property, 是一种特殊的Method
+* =>函数(箭头函数)，使用 =>实现的函数
+* 自定义类型使用 UpperCamelCase命名
+* 变量与Field使用 lowerCamelCase
 * 全局常理使用 CONSTANT_CASE
 * 不使用"_"下划线来作为前缀或后缀
 
@@ -97,19 +115,19 @@
     ES6： ECMA-262 6th Edition, [ECMA-262的第六版](https://262.ecma-international.org/6.0/)  
     ES7： [ES2016](https://262.ecma-international.org/7.0/)，  
         从这里开始，更多的以年来表示版本，现在最新的是[ES2022](https://262.ecma-international.org/13.0/)  
-    JavaScript: 简称JS，是（符合）ECMAScript的一个语言实现，它们大体相容，有不相的。[JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)  
+    JavaScript: 简称JS，是（符合）ECMAScript的一个语言实现，它们大体相容，有不相容的。[JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)  
     TypeScript: 简称TS，TypeScript is a strongly typed programming language that builds on JavaScript, giving you better tooling at any scale. [TypeScript](https://www.typescriptlang.org/docs/handbook/typescript-from-scratch.html)  
 
     汇总： 有一个组织叫ECMA，有代号为ECMA-262的规范，名叫ECMAScript，TC39是ECMA其中的一个技术委员会，由它来做ECMAScript，  
         Javascript是ECMAScript大体相容的语言实现，Typescript是基于Js的强类型语言。  
 
-2. 定义变量  
+2. 变量与class字段  
     1. 不使用var  
     2. 在类型明确的情况下可以不给出类型  
     3. 尽量不使用any类型  
     4. const 与 readonly  
         const是不能给变量重新赋值，可以修改内部的数据  
-        readonly在修辞变量时，是不可以修改内部数据，与是否重新赋值无关
+        readonly修辞变量时，是不可以修改内部数据，与是否重新赋值无关
         readonly在定义字段时是只赋值一次，且在构造时  
         readonly不能使用于所有类型（'readonly' type modifier is only permitted on array and tuple literal types）  
     5. as const 用在 literal values定义时，他们变成readonly
@@ -139,7 +157,6 @@
 
         // 对象
 
-        // 函数参数
 
         ```
 
@@ -179,19 +196,20 @@
 3. 函数  
 
     * => 函数，只使用在变量或参数上  
-        不使用 => 函数定义成员函数  
+        不使用 => 定义class函数  
         不使用 => 定义全局函数  
         可以使用 => 定义局部变量  
-        可以使用 => 调用函数时  
-        可以使用 => 实现接口
+        可以使用 => 调用函数传参时  
+        可以使用 => 实现接口  
+        可以使用 => 事件响应，在这时，可以把事件响应定义为字段（只有这时可以使用=> 定义字段）  
     * 使用默认值参数代替可选参数  
         默认值在写代码时，更不容易出。而在使用上是一样的  
 
     * 明确 Destructuring 参数类型  
     * Destructuring 参数默认值，不建议整个{}给默认值，除非默认值是导入或定义的外部分变量  
-    * 如果语法可以，尽量给方法参数加上readonly说明，表明方法不修改参数值
-    * 明确函数的返回类型，如果没有返回值，那为void
-    * 如果函数不返回任务类型，那么使用never
+    * 如果语法可以，尽量给函数参数加上readonly说明，表明函数不修改参数值  
+    * 明确函数的返回类型，如果没有返回值，那为void  
+    * 如果函数不返回任务类型，那么使用never  
 
     ```ts
     function f1(name?:string) {} //可选参，不建议使用，是一种语法糖， string|undefined
@@ -225,22 +243,22 @@
         Number.MIN_VALUE = 5e-324  
         在使用时，一定注意它的最大值不是int64的最大值  
         在ES2020 中有 [BigInt](https://v8.dev/features/bigint) 类型，这个类型不用担心int64的问题  
-        如果想要表示准备的整数，请使用BigInt等类型，而不要使用number类型
+        如果想要表示准确的整数，请使用BigInt等类型，而不要使用number类型
     2. null，它是一个特殊的object类型，有唯一值 null  
-        不要定义一个null类型的变量  
+        不要定义一个null类型的变量或字段  
         null使用在可空类型上  
         typeof 返回的类型是 object  
 
         ```ts
-        const v: null = null; //不允许，也不可以定义class的字符，函数参数
+        const v: null = null; //不允许定义null类型的变量或字段
         const v2: string|null = null; //可空的string
         ```
 
     3. undefined，是一个特殊类型，有唯一值 undefined  
-        不要定义undefined类型的变量，它是为了解决一个变量或字段是否定义而引入的关键字，并不是用来定义变量的  
+        不允许定义undefined类型的变量或字段，它是为了解决一个变量或字段是否定义而引入的关键字，并不是用来定义变量的  
         typeof 返回的类型是 undefined  
 
-    4. Symbol 类型: 不可变唯一,不建议使用,[see](https://www.typescriptlang.org/docs/handbook/symbols.html)
+    4. Symbol 类型: 不可变且唯一,不建议使用,[see](https://www.typescriptlang.org/docs/handbook/symbols.html)
 
         ```ts
         const id2 = Symbol('key');
@@ -257,7 +275,7 @@
         const v4: string|null|undefined; //不允许，undefined是表示没有定义，而这里在定义一个变量。
         ```
 
-    7. any类型，尽量不要使用，使用它相当于把ts退回来js
+    7. any类型，尽量不要使用，使用它相当于把ts退回到js
 
     8. 没有byte类型
         一般使用Uint8Array来处理bytes，如果是stream或很大的bytes可以使用ArrayBuffer类型
@@ -341,16 +359,16 @@
         ```
 
 5. class
-    1. 在单个函中，不能使用this,可以明确的传参数  
+    1. 在非方法中，不要使用this,可以明确的传参数  
     2. 不要要构造函数中使用this,这时的this并不明确或没有构造出来
     3. this，是明确，不像js中的this
         * 成员函数this就是对像自己  
         * => 函数，在类中时，this就是对象自己  
         * => 类函数外，不要使用this  
 
-    4. 不能使用 => 字义成员函数
-    5. 可以使用 => 定义事件触发函数，这时它相当于一个成员变量
-    6. 不要在成员函数上使用bind, 它会让人误解，且可能会有内容问题
+    4. 不能使用 => 字义class函数
+    5. 可以使用 => 定义事件触发函数，这时它相当于一个函数类型的字段
+    6. 不要在class函数上使用bind, 它会让人误解，且可能会有内容问题
 
     7. object to interface时，不要使用as  
 
@@ -392,10 +410,10 @@
     // 特别说明Object.create(null)值为null，但是if(Object.create(null)) 这里为true
     const empty = Object.create(null);// empty 的值是 {}， 所以它在if中是true
     empty.toString(); //toString 不是一个方法
-    empty.toString; //可以正常运行，因为toString是一个不在在的property，返回值为 undefined
+    empty.toString; //可以正常运行，因为toString是一个undefined的property，返回值为 undefined
     
     const v: any;
-    if (v){} //false， 此时v的值为 undefined
+    if (v){} //false
     const v2: Object;
     if (v2){} //编译不通过 “Variable 'v2' is used before being assigned”
     
@@ -403,7 +421,6 @@
 
 8. === and !==  
     尽量使用三等或不等，这个比较结果是明确的，而“==”不明确。
-    当与null 或undefined比较时，可以使用“==”或 “！=”，这个要看比较的结果
 
     ```ts
     const v : string | null = null;
@@ -466,7 +483,7 @@
 
     ```ts
     import * from 'x'; //不允许
-    import * as name from 'x'; // 可以, 给整个导入定义别名
+    import * as name from 'x'; // 可以, 定义别名
     import {name} from 'x'; // 可以
 
     ```
@@ -476,7 +493,7 @@
 [ECMAScript 2020](https://262.ecma-international.org/11.0/#sec-intro)  
 [TypeScript 5.2](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-2.html)  
 [v8](https://github.com/v8/v8)  
-[TypeScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)  
+[JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)  
 
 ### vue
 
