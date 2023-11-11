@@ -96,8 +96,8 @@
 * 方法Method，有this的class函数
 * 字段Field, 与Class的this相关，可以使用this使用的“变量”，单独使用时，不包括static Field
 * static Field, 与Class相关，直接使用Class可以使用的变量
-* Class字段，包含Field与static Field
-* Property, 包含Field，并不包含static Field, static Function, get set property，在本文档中不使用property
+* Class变量/字段，包含Field与static Field
+* Property, 包含Field，并不包含static Field, static Function, get set property，在本文档中不单独使用property
 * get set Property, 是一种特殊的Method
 * =>函数(箭头函数)，使用 =>实现的函数
 * 自定义类型使用 UpperCamelCase命名
