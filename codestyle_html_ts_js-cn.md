@@ -252,7 +252,9 @@
 
         //不允许在两个地方给默认， 没有什么特别原因，不要把默认值给在整个对象上
         function f9({a:number,b:string = ''} = {a: 10}) {}
-
+        //小心（不建议）使用可选参数, 它相当于一个控制变量，也就是说它大部分情况下，可以分为两个函数或者使用默认值解决
+        function f10({a, b = ''}:{a?: number, b: string}) {}
+        function f11({a, b = ''}:{a: number|undefined, b: string}) {}
     }
 
     ```
