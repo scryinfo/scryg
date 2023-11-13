@@ -156,7 +156,20 @@
         const [f6,,l6 = 8] = data;// f = 0, l = 8， 
 
         // 对象
+        {
+            const obj = { a: 1, b: { c: 2 } };
+            const {
+                a,
+                b: { c: d },
+            } = obj;
+            //上面的代码，只定义了 a,d两个变量，其中b与c只是字段名而已
+        }
 
+        {
+            // undefined在解构时认为不存在，而null是存在的
+            const {a = 1} = {a:undefined}; //a为1
+            const {b = 1} = {b:null}; //b为null
+        }
 
         ```
 
@@ -232,6 +245,15 @@
 
     // 检查是否为可选参数，一定使用 三个“=”
     if (p === undefined) {} 
+
+    {//解构
+        //给出默认值及参数类型，在有默认值且类型明确时，可以不指定类型
+        function f8({a = 1,b:string = ''}) {}
+
+        //不允许在两个地方给默认， 没有什么特别原因，不要把默认值给在整个对象上
+        function f9({a:number,b:string = ''} = {a: 10}) {}
+
+    }
 
     ```
 
