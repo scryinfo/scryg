@@ -32,6 +32,12 @@
 
 ## Name
 
+不建议使用： 可以使用但不推荐，如果要使用需要有足够的理由  
+禁止使用： 不可以使用，理由再多都不行  
+允许使用： 可以使用  
+建议使用： 推荐使用  
+必须使用： 一定这样使用
+
 1. 所有源代码文件名，使用小写，加下划线
 2. 所有目录文件名，使用小写，加下划线
 3. 命名使用有明确函义的英文单词
@@ -97,8 +103,8 @@
 * 字段Field, 与Class的this相关，可以使用this使用的“变量”，单独使用时，不包括static Field
 * static Field, 与Class相关，直接使用Class可以使用的变量
 * Class变量/字段，包含Field与static Field
-* Property, 包含Field，并不包含static Field, static Function, get set property，在本文档中不单独使用property
-* get set Property, 是一种特殊的Method
+* Property, js的Propery在ts中对应关系，会增加使用ts的难度，在本文档中不单独使用property
+* get set Property, 是一种特殊的Method，可以当作字段来使用
 * =>函数(箭头函数)，使用 =>实现的函数
 * 自定义类型使用 UpperCamelCase命名
 * 变量与Field使用 lowerCamelCase
@@ -122,14 +128,14 @@
         Javascript是ECMAScript大体相容的语言实现，Typescript是基于Js的强类型语言。  
 
 2. 变量与class字段  
-    1. 不使用var  
+    1. 禁止使用var  
     2. 在类型明确的情况下可以不给出类型  
-    3. 尽量不使用any类型  
+    3. 不建议使用any类型  
     4. const 与 readonly  
         const是不能给变量重新赋值，可以修改内部的数据  
         readonly修辞变量时，是不可以修改内部数据，与是否重新赋值无关
         readonly在定义字段时是只赋值一次，且在构造时  
-        readonly不能使用于所有类型（'readonly' type modifier is only permitted on array and tuple literal types）  
+        readonly在语法上，不能使用于所有类型（'readonly' type modifier is only permitted on array and tuple literal types）  
     5. as const 用在 literal values定义时，他们变成readonly
 
         ```ts
@@ -183,9 +189,9 @@
         //map
         const m1: Map<number,number> = new Map([[1,2]]); // key: 1, value: 2
         const m2: Map<number,number> = new Map([[3,4]]);
-        const array3 = [...m1, ...m2]; // 不建议这样使用，小心，array3是一个数组，不是map
+        const array3 = [...m1, ...m2]; // 不建议使用，小心，array3是一个数组，不是map
         const m4 = new Map([...m1, ...m2]); // 
-        const m5 = {...m1, ...m2}; // 结果为 {}， 不允许这样使用
+        const m5 = {...m1, ...m2}; // 结果为 {}， 不允许使用
         // map在初始化与展开，都使用的是是kv的数组，特别小心
 
         //object 
@@ -208,14 +214,14 @@
 
 3. 函数  
 
-    * => 函数，只使用在变量或参数上  
-        不使用 => 定义class函数  
-        不使用 => 定义全局函数  
+    * => 函数，使用在变量或参数上  
+        禁止使用 => 定义class函数  
+        禁止使用 => 定义全局函数  
         可以使用 => 定义局部变量  
-        可以使用 => 调用函数传参时  
+        建议使用 => 调用函数传参时  
         可以使用 => 实现接口  
         可以使用 => 事件响应，在这时，可以把事件响应定义为字段（只有这时可以使用=> 定义字段）  
-    * 使用默认值参数代替可选参数  
+    * 可以使用，用默认值参数代替可选参数  
         默认值在写代码时，更不容易出。而在使用上是一样的  
 
     * 明确 Destructuring 参数类型  
@@ -240,10 +246,10 @@
         data[0] = 0;//编译错误，不能赋值
     }
 
-    // 检查是否为可空参数，一定使用 三个“=”
+    // 必须使用，检查是否为可空参数，一定使用 三个“=”
     if (p === null) { }
 
-    // 检查是否为可选参数，一定使用 三个“=”
+    // 必须使用，检查是否为可选参数，使用 三个“=”
     if (p === undefined) {} 
 
     {//解构
@@ -354,11 +360,11 @@
         const keys = [''];//可以
         const key: string[] = ['']; //明确给出类型
         const keys2 = new Array<string>(); //不建议使用Array类型，直接使用string[]
-        const keys3 = new Array(); //不允许, 没有明确的类型
-        const keys4 = []; //不允许
-        const keys5 = {}; //不允许
+        const keys3 = new Array(); //禁止使用, 没有明确的类型
+        const keys4 = []; //禁止使用
+        const keys5 = {}; //禁止使用
 
-        const keys6 = Array.from<number>({length: 5}).fill(0);//这个可以 Array.from的返回类型为 number[]
+        const keys6 = Array.from<number>({length: 5}).fill(0);//可以使用 Array.from的返回类型为 number[]
         //合并数组
         const a1: number[] = [1,2,3];
         const a2: number[] = [4,5];
@@ -368,14 +374,14 @@
         ```
 
     11. Map
-        没有小写的map类型或关键字
+        没有小写的map类型或关键字  
 
         ```ts
         const m = new Map<string, number>();//类型明确
-        const m2 : Map<number,number> = new Map([[1,2]]);//可以
-        const m3 = new Map(); //不允许
-        const m4 = {}; //不允许
-        const m5 = {"1":2}; //不允许
+        const m2 : Map<number,number> = new Map([[1,2]]);//可以使用
+        const m3 = new Map(); //禁止使用
+        const m4 = {}; //禁止使用
+        const m5 = {"1":2}; //禁止使用
         
         //合并Map
         const data1: Map<number,number> = new Map([[1,2],[3,4]]);
@@ -385,17 +391,17 @@
         ```
 
 5. class
-    1. 在非方法中，不要使用this,可以明确的传参数  
+    1. 在非方法中，不建议使用this,可以明确的传参数  
     2. 特别小心在构造函数中使用this,这时的this并不明确或没有构造出来
-    3. this，是明确，不像js中的this 
+    3. this，是明确，不像js中的this  
         * 成员函数this就是对像自己  
         * => 函数，在类中时，this就是对象自己  
-        * => 类函数外，不要使用this  
+        * => 类函数外，不建议使用this  
 
-    4. 不能使用 => 字义class函数
+    4. 禁止使用 => 字义class函数
     5. 可以使用 => 定义事件触发函数，这时它相当于一个函数类型的字段
-    6. 不要在class函数上使用bind, 它会让人误解，且可能会有内容问题
-    7. object to interface时，不要使用as  
+    6. 禁止作用，在class函数上使用bind, 它会让人误解，且可能会有内容问题
+    7. object to interface时，不建议使用as  
 
         ```ts
             interface Data {
@@ -445,24 +451,24 @@
     ```
 
 8. === and !==  
-    尽量使用三等或不等，这个比较结果是明确的，而“==”不明确。
+    建议使用三等或不等，这个比较结果是明确的，而“==”不明确。
 
     ```ts
     const v : string | null = null;
-    if (v === null) {} //true，建议这样使用
+    if (v === null) {} //true，建议使用
 
     //注意，在“== null”时如果变量为undefined, 结果为true
     const v2: string | undefined = undefined;
-    if(v2 == null) {} // true, 不要这样使用
-    if(v2 === null) {} // false, 可以这样使用
+    if(v2 == null) {} // true, 不建议使用，除非明确目标
+    if(v2 === null) {} // false, 可以使用
     ```
   
 9. for循环
 
-    * 不要循环中改变判断条件，如果业务实现需要更改，请给出足够的理由
-    * 在使用for循环时，不要在第二个参数上调用函数，因为每一次循环都会运行对应的函数，浪费cpu。如果判断条件在变化，需要运行函数时，请给出足够的理由。  
+    * 不建议，在循环中改变判断条件，如果业务实现需要更改，请给出足够的理由
+    * 在使用for循环时，不建议在第二个参数上调用函数，因为每一次循环都会运行对应的函数，浪费cpu。如果判断条件在变化，需要运行函数时，请给出足够的理由。  
         如下是错误做法：
-    * 不使用 for in循环，它容易误解，实际上是遍历对象的属性
+    * 不建议使用 for in循环，它容易误解，实际上是遍历对象的属性
     * 使用 for of循环或明确要遍历的内容，如使用 for(const entry of a.entries()){}
 
     ```ts
@@ -496,20 +502,20 @@
 
     ```
 
-10. 不要使用’// @ts-ignore’
+10. 不建议使用’// @ts-ignore’
 
 11. 当使用“a as Type”或"a!" 一定要加上明确的说明，为什么类型一定是对的。不要使用 (<Type>a)这种语法
 
-12. 使用model, 不使用 namespace  
+12. 建议使用model, 不建议使用 namespace  
 
-13. 不使用default export,它的含义不明确（除非代码不能正常编译）
+13. 不建议使用default export,它的含义不明确（除非代码不能正常编译）
 
 14. import
 
     ```ts
-    import * from 'x'; //不允许
-    import * as name from 'x'; // 可以, 定义别名
-    import {name} from 'x'; // 可以
+    import * from 'x'; //禁止使用
+    import * as name from 'x'; // 可以使用, 定义别名
+    import {name} from 'x'; // 可以使用
 
     ```
 
