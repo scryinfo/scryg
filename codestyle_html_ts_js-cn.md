@@ -534,7 +534,7 @@
             "noImplicitThis": true,
             "strictBindCallApply": true,
             "strictFunctionTypes": true,
-            //<!-- "useDefineForClassFields": true, -->
+            "useDefineForClassFields": false, // 使用[Define]不使用[Set]，两条路二选一
             "skipLibCheck": false,
             "noEmit": true, //如果相查看输出文件，可以改为false
 
