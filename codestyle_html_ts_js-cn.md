@@ -519,6 +519,55 @@
 
     ```
 
+15. tsconfig.json
+
+    [tsconfig](https://www.typescriptlang.org/tsconfig)  
+
+    ```json
+    {
+        "compilerOptions": {
+            "strict": true,  //使用 strict
+            "strictNullChecks": true,
+            "strictPropertyInitialization": true,
+            "noImplicitAny": true,
+            "noImplicitReturns": true,
+            "noImplicitThis": true,
+            "strictBindCallApply": true,
+            "strictFunctionTypes": true,
+            //<!-- "useDefineForClassFields": true, -->
+            "skipLibCheck": false,
+            "noEmit": true, //如果相查看输出文件，可以改为false
+
+            "moduleResolution": "node16",  // nodenext == node16
+            "module": "ESNext", 
+            "target": "ESNext", // 使用最新版，最后再经过vite后，会生成都可以使用的版
+            "lib": ["ESNext", "DOM","DOM.Iterable", "ScriptHost"],
+
+            "jsx": "preserve",
+            "resolveJsonModule": true,
+            "isolatedModules": true,
+            "esModuleInterop": true,
+
+            "baseUrl": ".",
+            "paths": {
+                "@/*": ["src/*"]
+            },
+
+        },
+        "include": [
+            "src/**/*.ts",
+            "src/**/*.d.ts",
+            "src/**/*.tsx",
+            "src/**/*.vue"
+        ],
+        "references": [
+            {
+            "path": "./tsconfig.node.json"
+            }
+        ]
+    }
+    ```
+
 [Google Ts Style](https://google.github.io/styleguide/tsguide.html)  
 [TypeScript style guide -- ts dev](https://ts.dev/style/)  
 [ECMAScript 2020](https://262.ecma-international.org/11.0/#sec-intro)  
