@@ -229,6 +229,7 @@
     * 如果语法可以，尽量给函数参数加上readonly说明，表明函数不修改参数值  
     * 明确函数的返回类型，如果没有返回值，那为void  
     * 如果函数不返回任务类型，那么使用never  
+    * 不建议使用 overload,可以使用默认参数替代
 
     ```ts
     function f1(name?:string) {} //可选参，不建议使用，是一种语法糖， string|undefined
@@ -422,12 +423,69 @@
 
         ```
 
-    8. 可以使用 parameter propertied(在构造函数上定义属性)
-    9. 可以使用getters与setters
+    8. 可以使用 parameter propertied(在构造函数上定义属性)  
+    9. 可以使用getters与setters  
+    10. 类型转换及相关
+        * （不建议使用）判断类型 util.types.“ function isDate(object: unknown): object is Date” 方法实现说明  
+            Object.prototype.toString.call(data) === '[object Date]'  
+            调用toString方法来比较字符串，这种方法给人的感觉是很不可靠的
+        * （不建议使用）instanceof :  checks whether the prototype chain of x contains Foo.prototype,  
+            也就是说它是检查类型是否相容，并不是确定类型。  
+        * （不建议使用）x as ClassName
+            在ts中编译会类型检查，但类型转换，最终是在js运行时完成的，而class类型主要由ts来处理，这种判断很可能在运行时出问题。  
 
-6. 统一使用“;”结尾，明确表明代码结束，也方便于在html等插入代码  
+6. tsconfig.json
 
-7. if(v)
+    [tsconfig](https://www.typescriptlang.org/tsconfig)  
+
+    ```json
+    {
+        "compilerOptions": {
+            "strict": true,  //使用 strict
+            "strictNullChecks": true,
+            "strictPropertyInitialization": true,
+            "noImplicitAny": true,
+            "noImplicitReturns": true,
+            "noImplicitThis": true,
+            "strictBindCallApply": true,
+            "strictFunctionTypes": true,
+            "useDefineForClassFields": false, // 使用[Define]不使用[Set]，两条路二选一
+            "skipLibCheck": false,
+            "noEmit": true, //如果相查看输出文件，可以改为false
+
+            "moduleResolution": "node16",  // nodenext == node16
+            "module": "node16", 
+            "target": "ESNext", // 使用最新版，最后再经过vite后，会生成都可以使用的版
+            "lib": ["ESNext", "DOM","DOM.Iterable", "ScriptHost"],
+
+            "jsx": "preserve",
+            "resolveJsonModule": true,
+            "isolatedModules": true,
+            "esModuleInterop": true,
+
+            "baseUrl": ".",
+            "paths": {
+                "@/*": ["src/*"]
+            },
+
+        },
+        "include": [
+            "src/**/*.ts",
+            "src/**/*.d.ts",
+            "src/**/*.tsx",
+            "src/**/*.vue"
+        ],
+        "references": [
+            {
+            "path": "./tsconfig.node.json"
+            }
+        ]
+    }
+    ```
+
+7. 统一使用“;”结尾，明确表明代码结束，也方便于在html等插入代码  
+
+8. if(v)
 
     ```ts
     if (undefined || null ){} //false
@@ -450,8 +508,11 @@
     
     ```
 
-8. === and !==  
-    建议使用三等或不等，这个比较结果是明确的，而“==”不明确。
+    [see](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#truthiness-narrowing)  
+    0,NaN,"" (the empty string),0n (the bigint version of zero),null,undefined => false
+
+9. === and !==  
+    必须使用三等或不等，这个比较结果是明确的，而“==”不明确。
 
     ```ts
     const v : string | null = null;
@@ -463,7 +524,7 @@
     if(v2 === null) {} // false, 可以使用
     ```
   
-9. for循环
+10. for循环
 
     * 不建议，在循环中改变判断条件，如果业务实现需要更改，请给出足够的理由
     * 在使用for循环时，不建议在第二个参数上调用函数，因为每一次循环都会运行对应的函数，浪费cpu。如果判断条件在变化，需要运行函数时，请给出足够的理由。  
@@ -502,71 +563,22 @@
 
     ```
 
-10. 不建议使用’// @ts-ignore’
+11. 不建议使用’// @ts-ignore’
 
-11. 当使用“a as Type”或"a!" 一定要加上明确的说明，为什么类型一定是对的。不要使用 (<Type>a)这种语法
+12. 当使用“a as Type”或"a!" 一定要加上明确的说明，为什么类型一定是对的。不要使用 (<Type>a)这种语法
 
-12. 建议使用model, 不建议使用 namespace  
+13. 建议使用model, 不建议使用 namespace  
 
-13. 不建议使用default export,它的含义不明确（除非代码不能正常编译）
+14. 不建议使用default export,它的含义不明确（除非代码不能正常编译）
 
-14. import
+15. import
 
     ```ts
     import * from 'x'; //禁止使用
     import * as name from 'x'; // 可以使用, 定义别名
     import {name} from 'x'; // 可以使用
 
-    ```
-
-15. tsconfig.json
-
-    [tsconfig](https://www.typescriptlang.org/tsconfig)  
-
-    ```json
-    {
-        "compilerOptions": {
-            "strict": true,  //使用 strict
-            "strictNullChecks": true,
-            "strictPropertyInitialization": true,
-            "noImplicitAny": true,
-            "noImplicitReturns": true,
-            "noImplicitThis": true,
-            "strictBindCallApply": true,
-            "strictFunctionTypes": true,
-            "useDefineForClassFields": false, // 使用[Define]不使用[Set]，两条路二选一
-            "skipLibCheck": false,
-            "noEmit": true, //如果相查看输出文件，可以改为false
-
-            "moduleResolution": "node16",  // nodenext == node16
-            "module": "ESNext", 
-            "target": "ESNext", // 使用最新版，最后再经过vite后，会生成都可以使用的版
-            "lib": ["ESNext", "DOM","DOM.Iterable", "ScriptHost"],
-
-            "jsx": "preserve",
-            "resolveJsonModule": true,
-            "isolatedModules": true,
-            "esModuleInterop": true,
-
-            "baseUrl": ".",
-            "paths": {
-                "@/*": ["src/*"]
-            },
-
-        },
-        "include": [
-            "src/**/*.ts",
-            "src/**/*.d.ts",
-            "src/**/*.tsx",
-            "src/**/*.vue"
-        ],
-        "references": [
-            {
-            "path": "./tsconfig.node.json"
-            }
-        ]
-    }
-    ```
+    ``` 
 
 [Google Ts Style](https://google.github.io/styleguide/tsguide.html)  
 [TypeScript style guide -- ts dev](https://ts.dev/style/)  
