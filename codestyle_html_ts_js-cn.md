@@ -433,6 +433,32 @@
             也就是说它是检查类型是否相容，并不是确定类型。  
         * （不建议使用）x as ClassName
             在ts中编译会类型检查，但类型转换，最终是在js运行时完成的，而class类型主要由ts来处理，这种判断很可能在运行时出问题。  
+    11. Intersection Types (交叉类型)
+
+    ```ts
+    interface Colorful {
+        color: string;
+        radius: number;
+    }
+    interface Circle {
+        radius: number;
+    }
+    type ColorfulCircle = Colorful & Circle;
+    interface ColorfulCircleEx extends Colorful{
+        radius: number;
+    }
+
+    const v : ColorfulCircle = {color:'red', radius: 10};
+    const v2: Circle = v; //ok
+
+    const v3 : ColorfulCircleEx = {color:'red', radius: 10};
+    const v4: ColorfulCircle = v3; //ok
+
+    // & 与 extends 的效果是一样的，它们的区别是，当有冲突（同名但类型不同）时的处理方式不一样
+    // &： 变成never类型
+    // extends: 两个都有
+
+    ```
 
 6. tsconfig.json
 
