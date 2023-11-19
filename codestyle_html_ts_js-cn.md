@@ -463,7 +463,46 @@
 
     12. Generic Type  
         Think of Box as a template for a real type, where Type is a placeholder that will get replaced with some other type  
-        理解决，泛型是一种type的template，是使用类型参数的替换方式展开，认为是class的语法糖
+        理解，泛型是一种type的template，在运行时类型参数替换，它与C#的实现很像。
+        一个最直接的效果时Generic中static field只有一份，因为generic type只有“一份”
+
+        ```ts
+        class Box<Type> {
+            static onlyOne = 1;
+        }
+
+        const b1 = Box<number>();
+        const b2 = Box<string>();
+        Box.onlyOne = 2;
+        Box<number>.onlyOne = 10; //语法错，因为只有一份，所以不能通过Box<number>访问
+        b1.onlyOne = 3; //不建议这样使用，它会误以为"onlyOne"是在实例上的
+        
+        ```
+
+    13. 在constructor在开始处调用supper()
+    14. (建议)在derived class，如果要override方法时，参数相同，不然容易让人误解
+    15. 禁止继承 Built-in Types。因为它们是在js-engine中实现的，继承的效果与一般的class不一样，为为避免这种不一至的结果。
+    16. 不建议，在derived class中定义与base class同名字段
+    17. static Blocks in Classes， 这是比较好的初始方式，注它只会运行一次，是在运行import时
+    18. 禁止直接把方法作为参数传递。
+
+        ```ts
+        class MyClass {
+            name = "MyClass";
+            getName() {
+                return this.name;
+            }
+        }
+        const c = new MyClass();
+        const obj = {
+            name: "obj",
+            getName: c.getName,
+        };
+
+        // Prints "obj", not "MyClass"
+        console.log(obj.getName());
+        
+        ```
 
 6. tsconfig.json
 
