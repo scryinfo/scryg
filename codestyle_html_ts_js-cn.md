@@ -201,7 +201,7 @@
 
         ```
 
-    8. {} 是什么类型
+    8. {} 是什么类型，它是empty class
 
         ```ts
         const v1 = {}; //v是什么
@@ -391,7 +391,7 @@
         console.log(data.size);// 2, 已去掉重复
         ```
 
-5. class
+5. Class/Type/Interface
     1. 在非方法中，不建议使用this,可以明确的传参数  
     2. 特别小心在构造函数中使用this,这时的this并不明确或没有构造出来
     3. this，是明确，不像js中的this  
@@ -503,6 +503,68 @@
         console.log(obj.getName());
         
         ```
+
+    19. class is a collection of propeties.
+
+        ```ts
+        class Point1 {
+            x = 0;
+        }
+        class Point2 {
+            x = 0;
+        }
+        
+        // OK,  这个赋值是可以的，因为他们有相容的field
+        const p: Point1 = new Point2();
+
+        class Person {
+            name: string;
+            age: number;
+        }
+        
+        class Employee {
+            name: string;
+            age: number;
+            salary: number;
+        }
+        
+        // OK, 这个赋值是可以的，因为他们有相容的field
+        const p: Person = new Employee();
+        
+        ```
+
+    20. Utility Types(转换现在类型)
+
+    ```ts
+    // Partial<Type>, 把字段转换为可选字段
+    interface Todo {
+        title: string;
+        description: string;
+    }
+    Partial<Todo> == {
+        title?: string;
+        description?: string;
+    }
+    
+    //Required<Type> 把字段转换为非可选
+    //Readonly<Type> 把类型转换为readonly, 不可改
+    //Record<Keys, Type> 把类型转换为 Keys与value，有点像Map
+    interface CatInfo {
+        age: number;
+        breed: string;
+    }
+    type CatName = "miffy" | "boris" | "mordred";
+    const cats: Record<CatName, CatInfo> = {
+        miffy: { age: 10, breed: "Persian" },
+        boris: { age: 5, breed: "Maine Coon" },
+        mordred: { age: 16, breed: "British Shorthair" },
+    };
+    //Pick<Type, Keys> 包含类型中的指定字段
+    //Omit<Type, Keys> 排除类型中的指定字段，Exclude<UnionType, ExcludedMembers>对于UnionType
+    
+
+
+    ```
 
 6. tsconfig.json
 
