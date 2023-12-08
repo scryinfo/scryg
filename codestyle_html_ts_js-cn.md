@@ -721,10 +721,46 @@
 
 ### vue
 
-1. 在v-for中为item添加key 当列表有变化时，方便Vue精准找到该条列表数据，进行新旧状态对比，更新变化。
-2. 尽量不要在v-for中使用v-if来过虑集合中的元素 可以增加一个计算属性，在计算属性中增加条件来过虑集合，因为计算属性是有缓存的
-3. v-show与v-if的区别 v-show是修改display:none来达到不可见的，dom是一直存在的。v-if只有条件成立才生成dom
-4. 如果列表是不可修改的，使用Object.freeze来告诉vue，以提高长列表的性能 Vue通过Object.defineProperty对数据进行劫持，实现视图响应数据的变化，直接告诉vue数据不可改，减少vue做无用的事情
-5. 如果在Promise中修改邦定的数据，不能正常刷新到界面时，可以使用 this.$nextTick方法
-6. 在像tree这样的递归组件使用时，记得在所有使用tree标签时，都要邦定事情，不然只能有第一层有效
-7. 使用@Prop的property时，记得处理@Watch它，以保证产生相应的变化
+1. 建议使用setup来定义组件
+
+    ```ts
+    <template>
+    </template>
+
+    <script setup lang="ts">
+
+    </script>
+    ```
+
+2. 建议使用ref而不使用reactive，因为reactive看起来像是使用普通变化，更容易发生错误的理解
+
+    ```ts
+    // ref是深层响应性的，也就是深层嵌套对像
+    import {ref} from 'vue';
+    const data = ref({inner: {count:0}});
+    // 以下代码会触发响应
+    data.value.inner.count++;
+
+    // ref的对象的层次或properties数量不要太多，如果实在太多，为了提高性能可以使用 shallowRef/triggerRef
+    const data2 = shallowRef({count:0});
+    data2.value.count++; //不触发响应
+    data2.value = 10;//触发响应
+    triggerRef(data2); //手动触发响应
+
+    // 整个对象替换后，修改单个property会触发响应
+    const data3 = ref({inner:{level2:{count:0}}});
+    data3.value.inner.level2 = {count:1};
+    //...
+    data3.value.inner.level2.count = 10;//会触发响应
+
+    ```
+
+3. 
+
+11. 在v-for中为item添加key 当列表有变化时，方便Vue精准找到该条列表数据，进行新旧状态对比，更新变化。
+12. 尽量不要在v-for中使用v-if来过虑集合中的元素 可以增加一个计算属性，在计算属性中增加条件来过虑集合，因为计算属性是有缓存的
+13. v-show与v-if的区别 v-show是修改display:none来达到不可见的，dom是一直存在的。v-if只有条件成立才生成dom
+14. 如果列表是不可修改的，使用Object.freeze来告诉vue，以提高长列表的性能 Vue通过Object.defineProperty对数据进行劫持，实现视图响应数据的变化，直接告诉vue数据不可改，减少vue做无用的事情
+15. 如果在Promise中修改邦定的数据，不能正常刷新到界面时，可以使用 this.$nextTick方法
+16. 在像tree这样的递归组件使用时，记得在所有使用tree标签时，都要邦定事情，不然只能有第一层有效
+17. 使用@Prop的property时，记得处理@Watch它，以保证产生相应的变化
