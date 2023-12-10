@@ -755,7 +755,36 @@
 
     ```
 
-3. 
+3. watch说明
+
+    ```ts
+    import {ref} from 'vue';
+    const count = ref(0);
+    if (count.value === 0){
+        console.log(count.value);
+    }
+    watch(count,()=> {
+                if (count.value === 0){
+                    console.log(count.value);
+                }
+            }
+        );
+
+    ```
+
+    ```ts
+    // 上段代码，建议改为如下实现。优点是头少在watch外再处理一次，且不会有“事件执行先后或重复”的问题
+    import {ref} from 'vue';
+    const count = ref(0);
+    
+    watch(count,()=> {
+                if (count.value === 0){
+                    console.log(count.value);
+                }
+            },
+            {immediate:true} //watch中的callback会立刻被执行一次
+        );
+    ```
 
 11. 在v-for中为item添加key 当列表有变化时，方便Vue精准找到该条列表数据，进行新旧状态对比，更新变化。
 12. 尽量不要在v-for中使用v-if来过虑集合中的元素 可以增加一个计算属性，在计算属性中增加条件来过虑集合，因为计算属性是有缓存的
