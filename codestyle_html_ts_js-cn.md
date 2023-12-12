@@ -710,7 +710,7 @@
     import * as name from 'x'; // 可以使用, 定义别名
     import {name} from 'x'; // 可以使用
 
-    ``` 
+    ```
 
 [Google Ts Style](https://google.github.io/styleguide/tsguide.html)  
 [TypeScript style guide -- ts dev](https://ts.dev/style/)  
@@ -756,35 +756,101 @@
     ```
 
 3. watch说明
+    * watch的参数“immediate”，是立刻运行一次watchcallback.  
 
-    ```ts
-    import {ref} from 'vue';
-    const count = ref(0);
-    if (count.value === 0){
-        console.log(count.value);
-    }
-    watch(count,()=> {
-                if (count.value === 0){
-                    console.log(count.value);
+        ```ts
+        //不建议使用代码
+        import {ref} from 'vue';
+        const count = ref(0);
+        if (count.value === 0){
+            console.log(count.value);
+        }
+        watch(count,()=> {
+                    if (count.value === 0){
+                        console.log(count.value);
+                    }
                 }
-            }
-        );
+            );
 
-    ```
+        ```
 
-    ```ts
-    // 上段代码，建议改为如下实现。优点是头少在watch外再处理一次，且不会有“事件执行先后或重复”的问题
-    import {ref} from 'vue';
-    const count = ref(0);
-    
-    watch(count,()=> {
-                if (count.value === 0){
-                    console.log(count.value);
-                }
+        ```ts
+        // 上段代码，建议改为如下实现。优点是头少在watch外再处理一次，且不会有“事件执行先后或重复”的问题
+        import {ref} from 'vue';
+        const count = ref(0);
+        
+        watch(count,()=> {
+                    if (count.value === 0){
+                        console.log(count.value);
+                    }
+                },
+                {immediate:true} //watch中的callback会立刻被执行一次
+            );
+        ```
+
+    * ref的变量变化后，watch的watchcallback参数是异步被执行。  
+
+        ```ts
+        import {ref} from 'vue';
+        const count = ref(0);
+        
+        watch(count,()=> {
+                    if (count.value === 0){ //code3
+                        console.log(count.value);
+                    }
+                },
+                {immediate:true} //watch中的callback会立刻被执行一次
+            );
+        count.value = 1; //code 1
+        console.log('after value changed');// code 2
+        // 以上代码的运行先后为：
+        // code 3 (由于immediate而运行) --> code1 --> code3 --> code3
+        // 注：code 1 运行后是异步运行code3的
+        ```
+
+    * (不建议在setup中使用await/promise)ref的变量变化后,watch,await之间的先后关系
+
+        ```ts
+        <script setup lang="ts">
+        import { ref, watch } from "vue";
+        const count = ref(0);
+
+        watch( count,
+            () => {
+                console.log("code 3: in watch callback"); //code 3
             },
-            {immediate:true} //watch中的callback会立刻被执行一次
+            { immediate: true } //watch中的callback会立刻被执行一次
         );
-    ```
+        count.value = 1; //code 1
+        console.log("code 2: after value changed"); // code 2
+        await (async () => {
+            console.log("code 4: in async fun"); // code 4
+        })();
+        console.log("code 5: after await"); // code 5
+        
+        await (async () => {
+            console.log("code 6: in async fun"); // code 6
+            count.value = 2;
+            console.log("code 8: after value changed"); // code 8
+        })();
+        console.log("code 7: after await"); // code 7
+
+        </script>
+        // 以上代码的运行先后为：
+        // code 3: in watch callback
+        // code 2: after value changed
+        // code 4: in async fun
+        // code 3: in watch callback
+        // code 5: after await
+        // code 6: in async fun
+        // code 8: after value changed
+        // code 3: in watch callback
+        // code 7: after await
+        
+        // 说明
+        // 1, code 1 运行后是异步运行code3的（push 一个promise到队列中）
+        // 2, await 运行完成后，会运行watch的callback（await 等待promise运行完成）
+        ```
 
 11. 在v-for中为item添加key 当列表有变化时，方便Vue精准找到该条列表数据，进行新旧状态对比，更新变化。
 12. 尽量不要在v-for中使用v-if来过虑集合中的元素 可以增加一个计算属性，在计算属性中增加条件来过虑集合，因为计算属性是有缓存的
