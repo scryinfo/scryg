@@ -712,6 +712,10 @@
 
     ```
 
+16. （不建议使用)项目的第一层子目录中有index.ts  
+    如name/，这样非目录导入也有效，import {x} frome 'name' 会查找name/目录下的内容。
+    容易“隐藏”node_modules中包，所以不建议使用
+
 [Google Ts Style](https://google.github.io/styleguide/tsguide.html)  
 [TypeScript style guide -- ts dev](https://ts.dev/style/)  
 [ECMAScript 2020](https://262.ecma-international.org/11.0/#sec-intro)  
@@ -851,6 +855,39 @@
         // 1, code 1 运行后是异步运行code3的（push 一个promise到队列中）
         // 2, await 运行完成后，会运行watch的callback（await 等待promise运行完成）
         ```
+
+4. 在input中不建议使用@change事件验证输入，而使用@input。因为change事件容易产生“多次循环”，让人理解错误
+5. 使用defineModel方式实现父子组件中的v-model双向绑定
+
+    ```ts
+        <!-- Father.vue -->
+        <template>
+            <span>count</span>
+            <Child v-model="count" />
+        </template>
+        <script lang="ts" setup>
+            import { ref } from 'vue'
+            const count = ref<number>(0)
+        </script>
+
+        <!--  -->
+        <!-- Child.vue -->
+        <template>
+            count: {{ count }}
+            <button @click="onClick">count</button>
+        </template>
+
+        <script lang="ts" setup>
+            const count = defineModel<number>()
+            // 一步到位，完成事件注册和监听状态变化并发布事件
+            function onClick() {
+                count += 1
+            }
+        </script>
+
+    ```
+
+    [详细见](https://github.com/vuejs/rfcs/discussions/503)
 
 11. 在v-for中为item添加key 当列表有变化时，方便Vue精准找到该条列表数据，进行新旧状态对比，更新变化。
 12. 尽量不要在v-for中使用v-if来过虑集合中的元素 可以增加一个计算属性，在计算属性中增加条件来过虑集合，因为计算属性是有缓存的
