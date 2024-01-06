@@ -888,6 +888,7 @@
     ```
 
     [详细见](https://github.com/vuejs/rfcs/discussions/503)
+    记得在vite.config中增加 "vue({script:{defineModel: true}})"配置
 
 11. 在v-for中为item添加key 当列表有变化时，方便Vue精准找到该条列表数据，进行新旧状态对比，更新变化。
 12. 尽量不要在v-for中使用v-if来过虑集合中的元素 可以增加一个计算属性，在计算属性中增加条件来过虑集合，因为计算属性是有缓存的
