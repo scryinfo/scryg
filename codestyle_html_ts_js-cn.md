@@ -856,8 +856,26 @@
         // 2, await 运行完成后，会运行watch的callback（await 等待promise运行完成）
         ```
 
-4. 在input中不建议使用@change事件验证输入，而使用@input。因为change事件容易产生“多次循环”，让人理解错误
-5. 使用defineModel方式实现父子组件中的v-model双向绑定
+4. ref watch关系表
+
+    |           | ref | watch ref | shallowRef | watch shallow | reactive | watch reactive | shallowReactive |
+    | --------- |-----|-----------|------------|---------------|----------|----------------|-----------------|
+    | base type |
+    | array     |
+    | map       |
+    | l2 array  |
+    | l2 map    |
+    | other     |
+    | inner     |
+
+    base/value type: number,string,boolean,symbol类型  
+    reference type: object(class, type{},etc), array,function,date,regexp  
+    l1: 直接的数据
+    l2: object的field或array的元素
+    lx: 所有
+
+5. 在input中不建议使用@change事件验证输入，而使用@input。因为change事件容易产生“多次循环”，让人理解错误
+6. 使用defineModel方式实现父子组件中的v-model双向绑定
 
     ```ts
         <!-- Father.vue -->
