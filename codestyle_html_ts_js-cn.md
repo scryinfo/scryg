@@ -52,6 +52,8 @@
 
 ### CSS/HTML
 
+[HTML](https://developer.mozilla.org/en-US/docs/Web/HTML) 
+
 1. 左右居中
 2. 上下居中
     1. 文字上下居中
@@ -712,6 +714,40 @@
 
     ```
 
+    * import是编译时的，不像require是运行时的
+
+        ```ts
+        console.log('before');
+        import {a} from './a';
+        console.log('a after ' + a);
+        import {b} from './b';
+        console.log('b after ' + b);
+        console.log('after');
+
+        // a
+        export const a = 1;
+        console.log('run in a');
+        
+        // b
+        export const b = 1;
+        console.log('run in b');
+
+        ```
+
+        // 最后的输出结果为(因为import是编译时的，所以它会在所有语包之前就加载完成)：  
+        run in a  
+        run in b  
+        before  
+        a after 1  
+        b after 1  
+        after  
+
+    * import() 是运行时的，动态导入
+        1. 多次“运行”只导入一次
+        2. 如果import 与import() 同时存在，只会导入一次，且是import编译的那一次
+        3. import 与 import()导出的module，正常情况是相等的
+        4. 不能在model中export then函数，import()会运行它，产生import与import()不一至的结果
+
 16. （不建议使用)项目的第一层子目录中有index.ts  
     如name/，这样非目录导入也有效，import {x} frome 'name' 会查找name/目录下的内容。
     容易“隐藏”node_modules中包，所以不建议使用
@@ -725,16 +761,22 @@
 
 ### vue
 
-1. 建议使用setup来定义组件
+1. 单文件组件建议
 
     ```ts
     <template>
     </template>
 
     <script setup lang="ts">
-
+        const domRef = ref<HTMLInputElement|null>(null); //在这里不建议使用undefined
     </script>
+    <style lang="less">
+    <!-- 这里不建议使用 scoped，如果要使用给出充分的理由 -->
+    <!-- scoped的实现是在css名字加上一个唯一id,使用得css只在当前范围内有效 -->
+    </style>
     ```
+
+    [see](https://vuejs.org/api/sfc-script-setup#script-setup)  
 
 2. 建议使用ref而不使用reactive，因为reactive看起来像是使用普通变化，更容易发生错误的理解
 
