@@ -746,7 +746,10 @@
         1. 多次“运行”只导入一次
         2. 如果import 与import() 同时存在，只会导入一次，且是import编译的那一次
         3. import 与 import()导出的module，正常情况是相等的
-        4. 不能在model中export then函数，import()会运行它，产生import与import()不一至的结果
+        4. 不能在model中export then函数，import()会运行它，产生import与import()不一至的结果。  
+            如果有导出then函数，那么Promise在解析值时会检查是否有then方法（是否为thenable对象），如果是  
+            它会调用then方法，而在Promise.then方法却不会被调用  
+    * 禁止导出then方法，这会使import()方法产生可怪的结果，见上一条的说明  
 
 16. （不建议使用)项目的第一层子目录中有index.ts  
     如name/，这样非目录导入也有效，import {x} frome 'name' 会查找name/目录下的内容。
