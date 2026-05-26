@@ -1,11 +1,11 @@
 module github.com/scryinfo/scryg
 
-go 1.21
+go 1.26
 
 require (
-	github.com/google/uuid v1.3.0
-	github.com/oklog/ulid/v2 v2.1.0
-	github.com/stretchr/testify v1.8.4
+	github.com/google/uuid v1.6.0
+	github.com/oklog/ulid/v2 v2.1.1
+	github.com/stretchr/testify v1.11.1
 )
 
 require (

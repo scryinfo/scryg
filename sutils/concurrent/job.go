@@ -6,9 +6,9 @@ import (
 	"time"
 )
 
-/// 做一个job并等待超时，  如果duration时到还没有完成，会直接返回（但job依然在go routine中运行）
-/// 返回值 true, done, false time out
-/// duration 超时时间
+// / 做一个job并等待超时，  如果duration时到还没有完成，会直接返回（但job依然在go routine中运行）
+// / 返回值 true, done, false time out
+// / duration 超时时间
 func DoJobWaitTimeOut(job func(), duration time.Duration) bool {
 	done := false
 	closed := uint32(0)

@@ -8,10 +8,10 @@ import (
 	"os/signal"
 )
 
-//the return value indicates wether to wait for the signal agin. if it is true, it means waiting; if it is false, it means no waiting
+// the return value indicates wether to wait for the signal agin. if it is true, it means waiting; if it is false, it means no waiting
 type HandleSignal func(s os.Signal) bool
 
-//if the handle is empty or the return value of handle is false, please exsit waiting
+// if the handle is empty or the return value of handle is false, please exsit waiting
 func WaitSignal(handle HandleSignal, sig ...os.Signal) {
 	c := make(chan os.Signal)
 	signal.Notify(c, sig...)

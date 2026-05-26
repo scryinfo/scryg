@@ -9,7 +9,7 @@ import (
 	"unsafe"
 )
 
-//check if the final object pointed by interface is empty
+// check if the final object pointed by interface is empty
 func IsNil(any interface{}) bool {
 	re := true
 	if any != nil {
@@ -40,8 +40,8 @@ func IsNil(any interface{}) bool {
 	return re
 }
 
-//return the final type of t (non-pointer, non-interface)
-//todo test it
+// return the final type of t (non-pointer, non-interface)
+// todo test it
 func RealType(t interface{}) (ty reflect.Type) {
 	ty = nil
 	v := reflect.ValueOf(t)
@@ -61,7 +61,7 @@ func RealType(t interface{}) (ty reflect.Type) {
 
 // only support the field type of the pointer and interface
 // field is the type of the pointer and interface
-//newValue is the corresponding type
+// newValue is the corresponding type
 // the code depends on reflect.Value which contains the field name 'ptr'of pointer
 func SetPrivateField(field *reflect.Value, newValue interface{}) error {
 
@@ -115,7 +115,7 @@ func SetPrivateField(field *reflect.Value, newValue interface{}) error {
 	return err
 }
 
-//MergeClone marge and clone
+// MergeClone marge and clone
 func MergeClone(a []byte, b []byte) []byte {
 	var clone []byte
 	alen, blen := len(a), len(b)

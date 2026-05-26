@@ -21,7 +21,6 @@ import (
 	"crypto/aes"
 )
 
-//
 func encodeRsaPublic(data []byte, pubKey *rsa.PublicKey) (endata []byte, headLen int, err error) {
 	endata = nil
 	err = nil
@@ -215,14 +214,12 @@ func DecodeRsaPublic(endata []byte, pubKey *rsa.PublicKey, headLen int) (data []
 	return
 }
 
-//
 func PKCS5Padding(ciphertext []byte, blockSize int) []byte {
 	padding := blockSize - len(ciphertext)%blockSize
 	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
 	return append(ciphertext, padtext...)
 }
 
-//
 func PKCS5UnPadding(origData []byte) []byte {
 	length := len(origData)
 	unpadding := int(origData[length-1])
@@ -239,7 +236,7 @@ var (
 	errPrivateKey      = errors.New("get private key error")
 )
 
-//see  https://github.com/farmerx/gorsa
+// see  https://github.com/farmerx/gorsa
 func pubKeyByte(pub *rsa.PublicKey, in []byte, isEncrytp bool) ([]byte, error) {
 	k := (pub.N.BitLen() + 7) / 8
 	if isEncrytp {
@@ -261,7 +258,6 @@ func pubKeyByte(pub *rsa.PublicKey, in []byte, isEncrytp bool) ([]byte, error) {
 	}
 }
 
-//
 func priKeyByte(pri *rsa.PrivateKey, in []byte, isEncrytp bool) ([]byte, error) {
 	k := (pri.N.BitLen() + 7) / 8
 	if isEncrytp {
@@ -283,7 +279,6 @@ func priKeyByte(pri *rsa.PrivateKey, in []byte, isEncrytp bool) ([]byte, error) 
 	}
 }
 
-//
 func pubKeyIO(pub *rsa.PublicKey, in io.Reader, out io.Writer, isEncrytp bool) (err error) {
 	k := (pub.N.BitLen() + 7) / 8
 	if isEncrytp {
@@ -320,7 +315,6 @@ func pubKeyIO(pub *rsa.PublicKey, in io.Reader, out io.Writer, isEncrytp bool) (
 	return nil
 }
 
-//
 func priKeyIO(pri *rsa.PrivateKey, r io.Reader, w io.Writer, isEncrytp bool) (err error) {
 	k := (pri.N.BitLen() + 7) / 8
 	if isEncrytp {
@@ -357,7 +351,6 @@ func priKeyIO(pri *rsa.PrivateKey, r io.Reader, w io.Writer, isEncrytp bool) (er
 	return nil
 }
 
-//
 func pubKeyDecrypt(pub *rsa.PublicKey, data []byte) ([]byte, error) {
 	k := (pub.N.BitLen() + 7) / 8
 	if k != len(data) {
@@ -388,7 +381,6 @@ func pubKeyDecrypt(pub *rsa.PublicKey, data []byte) ([]byte, error) {
 	return d[i:], nil
 }
 
-//
 func priKeyEncrypt(rand io.Reader, priv *rsa.PrivateKey, hashed []byte) ([]byte, error) {
 	tLen := len(hashed)
 	k := (priv.N.BitLen() + 7) / 8
